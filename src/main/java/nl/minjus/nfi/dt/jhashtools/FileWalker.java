@@ -11,11 +11,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * This class offers a 'walker' that will go through a directory and offer
+ * the resulting files to one or more visitors.
  * @author kojak
  */
 public class FileWalker {
-    private final FileFilter fileFilter;
+    private FileFilter fileFilter;
     private final List<WalkerVisitor> visitors;
     private boolean abort = false;
 
@@ -27,6 +28,10 @@ public class FileWalker {
                 return true;
             }
         };
+    }
+
+    public void setFileFilter(FileFilter filter) {
+        this.fileFilter = filter;
     }
 
     public void addWalkerVisitor(WalkerVisitor visitor) {
