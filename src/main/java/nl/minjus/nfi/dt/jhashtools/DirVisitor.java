@@ -3,32 +3,42 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DirVisitor implements WalkerVisitor {
 
     private final Map<String, DigestsResults> resultMap;
-
-    private String algorithm;
+    private Set<String> algorithms;
 
     public DirVisitor() {
         resultMap = new HashMap<String, DigestsResults>();
-        this.algorithm = FileHasher.DEFAULT_ALGORITHM;
+        this.algorithms = new TreeSet<String>();
+        this.algorithms.add(FileHasher.DEFAULT_ALGORITHM);
+    }
+
+    public DirVisitor(Collection<String> algorithms) {
+        resultMap = new HashMap<String, DigestsResults>();
+        this.algorithms = new TreeSet<String>(algorithms);
     }
 
     public DirVisitor(String algorithm) {
         resultMap = new HashMap<String, DigestsResults>();
-        this.algorithm = algorithm;
+        this.algorithms = new TreeSet<String>();
+        this.algorithms.add(algorithm);
     }
 
     @Override
     public boolean visit(File theFile) {
         try {
-            byte[] digest = FileHasher.computeDigest(theFile, this.algorithm);
-            DigestsResults res = new DigestsResults(FileHasher.DEFAULT_ALGORITHM, digest);
+            DigestsResults res = FileHasher.computeDigest(theFile, this.algorithms);
             resultMap.put(theFile.toString(), res);
         } catch (FileNotFoundException ex) {
             // ignore

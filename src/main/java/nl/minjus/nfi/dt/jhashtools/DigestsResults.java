@@ -25,6 +25,15 @@ public class DigestsResults {
         this.results = new HashMap<String, byte[]>();
         this.results.put(algorithm, value);
     }
+
+    public boolean containsResult(String key) {
+        return this.results.containsKey(key);
+    }
+
+    public int size() {
+        return this.results.size();
+    }
+
     public byte[] getDigest(String key) {
         return this.results.get(key);
     }
@@ -35,5 +44,9 @@ public class DigestsResults {
 
     public void setDigest(String digestName, byte[] value) {
         this.results.put(digestName, value);
+    }
+
+    public byte[] digest() {
+        return results.values().iterator().next();
     }
 }

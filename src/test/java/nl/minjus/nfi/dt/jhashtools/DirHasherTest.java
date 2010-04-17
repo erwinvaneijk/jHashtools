@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
  */
 public class DirHasherTest {
 
-    private final Map<Integer, String> knownDigests = KnownDigests.getKnownDigests();
+    private final Map<Integer, String> knownDigests = KnownDigests.getKnownDigests().get("sha-256");
 
     public DirHasherTest() {
     }
