@@ -80,7 +80,7 @@ public class FileHasher {
 
         DigestsResults res = new DigestsResults();
         for (MessageDigest digest : digests) {
-            res.setDigest(digest.getAlgorithm(), digest.digest());
+            res.setDigest(digest.getAlgorithm(), new Digest(digest.digest()));
         }
         return res;
     }

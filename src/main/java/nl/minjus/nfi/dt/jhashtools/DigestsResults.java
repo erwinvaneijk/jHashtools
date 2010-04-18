@@ -15,14 +15,14 @@ import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
  */
 public class DigestsResults {
 
-    private Map<String, byte[]> results;
+    private Map<String, Digest> results;
 
     public DigestsResults() {
-        this.results = new HashMap<String, byte[]>();
+        this.results = new HashMap<String, Digest>();
     }
 
-    public DigestsResults(String algorithm, byte[] value) {
-        this.results = new HashMap<String, byte[]>();
+    public DigestsResults(String algorithm, Digest value) {
+        this.results = new HashMap<String, Digest>();
         this.results.put(algorithm, value);
     }
 
@@ -34,19 +34,19 @@ public class DigestsResults {
         return this.results.size();
     }
 
-    public byte[] getDigest(String key) {
+    public Digest getDigest(String key) {
         return this.results.get(key);
     }
     
     public String getHexDigest(String digestName) {
-        return StringOperations.hexify(this.results.get(digestName));
+        return this.results.get(digestName).toHex();
     }
 
-    public void setDigest(String digestName, byte[] value) {
+    public void setDigest(String digestName, Digest value) {
         this.results.put(digestName, value);
     }
 
-    public byte[] digest() {
+    public Digest digest() {
         return results.values().iterator().next();
     }
 }

@@ -50,4 +50,15 @@ public class DirHasher {
         walker.walk(startFile);
         return visitor.getResults();
     }
+
+    void updateDigests(Map<String, DigestsResults> digests, File file) {
+        if (! file.exists()) {
+            throw new IllegalArgumentException(String.format("File %s does not exist", file.toString()));
+        }
+
+        FileWalker walker = new FileWalker();
+        DirVisitor visitor = new DirVisitor(algorithms, digests);
+        walker.addWalkerVisitor(visitor);
+        walker.walk(file);
+    }
 }

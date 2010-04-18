@@ -35,6 +35,11 @@ public class DirVisitor implements WalkerVisitor {
         this.algorithms.add(algorithm);
     }
 
+    DirVisitor(Collection<String> algorithms, Map<String, DigestsResults> digests) {
+        resultMap = digests;
+        this.algorithms = new TreeSet<String>(algorithms);
+    }
+
     @Override
     public boolean visit(File theFile) {
         try {

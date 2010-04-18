@@ -69,7 +69,7 @@ public class FileHasherTest {
         try {
             String expResult = expectedDigests.get(1);
             DigestsResults results = FileHasher.computeDigest(this.testFile);
-            String result = StringOperations.hexify(results.digest());
+            String result = results.digest().toHex();
             assertEquals(expResult, result);
         } catch (FileNotFoundException ex) {
             fail(ex.toString());
