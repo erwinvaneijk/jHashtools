@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -19,17 +20,17 @@ import java.util.TreeSet;
  */
 public class DirHasher {
 
-    private Map<String, DigestsResults> results;
+    private DirHasherResult results;
 
     private Set<String> algorithms;
 
     public DirHasher() {
-        results = new HashMap<String, DigestsResults>();
+        results = new DirHasherResult();
         algorithms = new TreeSet<String>();
     }
 
     public DirHasher(String algorithm) {
-        results = new HashMap<String, DigestsResults>();
+        results = new DirHasherResult();
         algorithms = new TreeSet<String>();
         algorithms.add(algorithm);
     }
@@ -38,7 +39,7 @@ public class DirHasher {
         algorithms.add(algorithm);
     }
 
-    public Map<String, DigestsResults> getDigests(final File startFile) {
+    public DirHasherResult getDigests(final File startFile) {
 
         if (! startFile.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", startFile.toString()));
@@ -51,7 +52,7 @@ public class DirHasher {
         return visitor.getResults();
     }
 
-    void updateDigests(Map<String, DigestsResults> digests, File file) {
+    public void updateDigests(DirHasherResult digests, File file) {
         if (! file.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", file.toString()));
         }

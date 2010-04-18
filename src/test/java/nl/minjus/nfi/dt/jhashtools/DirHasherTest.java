@@ -45,7 +45,7 @@ public class DirHasherTest {
     @Test
     public void testGetDigests() {
         DirHasher dirHasher = new DirHasher("sha-256");
-        Map<String, DigestsResults> digests = dirHasher.getDigests(new File("testdata"));
+        Map<String, DigestResult> digests = dirHasher.getDigests(new File("testdata"));
         assertEquals(knownDigests.size(), digests.size());
         for (Integer k: this.knownDigests.keySet()) {
             String filename = String.format("testdata/testfile%d.bin", k);
@@ -60,7 +60,7 @@ public class DirHasherTest {
     public void testGetDirectoryDigestRaisedIllegalArgument() {
         try {
             DirHasher dirHasher = new DirHasher("sha-256");
-            Map<String, DigestsResults> digests = dirHasher.getDigests(new File("does-not-exist"));
+            Map<String, DigestResult> digests = dirHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
         } catch (IllegalArgumentException ex) {
             // everything is ok.

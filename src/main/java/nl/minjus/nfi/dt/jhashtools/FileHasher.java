@@ -22,19 +22,19 @@ public class FileHasher {
     public static final String DEFAULT_ALGORITHM = "sha-256";
     private List<MessageDigest> digests;
 
-    public static DigestsResults computeDigest(File file, String algorithm)
+    public static DigestResult computeDigest(File file, String algorithm)
             throws FileNotFoundException, IOException {
         FileHasher hasher = new FileHasher(algorithm);
         return hasher.getDigest(file);
     }
 
-    public static DigestsResults computeDigest(File file, Collection<String> algorithms)
+    public static DigestResult computeDigest(File file, Collection<String> algorithms)
             throws FileNotFoundException, IOException {
         FileHasher hasher = new FileHasher(algorithms);
         return hasher.getDigest(file);
     }
 
-    public static DigestsResults computeDigest(File file)
+    public static DigestResult computeDigest(File file)
             throws IOException, FileNotFoundException {
         return FileHasher.computeDigest(file, "sha-256");
     }
@@ -59,7 +59,7 @@ public class FileHasher {
         }
     }
 
-    public DigestsResults getDigest(File file) throws FileNotFoundException, IOException {
+    public DigestResult getDigest(File file) throws FileNotFoundException, IOException {
         if (!file.exists()) {
             throw new FileNotFoundException(String.format("File %s does not exist", file.toString()));
         }
@@ -78,9 +78,9 @@ public class FileHasher {
             stream.close();
         }
 
-        DigestsResults res = new DigestsResults();
+        DigestResult res = new DigestResult();
         for (MessageDigest digest : digests) {
-            res.setDigest(digest.getAlgorithm(), new Digest(digest.digest()));
+            res.add(new Digest(digest.getAlgorithm(), digest.digest()));
         }
         return res;
     }

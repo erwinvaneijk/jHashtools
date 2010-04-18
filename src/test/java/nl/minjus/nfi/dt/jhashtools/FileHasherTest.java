@@ -50,7 +50,7 @@ public class FileHasherTest {
         try {
             FileHasher instance = new FileHasher(FileHasher.DEFAULT_ALGORITHM);
             String expResult = expectedDigests.get(1);
-            DigestsResults results = instance.getDigest(this.testFile);
+            DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
             assertNotNull(results.getDigest(FileHasher.DEFAULT_ALGORITHM));
             String digest = results.getHexDigest(FileHasher.DEFAULT_ALGORITHM);
@@ -68,7 +68,7 @@ public class FileHasherTest {
         System.out.println("computeDigest");
         try {
             String expResult = expectedDigests.get(1);
-            DigestsResults results = FileHasher.computeDigest(this.testFile);
+            DigestResult results = FileHasher.computeDigest(this.testFile);
             String result = results.digest().toHex();
             assertEquals(expResult, result);
         } catch (FileNotFoundException ex) {

@@ -11,17 +11,28 @@ import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
  *
  * @author kojak
  */
-public class Digest {
+public class Digest implements Comparable<Digest> {
     private byte[] content;
+    private String algorithm;
 
-    public Digest(byte[] value) {
+    public Digest(String algorithm, byte[] value) {
         this.content = value;
+        this.algorithm = algorithm;
     }
 
-    public Digest(String value) {
-        throw new UnsupportedOperationException();
+    public Digest(String algorithm, String hexValue) {
+        this.algorithm = algorithm;
+        this.content = StringOperations.hexToBytes(hexValue);
     }
 
+    public void setAlgorithm(final String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public String getAlgorithm() {
+        return this.algorithm;
+    }
+    
     public void setContent(byte[] value) {
         this.content = value;
     }
@@ -34,7 +45,37 @@ public class Digest {
         return StringOperations.hexify(content);
     }
     
+    @Override
     public String toString() {
         return StringOperations.hexify(content);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o!=null) && (o instanceof Digest)) {
+            Digest digest = (Digest) o;
+            return (this.algorithm.equals(digest.algorithm) && (this.content.equals(digest.content)));
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int compareTo(Digest o) {
+        if (! this.algorithm.equals(o.algorithm)) {
+            return this.algorithm.compareTo(o.algorithm);
+        }
+
+        for (int i=0; i<Math.min(this.content.length, o.content.length); i++) {
+            if (this.content[i] < o.content[i]) {
+                return 1;
+            } else if (this.content[i] > o.content[i]) {
+                return -1;
+            }
+        }
+        if (this.content.length == o.content.length)
+            return 0;
+        else
+            return this.content.length - o.content.length;
     }
 }

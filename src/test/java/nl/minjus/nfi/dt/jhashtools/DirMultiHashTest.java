@@ -47,7 +47,7 @@ public class DirMultiHashTest {
         DirHasher dirHasher = new DirHasher();
         dirHasher.addAlgorithm("sha-256");
         dirHasher.addAlgorithm("sha-1");
-        Map<String, DigestsResults> digests = dirHasher.getDigests(new File("testdata"));
+        Map<String, DigestResult> digests = dirHasher.getDigests(new File("testdata"));
         assertEquals(10, digests.size());
         assertEquals(knownDigests.size(), 2);
         assertEquals(knownDigests.get("sha-256").size(), digests.size());
