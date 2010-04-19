@@ -9,10 +9,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,14 @@ public class FileHasherTest {
     private File testFile;
 
     public FileHasherTest() {
-        expectedDigests = KnownDigests.getKnownDigests().get(FileHasher.DEFAULT_ALGORITHM);
+        DirHasherResult result = KnownDigests.getKnownResults();
+        expectedDigests = new TreeMap<Integer, String>();
+        int i = 1;
+        for (Map.Entry<String, DigestResult> entry: result.entrySet()) {
+            System.err.printf("Adding %d to %s\n", i, entry.getValue());
+            expectedDigests.put(i, entry.getValue().getHexDigest(FileHasher.DEFAULT_ALGORITHM));
+            i += 1;
+        }
     }
 
     @Before

@@ -2,6 +2,7 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
+import java.util.Collection;
 import java.util.TreeSet;
 
 /**
@@ -17,6 +18,11 @@ public class DigestResult extends TreeSet<Digest> {
         this.add(value);
     }
 
+    public DigestResult(Collection<Digest> coll) {
+        for (Digest d : coll) {
+            this.add(d);
+        }
+    }
     public boolean containsResult(String key) {
         for (Digest e : this) {
             if (e.getAlgorithm().equals(key)) {
@@ -57,6 +63,30 @@ public class DigestResult extends TreeSet<Digest> {
                 }
             }
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * matches returns true if the digests available on both
+     * arguments (this) and (o) are equal. If a digest algorithm on one
+     * side is available, that is not available on the other it is not
+     * compared.
+     *
+     * When there is no match in algorithm, matches returns false.
+     *
+     * @param other
+     * @return
+     */
+    boolean matches(DigestResult o) {
+        if ((o != null) && (o instanceof DigestResult)) {
+            DigestResult other = (DigestResult) o;
+            boolean found = false;
+            for (Digest d : this) {
+                found = found || other.contains(d);
+            }
+            return found;
         } else {
             return false;
         }

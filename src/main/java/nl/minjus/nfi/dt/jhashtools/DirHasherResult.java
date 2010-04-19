@@ -13,6 +13,14 @@ import java.util.TreeMap;
  */
 public class DirHasherResult extends TreeMap<String, DigestResult> {
 
+
+    public DirHasherResult getByAlgorithm(String algorithm) {
+        DirHasherResult result = new DirHasherResult();
+        for (Map.Entry<String, DigestResult> entry: this.entrySet()) {
+            result.put(entry.getKey(), new DigestResult(entry.getValue().getDigest(algorithm)));
+        }
+        return result;
+    }
     /**
      * Exclude all entries that are in o from this set and return
      * the resulting set.
@@ -64,9 +72,9 @@ public class DirHasherResult extends TreeMap<String, DigestResult> {
         DirHasherResult result = new DirHasherResult();
         for (Map.Entry<String, DigestResult> entry : this.entrySet()) {
             String key = entry.getKey();
-            DigestResult value = entry.getValue();
-            if (o.containsKey(key) && value.equals(o.get(key))) {
-                result.put(key, value);
+            DigestResult digestForKey = entry.getValue();
+            if (o.containsKey(key) && digestForKey.matches(o.get(key))) {
+                result.put(key, digestForKey);
             }
         }
         return result;
@@ -78,7 +86,7 @@ public class DirHasherResult extends TreeMap<String, DigestResult> {
      * @param digests
      * @return
      */
-    DirHasherResult notIntersect(DirHasherResult o) {
+    public DirHasherResult notIntersect(DirHasherResult o) {
         DirHasherResult result = new DirHasherResult();
         for (Map.Entry<String, DigestResult> entry : this.entrySet()) {
             String key = entry.getKey();

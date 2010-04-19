@@ -20,10 +20,10 @@ import static org.junit.Assert.*;
  */
 public class DirMultiHashTest {
 
-    Map<String, Map<Integer, String>> knownDigests;
+    DirHasherResult knownDigests;
 
     public DirMultiHashTest() {
-        this.knownDigests = KnownDigests.getKnownDigests();
+        this.knownDigests = KnownDigests.getKnownResults();
     }
 
     @BeforeClass
@@ -47,23 +47,24 @@ public class DirMultiHashTest {
         DirHasher dirHasher = new DirHasher();
         dirHasher.addAlgorithm("sha-256");
         dirHasher.addAlgorithm("sha-1");
-        Map<String, DigestResult> digests = dirHasher.getDigests(new File("testdata"));
+        dirHasher.addAlgorithm("md5");
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
         assertEquals(10, digests.size());
-        assertEquals(knownDigests.size(), 2);
-        assertEquals(knownDigests.get("sha-256").size(), digests.size());
-        assertEquals(knownDigests.get("sha-1").size(), digests.size());
+        assertEquals(knownDigests.size(), 10);
+        assertEquals(knownDigests.getByAlgorithm("sha-256").size(), digests.size());
+        assertEquals(knownDigests.getByAlgorithm("sha-1").size(), digests.size());
+        assertEquals(knownDigests.getByAlgorithm("md5").size(), digests.size());
+        assertEquals(digests.getByAlgorithm("md5").size(), digests.size());
+        assertEquals(digests.getByAlgorithm("sha-256").size(), digests.size());
+        assertEquals(digests.getByAlgorithm("sha-1").size(), digests.size());
 
-        for (Map.Entry<String, Map<Integer, String>> entry : knownDigests.entrySet()) {
-            String algorithm = entry.getKey();
-            Map<Integer, String> knownAlgorithmDigests = entry.getValue();
-            for (Map.Entry<Integer, String> fileDigestPair : knownAlgorithmDigests.entrySet()) {
-                int k = fileDigestPair.getKey();
-                String expectedDigest = fileDigestPair.getValue();
-                String filename = String.format("testdata/testfile%d.bin", k);
-                assertTrue("The filename should exist in the map", digests.containsKey(filename));
-                assertEquals(String.format("%s has wrong %s digest", algorithm, filename),
-                        expectedDigest,
-                        digests.get(filename).getHexDigest(algorithm));
+        for (Map.Entry<String, DigestResult> entry : knownDigests.entrySet()) {
+            String filename = entry.getKey();
+            DigestResult knownResults = entry.getValue();
+            assertTrue(digests.containsKey(filename));
+            DigestResult foundResults = digests.get(filename);
+            for (Digest digest : knownResults) {
+                assertTrue(digest.toString(), foundResults.contains(digest));
             }
         }
     }

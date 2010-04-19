@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
  */
 public class DirHasherTest {
 
-    private final Map<Integer, String> knownDigests = KnownDigests.getKnownDigests().get("sha-256");
+    private final DirHasherResult knownDigests = KnownDigests.getKnownResults();
 
     public DirHasherTest() {
     }
@@ -45,15 +45,31 @@ public class DirHasherTest {
     @Test
     public void testGetDigests() {
         DirHasher dirHasher = new DirHasher("sha-256");
-        Map<String, DigestResult> digests = dirHasher.getDigests(new File("testdata"));
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
         assertEquals(knownDigests.size(), digests.size());
-        for (Integer k: this.knownDigests.keySet()) {
-            String filename = String.format("testdata/testfile%d.bin", k);
-            assertTrue("The filename should exist in the map", digests.containsKey(filename));
-            assertEquals(String.format("%s has wrong digest", filename),
-                    this.knownDigests.get(k), 
-                    digests.get(filename).getHexDigest(FileHasher.DEFAULT_ALGORITHM));
-        }
+        DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
+        assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
+        assertEquals(knownDigests, digests.intersect(knownDigests));
+    }
+
+    @Test
+    public void testGetMd5Digests() {
+        DirHasher dirHasher = new DirHasher("md5");
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+        assertEquals(knownDigests.size(), digests.size());
+        DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
+        assertEquals(knownDigestMd5, digests.intersect(knownDigestMd5));
+        assertEquals(knownDigests, digests.intersect(knownDigests));
+    }
+
+    @Test
+    public void testGetShaDigests() {
+        DirHasher dirHasher = new DirHasher("sha-1");
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+        assertEquals(knownDigests.size(), digests.size());
+        DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
+        assertEquals(knownDigestSha, digests.intersect(knownDigestSha));
+        assertEquals(knownDigests, digests.intersect(knownDigests));
     }
 
     @Test

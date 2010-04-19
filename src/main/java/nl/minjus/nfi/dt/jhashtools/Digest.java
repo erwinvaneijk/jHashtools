@@ -47,7 +47,7 @@ public class Digest implements Comparable<Digest> {
     
     @Override
     public String toString() {
-        return StringOperations.hexify(content);
+        return this.algorithm + ":" + StringOperations.hexify(content);
     }
 
     @Override

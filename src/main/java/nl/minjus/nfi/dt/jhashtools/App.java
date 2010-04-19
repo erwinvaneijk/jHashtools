@@ -135,6 +135,7 @@ public class App
 
         Options options = new Options();
 
+        options.addOption("h", "help", false, "Get help on the supported commandline options");
         options.addOption("2", "sha-256", false, "Output a sha-256 digest (Default if none given)");
         options.addOption("1", "sha-1", false, "Output a sha-1 digest");
         options.addOption(null, "sha-512", false, "Output a sha-512 digest");
@@ -153,10 +154,15 @@ public class App
         CommandLine line;
         try {
             line = parser.parse(options, args);
+            if (line.hasOption("help")) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("hashtree [options] dir [dir...]", options);
+                System.exit(0);
+            }
         } catch (ParseException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("hashtree", options);
+            formatter.printHelp("hashtree [options] dir [dir...]", options);
             return null;
         }
         return line;
