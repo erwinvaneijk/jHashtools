@@ -21,6 +21,7 @@ public class DirHasherResult extends TreeMap<String, DigestResult> {
         }
         return result;
     }
+
     /**
      * Exclude all entries that are in o from this set and return
      * the resulting set.
@@ -73,8 +74,13 @@ public class DirHasherResult extends TreeMap<String, DigestResult> {
         for (Map.Entry<String, DigestResult> entry : this.entrySet()) {
             String key = entry.getKey();
             DigestResult digestForKey = entry.getValue();
-            if (o.containsKey(key) && digestForKey.matches(o.get(key))) {
-                result.put(key, digestForKey);
+            if (o.containsKey(key)) {
+                DigestResult otherKey = o.get(key);
+                if (digestForKey.matches(otherKey)) {
+                    result.put(key, digestForKey);
+                } else if (otherKey.matches(digestForKey)) {
+                    result.put(key, otherKey);
+                }
             }
         }
         return result;

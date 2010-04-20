@@ -169,7 +169,7 @@ public class App
     }
 
     private static void verifyDigests(PrintStream out, DirHasherResult origDigests, DirHasherResult digests) {
-        DirHasherResult differences = origDigests.notIntersect(digests);
+        DirHasherResult differences = digests.notIntersect(origDigests);
         if (differences.size() == 0) {
             out.println("There are no differences");
         }
