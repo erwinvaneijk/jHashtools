@@ -42,7 +42,6 @@ public class StringOperationsTest {
      */
     @Test
     public void testHexify() {
-        System.out.println("hexify");
         byte[] buf = new byte[] { 0x10, 0x11, 0x12, 0x13 };
         String expResult = "10111213";
         String result = StringOperations.hexify(buf);

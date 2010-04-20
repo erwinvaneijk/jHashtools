@@ -63,6 +63,15 @@ public class DirHasherTest {
     }
 
     @Test
+    public void testGetDigestsExclude() {
+        DirHasher dirHasher = new DirHasher("sha-256");
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+        assertEquals(knownDigests.size(), digests.size());
+        DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
+        assertEquals(0, digests.exclude(knownDigestSha256).size());
+    }
+    
+    @Test
     public void testGetMd5Digests() {
         DirHasher dirHasher = new DirHasher("md5");
         DirHasherResult digests = dirHasher.getDigests(new File("testdata"));

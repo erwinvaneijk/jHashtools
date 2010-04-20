@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersister;
@@ -68,9 +69,13 @@ public class App
             directoryHasher = new DirHasher();
         }
 
+        if (line.hasOption("verbose")) {
+            directoryHasher.setVerbose(true);
+        }
+        
         DirHasherResult digests = new DirHasherResult();
         for (String filename: filesToProcess) {
-            System.out.printf("Handling %s\n", filename);
+            Logger.getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
             directoryHasher.updateDigests(digests, new File(filename));
         }
 
@@ -141,6 +146,7 @@ public class App
         options.addOption(null, "sha-512", false, "Output a sha-512 digest");
         options.addOption(null, "md5", false, "Output a md5 digest");
         options.addOption(null, "ripemd", false, "Output a ripemd digest");
+        options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption(OptionBuilder.withLongOpt("output")
                 .withDescription("The file the output is written to")
                 .hasArg()
@@ -171,7 +177,23 @@ public class App
     private static void verifyDigests(PrintStream out, DirHasherResult origDigests, DirHasherResult digests) {
         DirHasherResult differences = digests.notIntersect(origDigests);
         if (differences.size() == 0) {
-            out.println("There are no differences");
+            out.println("There are no differences.");
+        } else {
+            if (differences.containsKey("./hashes.txt")) {
+                out.println("There are no differences.");
+                out.println("hashes.txt:");
+                for (Digest d: differences.get("./hashes.txt")) {
+                    out.printf("\t%s\n", d.toString());
+                }
+            } else {
+                out.println("There are differences.");
+                for (Map.Entry<String, DigestResult> entry: differences.entrySet()) {
+                    out.println(entry.getKey());
+                    for (Digest d: entry.getValue()) {
+                        out.printf("\t%s\n", d.toString());
+                    }
+                }
+            }
         }
     }
 }

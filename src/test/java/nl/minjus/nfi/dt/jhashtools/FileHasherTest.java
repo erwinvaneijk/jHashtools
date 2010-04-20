@@ -33,7 +33,6 @@ public class FileHasherTest {
         expectedDigests = new TreeMap<Integer, String>();
         int i = 1;
         for (Map.Entry<String, DigestResult> entry: result.entrySet()) {
-            System.err.printf("Adding %d to %s\n", i, entry.getValue());
             expectedDigests.put(i, entry.getValue().getHexDigest(FileHasher.DEFAULT_ALGORITHM));
             i += 1;
         }
@@ -53,7 +52,6 @@ public class FileHasherTest {
      */
     @Test
     public void testGetDigest() {
-        System.out.println("getDigest");
         try {
             FileHasher instance = new FileHasher(FileHasher.DEFAULT_ALGORITHM);
             String expResult = expectedDigests.get(1);
@@ -72,7 +70,6 @@ public class FileHasherTest {
 
     @Test
     public void testComputeDigest() {
-        System.out.println("computeDigest");
         try {
             String expResult = expectedDigests.get(1);
             DigestResult results = FileHasher.computeDigest(this.testFile);

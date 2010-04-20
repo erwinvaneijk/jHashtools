@@ -23,6 +23,7 @@ public class DirHasher {
     private DirHasherResult results;
 
     private Set<String> algorithms;
+    private boolean verbose;
 
     public DirHasher() {
         results = new DirHasherResult();
@@ -46,7 +47,7 @@ public class DirHasher {
         }
 
         FileWalker walker = new FileWalker();
-        DirVisitor visitor = new DirVisitor(algorithms);
+        DirVisitor visitor = new DirVisitor(algorithms, this.verbose);
         walker.addWalkerVisitor(visitor);
         walker.walk(startFile);
         return visitor.getResults();
@@ -59,7 +60,16 @@ public class DirHasher {
 
         FileWalker walker = new FileWalker();
         DirVisitor visitor = new DirVisitor(algorithms, digests);
+        visitor.setVerbose(this.verbose);
         walker.addWalkerVisitor(visitor);
         walker.walk(file);
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    public boolean getVerbose() {
+        return this.verbose;
     }
 }

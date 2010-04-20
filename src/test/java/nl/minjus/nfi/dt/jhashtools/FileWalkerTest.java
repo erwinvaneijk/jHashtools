@@ -43,7 +43,6 @@ public class FileWalkerTest {
      */
     @Test
     public void testAddWalkerVisitor() {
-        System.out.println("addWalkerVisitor");
         WalkerVisitor visitor = null;
         FileWalker instance = new FileWalker();
         instance.addWalkerVisitor(visitor);
@@ -56,7 +55,6 @@ public class FileWalkerTest {
      */
     @Test
     public void testWalkWithUnknownFile() {
-        System.out.println("walk");
         File file = new File("unknown");
         FileWalker instance = new FileWalker();
         boolean expResult = true;
@@ -86,7 +84,6 @@ public class FileWalkerTest {
      */
     @Test
     public void testWalkWithKnownDirStructure() {
-        System.out.println("walkWithKnownStructure");
         File file = new File("testdata");
         FileWalker instance = new FileWalker();
         WalkerVisitorImpl visitor = new WalkerVisitorImpl();

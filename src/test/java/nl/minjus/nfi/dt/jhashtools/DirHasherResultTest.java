@@ -56,7 +56,6 @@ public class DirHasherResultTest {
      */
     @Test
     public void testExclude() {
-        System.out.println("exclude");
         DirHasherResult result = setOne.exclude(setTwo);
         assertEquals(0, result.size());
     }

@@ -57,7 +57,6 @@ public class JsonPersisterTest {
     @Test
     public void testPersist() {
         try {
-            System.out.println("persist");
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             DigestResult obj = new DigestResult();
             Digest d = new Digest("sha-1", "0000111122223333444455556666777788889999aaaa");
@@ -76,7 +75,6 @@ public class JsonPersisterTest {
      */
     @Test
     public void testLoad() {
-        System.out.println("load");
         InputStream stream = new ByteArrayInputStream(this.testDigestResultInJson.getBytes());
         Class<DigestResult> clazz = DigestResult.class;
         JsonPersister instance = new JsonPersister();
@@ -89,8 +87,6 @@ public class JsonPersisterTest {
     @Test
     public void testPersistDirHasherResult() {
         try {
-            System.out.println("persist");
-            
             Digest d = new Digest("sha-1", "0000111122223333444455556666777788889999aaaa");
             DigestResult digestResult = new DigestResult();
             digestResult.add(d);
@@ -110,7 +106,6 @@ public class JsonPersisterTest {
 
     @Test
     public void testLoadDirHasherResult() {
-        System.out.println("loadDirHasherResult");
         InputStream stream = new ByteArrayInputStream(this.testDirHasherResultInJson.getBytes());
         Class<DirHasherResult> clazz = DirHasherResult.class;
         JsonPersister instance = new JsonPersister();
