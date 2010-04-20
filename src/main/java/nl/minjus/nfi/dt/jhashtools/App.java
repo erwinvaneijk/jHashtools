@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersister;
 import nl.minjus.nfi.dt.jhashtools.persistence.Persist;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;

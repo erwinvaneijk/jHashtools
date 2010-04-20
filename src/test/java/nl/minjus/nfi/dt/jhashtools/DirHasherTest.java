@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
@@ -49,7 +48,7 @@ public class DirHasherTest {
         assertEquals(knownDigests.size(), digests.size());
         DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
         assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
-        assertEquals(knownDigests, digests.intersect(knownDigests));
+        assertEquals(digests, digests.intersect(knownDigests));
     }
 
     @Test
@@ -59,7 +58,7 @@ public class DirHasherTest {
         assertEquals(knownDigests.size(), digests.size());
         DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
         assertEquals(knownDigestMd5, digests.intersect(knownDigestMd5));
-        assertEquals(knownDigests, digests.intersect(knownDigests));
+        assertEquals(digests, digests.intersect(knownDigests));
     }
 
     @Test
@@ -69,7 +68,29 @@ public class DirHasherTest {
         assertEquals(knownDigests.size(), digests.size());
         DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
         assertEquals(knownDigestSha, digests.intersect(knownDigestSha));
-        assertEquals(knownDigests, digests.intersect(knownDigests));
+        assertEquals(digests, digests.intersect(knownDigests));
+    }
+
+    @Test
+    public void testGetTwoOutOfThreeDigests() {
+        DirHasher dirHasher = new DirHasher("sha-256");
+        dirHasher.addAlgorithm("md5");
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+        assertEquals(knownDigests.size(), digests.size());
+        DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
+        assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
+        assertEquals(digests, digests.intersect(knownDigests));
+    }
+
+    @Test
+    public void testGetThreeOutOfThreeDigests() {
+        DirHasher dirHasher = new DirHasher("sha-256");
+        dirHasher.addAlgorithm("md5");
+        dirHasher.addAlgorithm("sha-1");
+
+        DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+        assertEquals(knownDigests.size(), digests.size());
+        assertEquals(digests, digests.intersect(knownDigests));
     }
 
     @Test

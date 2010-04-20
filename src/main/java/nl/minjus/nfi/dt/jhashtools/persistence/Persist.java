@@ -5,6 +5,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import java.io.InputStream;
 import java.io.OutputStream;
 

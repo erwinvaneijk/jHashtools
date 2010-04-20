@@ -5,6 +5,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

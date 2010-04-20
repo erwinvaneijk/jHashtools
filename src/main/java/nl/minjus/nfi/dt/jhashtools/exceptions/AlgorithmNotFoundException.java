@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.exceptions;
 
 /**
  *
  * @author eijk
  */
-class AlgorithmNotFoundException extends RuntimeException {
+public class AlgorithmNotFoundException extends RuntimeException {
 
     public AlgorithmNotFoundException() {
     }

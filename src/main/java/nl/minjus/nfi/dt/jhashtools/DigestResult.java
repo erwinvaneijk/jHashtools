@@ -2,6 +2,7 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
+import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -83,8 +84,8 @@ public class DigestResult extends TreeSet<Digest> {
         if ((o != null) && (o instanceof DigestResult)) {
             DigestResult other = (DigestResult) o;
             boolean found = false;
-            for (Digest d : this) {
-                found = found || other.contains(d);
+            for (Digest d : other) {
+                found = found || this.contains(d);
             }
             return found;
         } else {

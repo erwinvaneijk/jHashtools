@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package nl.minjus.nfi.dt.jhashtools.persistence;
+package nl.minjus.nfi.dt.jhashtools.exceptions;
 
 /**
  *
