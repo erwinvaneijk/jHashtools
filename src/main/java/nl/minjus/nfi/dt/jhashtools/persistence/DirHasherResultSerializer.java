@@ -16,6 +16,7 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
+import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
@@ -31,6 +32,8 @@ public class DirHasherResultSerializer
     @Override
     public JsonElement serialize(DirHasherResult src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject map = new JsonObject();
+        JsonElement constructionInfo = context.serialize(src.getConstructionInfo());
+        map.add("constructionInfo", constructionInfo);
         for (Map.Entry<String, DigestResult> entry: src.entrySet()) {
             JsonElement valueElement = context.serialize(entry.getValue(), DigestResult.class);
             map.add(entry.getKey(), valueElement);
@@ -45,10 +48,16 @@ public class DirHasherResultSerializer
         JsonObject object = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry: object.entrySet()) {
             JsonElement e = entry.getValue();
-            Type digestResultType = new TypeToken<DigestResult>() {}.getType();
-            DigestResult result = context.deserialize(e, digestResultType);
-            String key = entry.getKey();
-            dirHasherResult.put(key, result);
+            if (entry.getKey().equals("constructionInfo")) {
+                Type constructionInfoType = new TypeToken<ConstructionInfo>() {}.getType();
+                ConstructionInfo info = context.deserialize(e, constructionInfoType);
+                dirHasherResult.setConstructionInfo(info);
+            } else {
+                Type digestResultType = new TypeToken<DigestResult>() {}.getType();
+                DigestResult result = context.deserialize(e, digestResultType);
+                String key = entry.getKey();
+                dirHasherResult.put(key, result);
+            }
         }
         return dirHasherResult;
     }

@@ -98,7 +98,9 @@ public class JsonPersisterTest {
             instance.persist(out, obj);
             String str = out.toString();
 
-            assertEquals(this.testDirHasherResultInJson, str);
+            InputStream stream = new ByteArrayInputStream(str.getBytes());
+            DirHasherResult res = (DirHasherResult) instance.load(stream, DirHasherResult.class);
+            assertEquals(obj, res);
         } catch (PersistenceException ex) {
             fail("Persistence not good.");
         }

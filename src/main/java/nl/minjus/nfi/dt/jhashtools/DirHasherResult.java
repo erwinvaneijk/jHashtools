@@ -13,7 +13,21 @@ import java.util.TreeMap;
  */
 public class DirHasherResult extends TreeMap<String, DigestResult> {
 
+    private ConstructionInfo constructionInfo;
 
+    /**
+     * Constructor.
+     */
+    public DirHasherResult() {
+        this.constructionInfo = new ConstructionInfo();
+    }
+
+    /**
+     * Get the results by using only the algorithm mentioned.
+     * 
+     * @param algorithm the algorithm to look for.
+     * @return
+     */
     public DirHasherResult getByAlgorithm(String algorithm) {
         DirHasherResult result = new DirHasherResult();
         for (Map.Entry<String, DigestResult> entry: this.entrySet()) {
@@ -102,5 +116,19 @@ public class DirHasherResult extends TreeMap<String, DigestResult> {
             }
         }
         return result;
+    }
+
+    /**
+     * @return the constructionInfo
+     */
+    public ConstructionInfo getConstructionInfo() {
+        return constructionInfo;
+    }
+
+    /**
+     * @param constructionInfo the constructionInfo to set
+     */
+    public void setConstructionInfo(ConstructionInfo constructionInfo) {
+        this.constructionInfo = constructionInfo;
     }
 }
