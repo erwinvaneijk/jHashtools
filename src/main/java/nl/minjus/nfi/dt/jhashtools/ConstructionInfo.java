@@ -63,7 +63,7 @@ public class ConstructionInfo {
      * @return the constructionDate
      */
     public Date getConstructionDate() {
-        return constructionDate;
+        return this.constructionDate;
     }
 
     /**
