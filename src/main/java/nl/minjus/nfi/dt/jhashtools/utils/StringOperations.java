@@ -8,7 +8,7 @@ package nl.minjus.nfi.dt.jhashtools.utils;
  *
  * @author kojak
  */
-public class StringOperations {
+public final class StringOperations {
 
     private static final String HEXES = "0123456789abcdef";
     private static final char[] kDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',

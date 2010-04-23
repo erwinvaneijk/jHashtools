@@ -8,6 +8,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -79,6 +80,42 @@ public class FileHasherTest {
             fail(ex.toString());
         } catch (IOException ex) {
             fail(ex.toString());
+        }
+    }
+
+    @Test
+    public void testNoSuchAlgorithmOnFileHasher() {
+        try {
+            FileHasher h = new FileHasher("foo");
+            fail("Should have thrown NoSuchAlgorithmException");
+        } catch (RuntimeException ex) {
+            // pass
+        }
+    }
+
+    @Test
+    public void testNoSuchAlgorithmOnFileHasherCollection() {
+        try {
+            ArrayList<String> algorithms = new ArrayList<String>();
+            algorithms.add("md5");
+            algorithms.add("foo");
+            FileHasher h = new FileHasher(algorithms);
+            fail("Should have thrown NoSuchAlgorithmException");
+        } catch (RuntimeException ex) {
+            // pass
+        }
+    }
+
+    @Test
+    public void testFileHasherUnknownFile() {
+        try {
+            FileHasher h = new FileHasher("md5");
+            DigestResult d = h.getDigest(new File("Does not exist"));
+            fail("Should have thrown FileNotFoundException");
+        } catch (FileNotFoundException ex) {
+            // pass
+        } catch (IOException ex) {
+            fail("Should not get IOException");
         }
     }
 }

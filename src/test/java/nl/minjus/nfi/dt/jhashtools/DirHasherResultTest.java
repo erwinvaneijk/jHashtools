@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -61,7 +62,7 @@ public class DirHasherResultTest {
     }
 
     @Test
-    public void testEcludeOneLeft() {
+    public void testExcludeOneLeft() {
         setTwo.put("four", new DigestResult(new Digest("crc", "2222")));
         DirHasherResult result = setTwo.exclude(setOne);
         assertEquals(1, result.size());
@@ -124,6 +125,24 @@ public class DirHasherResultTest {
     }
 
     @Test
+    public void testNotIntersect() {
+        DirHasherResult result = setOne.notIntersect(setTwo);
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testNotIntersectTwo() {
+        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
+        setTwo.put("five", new DigestResult(new Digest("crc", "3333")));
+
+        DirHasherResult result = setOne.notIntersect(setTwo);
+
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("four"));
+    }
+
+    @Test
     public void testIntersectTwo() {
         setOne.put("four", new DigestResult(new Digest("crc", "2222")));
         setTwo.put("four", new DigestResult(new Digest("crc", "3333")));
@@ -132,6 +151,38 @@ public class DirHasherResultTest {
 
         assertEquals(3, result.size());
         assertTrue(! result.containsKey("four"));
+        assertTrue(result.get("three").containsResult("crc"));
+        assertEquals(new Digest("crc", "2222"), result.get("three").getDigest("crc"));
+    }
+
+    @Test
+    public void testIntersectTwoDifferentSets() {
+        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
+        setTwo.put("five", new DigestResult(new Digest("crc", "3333")));
+
+        DirHasherResult result = setOne.intersect(setTwo);
+
+        assertEquals(3, result.size());
+        assertTrue(! result.containsKey("four"));
+        assertTrue(! result.containsKey("five"));
+    }
+
+    @Test
+    public void testIntersectTwoMultipleHits() {
+        ArrayList list = new ArrayList();
+        list.add( new Digest("crc", "eeee") );
+        list.add( new Digest("md4", "1111") );
+        setOne.put("four", new DigestResult(list));
+        ArrayList list2 = new ArrayList();
+        list.add( new Digest("md4", "1111") );
+        setTwo.put("four", new DigestResult(list2));
+
+        DirHasherResult result = setOne.intersect(setTwo);
+
+        assertEquals(3, result.size());
+        assertTrue(! result.containsKey("four"));
+        assertTrue(! result.containsKey("five"));
+        assertTrue(result.get("three").containsResult("crc"));
     }
 
     @Test
@@ -146,11 +197,11 @@ public class DirHasherResultTest {
     }
 
     @Test
-    public void testNotIntersect() {
+    public void testNotIntersectSameDifferent() {
         setOne.put("four", new DigestResult(new Digest("crc", "2222")));
         setTwo.put("four", new DigestResult(new Digest("crc", "3333")));
 
-        DirHasherResult result = setOne.includeWrong(setTwo);
+        DirHasherResult result = setOne.notIntersect(setTwo);
 
         assertEquals(1, result.size());
         assertTrue(result.containsKey("four"));

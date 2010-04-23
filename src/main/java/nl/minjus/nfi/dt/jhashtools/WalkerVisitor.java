@@ -19,6 +19,6 @@ public interface WalkerVisitor {
      * @param theFile
      * @return false if the walker should abort.
      */
-    boolean visit(File theFile);
+    void visit(File theFile);
 
 }

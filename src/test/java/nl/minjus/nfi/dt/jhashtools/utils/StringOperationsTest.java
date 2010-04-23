@@ -48,4 +48,9 @@ public class StringOperationsTest {
         assertEquals(expResult, result);
     }
 
+    @Test
+    public void testNullCaseHexify() {
+        assertNull(StringOperations.hexify(null));
+    }
+
 }

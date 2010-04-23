@@ -2,6 +2,7 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
+import java.security.NoSuchAlgorithmException;
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 import java.util.Collection;
 import java.util.TreeSet;
@@ -39,7 +40,7 @@ public class DigestResult extends TreeSet<Digest> {
                 return e;
             }
         }
-        throw new AlgorithmNotFoundException();
+        throw new AlgorithmNotFoundException("Algorithm " + key + " not found");
     }
 
     public String getHexDigest(String digestName) {

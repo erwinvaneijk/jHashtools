@@ -57,8 +57,8 @@ public class FileWalkerTest {
     public void testWalkWithUnknownFile() {
         File file = new File("unknown");
         FileWalker instance = new FileWalker();
-        boolean expResult = true;
-        boolean result = instance.walk(file);
+        int expResult = 0;
+        int result = instance.walk(file);
         assertEquals(expResult, result);
     }
 
@@ -73,9 +73,9 @@ public class FileWalkerTest {
             return this.number;
         }
 
-        public boolean visit(File file) {
+        @Override
+        public void visit(File file) {
             number += 1;
-            return true;
         };
     };
 
@@ -88,8 +88,8 @@ public class FileWalkerTest {
         FileWalker instance = new FileWalker();
         WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        boolean expResult = true;
-        boolean result = instance.walk(file);
+        int expResult = 10;
+        int result = instance.walk(file);
         assertEquals(expResult, result);
         assertEquals(10, visitor.getNumber());
     }

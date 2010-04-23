@@ -3,6 +3,8 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -11,7 +13,7 @@ import java.util.logging.Logger;
 
 public class DirVisitor implements WalkerVisitor {
 
-    private final DirHasherResult resultMap;
+    private DirHasherResult resultMap;
     private Set<String> algorithms;
     private boolean verbose;
 
@@ -22,34 +24,32 @@ public class DirVisitor implements WalkerVisitor {
         this.verbose = false;
     }
 
-    public DirVisitor(Collection<String> algorithms) {
-        resultMap = new DirHasherResult();
-        this.algorithms = new TreeSet<String>(algorithms);
-        this.verbose = false;
-    }
-
-    public DirVisitor(String algorithm) {
+    public DirVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
         this.algorithms = new TreeSet<String>();
-        this.algorithms.add(algorithm);
-        this.verbose = false;
-    }
-
-    DirVisitor(Collection<String> algorithms, DirHasherResult digests) {
-        resultMap = digests;
-        this.algorithms = new TreeSet<String>(algorithms);
-        this.verbose = false;
-    }
-
-    DirVisitor(Set<String> algorithms, boolean verbose) {
-        resultMap = new DirHasherResult();
-        this.algorithms = new TreeSet<String>(algorithms);
+        for (String algorithm: algorithms) {
+            this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
+        }
         this.verbose = verbose;
     }
 
+    public DirVisitor(String algorithm) throws NoSuchAlgorithmException {
+        resultMap = new DirHasherResult();
+        this.algorithms = new TreeSet<String>();
+        this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
+        this.verbose = false;
+    }
+
+    DirVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException {
+        this(algorithms, false);
+        this.resultMap = digests;
+    }
+
     @Override
-    public boolean visit(File theFile) {
+    public void visit(File theFile) {
         try {
+            // FIXME
+            // This should better be handled with an aspect, instead of this clutter.
             if (this.verbose) {
                 Logger.getLogger(DirVisitor.class.getName()).log(Level.INFO, "Processing file [" + theFile.toString() + "]");
             }
@@ -61,7 +61,6 @@ public class DirVisitor implements WalkerVisitor {
         } catch (IOException ex) {
             Logger.getLogger(DirVisitor.class.getName()).log(Level.SEVERE, "Got IOException while processing " + theFile.toString());
         }
-        return true;
     }
 
     public final DirHasherResult getResults() {

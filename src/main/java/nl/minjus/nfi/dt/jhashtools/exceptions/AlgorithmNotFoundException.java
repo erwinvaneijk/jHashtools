@@ -14,4 +14,8 @@ public class AlgorithmNotFoundException extends RuntimeException {
     public AlgorithmNotFoundException() {
     }
 
+    public AlgorithmNotFoundException(String string) {
+        super(string);
+    }
+
 }

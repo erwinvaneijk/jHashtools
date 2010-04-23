@@ -6,6 +6,8 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -25,10 +27,9 @@ public class DirHasher {
         algorithms = new TreeSet<String>();
     }
 
-    public DirHasher(String algorithm) {
-        results = new DirHasherResult();
-        algorithms = new TreeSet<String>();
-        algorithms.add(algorithm);
+    public DirHasher(String algorithm) throws NoSuchAlgorithmException {
+        this();
+        this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
     }
 
     public void addAlgorithm(String algorithm) {
@@ -36,16 +37,11 @@ public class DirHasher {
     }
 
     public DirHasherResult getDigests(final File startFile) {
-
         if (! startFile.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", startFile.toString()));
         }
-
-        FileWalker walker = new FileWalker();
-        DirVisitor visitor = new DirVisitor(algorithms, this.verbose);
-        walker.addWalkerVisitor(visitor);
-        walker.walk(startFile);
-        return visitor.getResults();
+        updateDigests(this.results, startFile);
+        return this.results;
     }
 
     public void updateDigests(DirHasherResult digests, File file) {
@@ -53,18 +49,23 @@ public class DirHasher {
             throw new IllegalArgumentException(String.format("File %s does not exist", file.toString()));
         }
 
-        FileWalker walker = new FileWalker();
-        DirVisitor visitor = new DirVisitor(algorithms, digests);
-        visitor.setVerbose(this.verbose);
-        walker.addWalkerVisitor(visitor);
-        walker.walk(file);
+        try {
+            FileWalker walker = new FileWalker();
+            DirVisitor visitor = new DirVisitor(algorithms, digests);
+            visitor.setVerbose(this.verbose);
+            walker.addWalkerVisitor(visitor);
+            walker.walk(file);
+        } catch (NoSuchAlgorithmException ex) {
+            // ignore. This should not happen, because we've already checked
+            // the algorithms in the constructor;
+        }
     }
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
-    public boolean getVerbose() {
+    public boolean isVerbose() {
         return this.verbose;
     }
 }
