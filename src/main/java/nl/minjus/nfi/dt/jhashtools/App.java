@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,55 +27,42 @@ import org.apache.commons.cli.PosixParser;
  * Hello world!
  *
  */
-public class App 
-{
-    public static void main( String[] args )
-    {
+public class App {
+
+    public static void main(String[] args) {
         CommandLine line = App.getCommandLine(args);
         String[] filesToProcess = line.getArgs();
 
         DirHasher directoryHasher = null;
-        if (line.hasOption("sha-256")) {
-            directoryHasher = new DirHasher("sha-256");
-        }
-        if (line.hasOption("sha-1")) {
-            if (directoryHasher == null) {
-                directoryHasher = new DirHasher("sha-1");
-            } else {
+        try {
+            directoryHasher = new DirHasher(FileHasher.NO_ALGORITHM);
+            if (line.hasOption("sha-256")) {
+                directoryHasher.addAlgorithm("sha-256");
+            }
+            if (line.hasOption("sha-1")) {
                 directoryHasher.addAlgorithm("sha-1");
             }
-        }
-        if (line.hasOption("sha-512")) {
-            if (directoryHasher == null) {
-                directoryHasher = new DirHasher("sha-512");
-            } else {
+            if (line.hasOption("sha-512")) {
                 directoryHasher.addAlgorithm("sha-512");
             }
-        }
-        if (line.hasOption("md5")) {
-            if (directoryHasher == null) {
-                directoryHasher = new DirHasher("md5");
-            } else {
+            if (line.hasOption("md5")) {
                 directoryHasher.addAlgorithm("md5");
             }
-        }
-        if (line.hasOption("ripemd")) {
-            if (directoryHasher == null) {
-                directoryHasher = new DirHasher("ripemd");
-            } else {
+            if (line.hasOption("ripemd")) {
                 directoryHasher.addAlgorithm("ripemd");
             }
-        }
-        if (directoryHasher == null) {
-            directoryHasher = new DirHasher();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Algoritm not found", ex);
+        } finally {
+            directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
         }
 
         if (line.hasOption("verbose")) {
             directoryHasher.setVerbose(true);
         }
-        
+
         DirHasherResult digests = new DirHasherResult();
-        for (String filename: filesToProcess) {
+        for (String filename : filesToProcess) {
             Logger.getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
             directoryHasher.updateDigests(digests, new File(filename));
         }
@@ -126,8 +114,7 @@ public class App
             stream = new FileInputStream(inputFile);
             Persist persist = new JsonPersister();
             result = (DirHasherResult) persist.load(stream, DirHasherResult.class);
-        }
-        catch (FileNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             return result;
@@ -147,16 +134,8 @@ public class App
         options.addOption(null, "md5", false, "Output a md5 digest");
         options.addOption(null, "ripemd", false, "Output a ripemd digest");
         options.addOption("v", "verbose", false, "Create verbose output");
-        options.addOption(OptionBuilder.withLongOpt("output")
-                .withDescription("The file the output is written to")
-                .hasArg()
-                .withArgName("outputfile")
-                .create("o"));
-        options.addOption(OptionBuilder.withLongOpt("input")
-                .withDescription("The file needed to verify the found digests")
-                .hasArg()
-                .withArgName("inputfile")
-                .create("i"));
+        options.addOption(OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o"));
+        options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
         CommandLine line;
         try {
             line = parser.parse(options, args);
@@ -182,14 +161,14 @@ public class App
             if (differences.containsKey("./hashes.txt")) {
                 out.println("There are no differences.");
                 out.println("hashes.txt:");
-                for (Digest d: differences.get("./hashes.txt")) {
+                for (Digest d : differences.get("./hashes.txt")) {
                     out.printf("\t%s\n", d.toString());
                 }
             } else {
                 out.println("There are differences.");
-                for (Map.Entry<String, DigestResult> entry: differences.entrySet()) {
+                for (Map.Entry<String, DigestResult> entry : differences.entrySet()) {
                     out.println(entry.getKey());
-                    for (Digest d: entry.getValue()) {
+                    for (Digest d : entry.getValue()) {
                         out.printf("\t%s\n", d.toString());
                     }
                 }

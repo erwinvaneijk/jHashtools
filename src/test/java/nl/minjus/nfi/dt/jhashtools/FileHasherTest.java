@@ -8,6 +8,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -101,7 +102,7 @@ public class FileHasherTest {
             algorithms.add("foo");
             FileHasher h = new FileHasher(algorithms);
             fail("Should have thrown NoSuchAlgorithmException");
-        } catch (RuntimeException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             // pass
         }
     }

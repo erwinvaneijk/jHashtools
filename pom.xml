@@ -79,6 +79,11 @@
                         <packageLineRate>85</packageLineRate>
                         <packageBranchRate>85</packageBranchRate>
                         <regexes>
+			    <regex>
+                                <pattern>nl.minjus.nfi.dt.jhashtools.exceptions.*</pattern>
+                                <branchRate>10</branchRate>
+                                <lineRate>10</lineRate>
+			    </regex>
                             <regex>
                                 <pattern>nl.minjus.nfi.dt.jhashtools.*</pattern>
                                 <branchRate>90</branchRate>

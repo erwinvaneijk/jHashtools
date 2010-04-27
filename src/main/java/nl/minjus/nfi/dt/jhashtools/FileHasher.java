@@ -20,6 +20,7 @@ import java.util.List;
 public class FileHasher {
 
     public static final String DEFAULT_ALGORITHM = "sha-256";
+    public static final String NO_ALGORITHM = "none";
     private List<MessageDigest> digests;
 
     public static DigestResult computeDigest(File file, String algorithm)
@@ -29,7 +30,7 @@ public class FileHasher {
     }
 
     public static DigestResult computeDigest(File file, Collection<String> algorithms)
-            throws FileNotFoundException, IOException {
+            throws FileNotFoundException, IOException, NoSuchAlgorithmException {
         FileHasher hasher = new FileHasher(algorithms);
         return hasher.getDigest(file);
     }
@@ -40,22 +41,20 @@ public class FileHasher {
     }
 
     public FileHasher(String algorithm) {
-        try {
-            this.digests = new ArrayList<MessageDigest>();
-            this.digests.add(MessageDigest.getInstance(algorithm));
-        } catch (NoSuchAlgorithmException ex) {
-            throw new RuntimeException(ex);
+        if (!algorithm.equals(NO_ALGORITHM)) {
+            try {
+                this.digests = new ArrayList<MessageDigest>();
+                this.digests.add(MessageDigest.getInstance(algorithm));
+            } catch (NoSuchAlgorithmException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
-    public FileHasher(Collection<String> algorithms) {
-        try {
-            this.digests = new ArrayList<MessageDigest>();
-            for (String algorithm : algorithms) {
-                this.digests.add(MessageDigest.getInstance(algorithm));
-            }
-        } catch (NoSuchAlgorithmException ex) {
-            throw new RuntimeException(ex);
+    public FileHasher(Collection<String> algorithms) throws NoSuchAlgorithmException {
+        this.digests = new ArrayList<MessageDigest>();
+        for (String algorithm : algorithms) {
+            addAlgorithm(algorithm);
         }
     }
 
@@ -83,5 +82,12 @@ public class FileHasher {
             res.add(new Digest(digest.getAlgorithm(), digest.digest()));
         }
         return res;
+    }
+
+    public void addAlgorithm(String algorithm) throws NoSuchAlgorithmException {
+        if (algorithm.equals(NO_ALGORITHM)) {
+            return;
+        }
+        this.digests.add(MessageDigest.getInstance(algorithm));
     }
 }
