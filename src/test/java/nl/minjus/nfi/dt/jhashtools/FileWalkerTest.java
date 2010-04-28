@@ -5,13 +5,11 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
+import org.junit.*;
+
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -76,8 +74,8 @@ public class FileWalkerTest {
         @Override
         public void visit(File file) {
             number += 1;
-        };
-    };
+        }
+    }
 
     /**
      * Test of walk method, of class FileWalker.

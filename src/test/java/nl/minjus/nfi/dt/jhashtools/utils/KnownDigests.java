@@ -16,7 +16,7 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
  */
 public class KnownDigests {
 
-    public final static DirHasherResult getKnownResults() {
+    public  static DirHasherResult getKnownResults() {
         DirHasherResult knownResults = new DirHasherResult();
 
         Map<Integer, Digest> expectedSha256Digests = new HashMap<Integer, Digest>();

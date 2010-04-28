@@ -1,27 +1,15 @@
 package nl.minjus.nfi.dt.jhashtools;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersister;
 import nl.minjus.nfi.dt.jhashtools.persistence.Persist;
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
+
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+
+import static java.util.logging.Logger.getLogger;
 
 /**
  * Hello world!
@@ -29,8 +17,8 @@ import org.apache.commons.cli.PosixParser;
  */
 public class App {
 
-    public static void main(String[] args) {
-        CommandLine line = App.getCommandLine(args);
+    public static void main(String[] arguments) {
+        CommandLine line = App.getCommandLine(arguments);
         String[] filesToProcess = line.getArgs();
 
         DirHasher directoryHasher = null;
@@ -52,7 +40,7 @@ public class App {
                 directoryHasher.addAlgorithm("ripemd");
             }
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Algoritm not found", ex);
+            getLogger(App.class.getName()).log(Level.SEVERE, "Algoritm not found", ex);
         } finally {
             directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
         }
@@ -63,12 +51,12 @@ public class App {
 
         DirHasherResult digests = new DirHasherResult();
         for (String filename : filesToProcess) {
-            Logger.getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
+            getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
             directoryHasher.updateDigests(digests, new File(filename));
         }
 
         if (line.hasOption("i") && line.hasOption("o")) {
-            Logger.getLogger(App.class.getName()).log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
+            getLogger(App.class.getName()).log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
         }
         if (line.hasOption("i")) {
@@ -88,21 +76,21 @@ public class App {
         try {
             File outputFile = new File(outputFilename);
             if (outputFile.exists()) {
-                Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Output file exists. Aborting");
+                getLogger(App.class.getName()).log(Level.SEVERE, "Output file exists. Aborting");
                 System.exit(-1);
             }
             file = new FileOutputStream(outputFile);
             Persist persist = new JsonPersister();
             persist.persist(file, digests);
         } catch (PersistenceException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Cannot persist content to file", ex);
+            getLogger(App.class.getName()).log(Level.SEVERE, "Cannot persist content to file", ex);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Cannot create file", ex);
+            getLogger(App.class.getName()).log(Level.SEVERE, "Cannot create file", ex);
         } finally {
             try {
                 file.close();
             } catch (IOException ex) {
-                Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Cannot close file", ex);
+                getLogger(App.class.getName()).log(Level.SEVERE, "Cannot close file", ex);
             }
         }
     }
@@ -131,7 +119,7 @@ public class App {
                 System.exit(0);
             }
         } catch (ParseException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("hashtree [options] dir [dir...]", options);
             return null;

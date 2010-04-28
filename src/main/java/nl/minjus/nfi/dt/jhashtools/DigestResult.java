@@ -2,8 +2,8 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
-import java.security.NoSuchAlgorithmException;
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
+
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -79,11 +79,10 @@ public class DigestResult extends TreeSet<Digest> {
      * When there is no match in algorithm, matches returns false.
      *
      * @param other
-     * @return
+     * @return true when this matches other.
      */
-    boolean matches(DigestResult o) {
-        if ((o != null) && (o instanceof DigestResult)) {
-            DigestResult other = (DigestResult) o;
+    boolean matches(DigestResult other) {
+        if ((other != null)) {
             boolean found = false;
             for (Digest d : other) {
                 found = found || this.contains(d);
