@@ -1,3 +1,28 @@
+/*
+ * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
@@ -21,9 +46,50 @@ public class App {
         CommandLine line = App.getCommandLine(arguments);
         String[] filesToProcess = line.getArgs();
 
+        DirHasher directoryHasher = createDirectoryHasher(line);
+
+        DirHasherResult digests = new DirHasherResult();
+        for (String filename : filesToProcess) {
+            getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
+            directoryHasher.updateDigests(digests, new File(filename));
+        }
+
+        if (line.hasOption("i") && line.hasOption("o")) {
+            getLogger(App.class.getName()).log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
+            System.exit(1);
+        }
+
+        if (line.hasOption("i")) {
+            String filename = line.getOptionValue("i");
+            verifyFoundDigests(digests, filename);
+        } else if (line.hasOption("o")) {
+            DirHasherResult resultFileDigests = persistDigestsToFile(digests, line.getOptionValue("output"));
+            outputDigests(System.err, resultFileDigests);
+        }
+
+        System.exit(0);
+    }
+
+    private static void outputDigests(PrintStream out, DirHasherResult resultFileDigests) {
+        out.printf("Generated with hashtree (java) by %s\n", System.getProperty("user.name"));
+        out.printf("%s\n", resultFileDigests.firstKey());
+        DigestResult res = resultFileDigests.firstEntry().getValue();
+        for (Digest d: res) {
+            out.printf("\t%s\n", d.toString('\t'));
+        }
+    }
+
+    private static void verifyFoundDigests(DirHasherResult digests, String filename) {
+        DirHasherResultVerifier verifier = new DirHasherResultVerifier(digests);
+        verifier.loadDigestsFromFile(filename);
+        verifier.verify(System.out);
+    }
+
+    private static DirHasher createDirectoryHasher(CommandLine line) {
         DirHasher directoryHasher = null;
         try {
             directoryHasher = new DirHasher(FileHasher.NO_ALGORITHM);
+
             if (line.hasOption("sha-256")) {
                 directoryHasher.addAlgorithm("sha-256");
             }
@@ -42,36 +108,23 @@ public class App {
         } catch (NoSuchAlgorithmException ex) {
             getLogger(App.class.getName()).log(Level.SEVERE, "Algoritm not found", ex);
         } finally {
-            directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
+            try {
+                if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
+                    directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
+                }
+            } catch (NoSuchAlgorithmException ex) {
+                getLogger(App.class.getName()).log(Level.SEVERE, "Algorithm is not found", ex);
+                System.exit(1);
+            }
         }
 
-        if (line.hasOption("verbose")) {
+        if ((directoryHasher != null) && line.hasOption("verbose")) {
             directoryHasher.setVerbose(true);
         }
-
-        DirHasherResult digests = new DirHasherResult();
-        for (String filename : filesToProcess) {
-            getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
-            directoryHasher.updateDigests(digests, new File(filename));
-        }
-
-        if (line.hasOption("i") && line.hasOption("o")) {
-            getLogger(App.class.getName()).log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
-            System.exit(1);
-        }
-        if (line.hasOption("i")) {
-            String filename = line.getOptionValue("i");
-            DirHasherResultVerifier verifier = new DirHasherResultVerifier(digests);
-            verifier.loadDigestsFromFile(filename);
-            verifier.verify(System.out);
-        } else if (line.hasOption("o")) {
-            persistDigestsToFile(digests, line.getOptionValue("output"));
-        }
-
-        System.exit(0);
+        return directoryHasher;
     }
 
-    private static void persistDigestsToFile(DirHasherResult digests, String outputFilename) {
+    private static DirHasherResult persistDigestsToFile(DirHasherResult digests, String outputFilename) {
         OutputStream file = null;
         try {
             File outputFile = new File(outputFilename);
@@ -82,17 +135,26 @@ public class App {
             file = new FileOutputStream(outputFile);
             Persist persist = new JsonPersister();
             persist.persist(file, digests);
+            file.flush();
+            
+            DirHasher d = new DirHasher(digests.firstEntry().getValue().getAlgorithms());
+            return d.getDigests(outputFile);
         } catch (PersistenceException ex) {
             getLogger(App.class.getName()).log(Level.SEVERE, "Cannot persist content to file", ex);
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             getLogger(App.class.getName()).log(Level.SEVERE, "Cannot create file", ex);
+        } catch (NoSuchAlgorithmException ex) {
+            getLogger(App.class.getName()).log(Level.SEVERE, "Cannot create the algorithm", ex);
         } finally {
             try {
-                file.close();
+                if (file != null) {
+                    file.close();
+                }
             } catch (IOException ex) {
                 getLogger(App.class.getName()).log(Level.SEVERE, "Cannot close file", ex);
             }
         }
+        return null;
     }
 
     @SuppressWarnings("static-access")
