@@ -1,3 +1,27 @@
+<!--
+  ~ Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+  ~
+  ~ Redistribution and use in source and binary forms, with or without modification, are
+  ~ permitted provided that the following conditions are met:
+  ~
+  ~    1. Redistributions of source code must retain the above copyright notice, this list of
+  ~       conditions and the following disclaimer.
+  ~
+  ~    2. Redistributions in binary form must reproduce the above copyright notice, this list
+  ~       of conditions and the following disclaimer in the documentation and/or other materials
+  ~       provided with the distribution.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
+  ~ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+  ~ FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+  ~ CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  ~ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+  ~ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  ~ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ~ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -48,8 +72,14 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>nl.minjus.nfi.dt.jhashtools.App</mainClass>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>nl.minjus.nfi.dt.jhashtools.App</Main-Class>
+                                        <Implementation-Build>${buildNumber}</Implementation-Build>
+                                        <Implementation-Version>${version}</Implementation-Version>
+                                        <Build-Number>${buildNumber}</Build-Number>
+                                    </manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -79,11 +109,11 @@
                         <packageLineRate>85</packageLineRate>
                         <packageBranchRate>85</packageBranchRate>
                         <regexes>
-			    <regex>
+                            <regex>
                                 <pattern>nl.minjus.nfi.dt.jhashtools.exceptions.*</pattern>
                                 <branchRate>10</branchRate>
                                 <lineRate>10</lineRate>
-			    </regex>
+                            </regex>
                             <regex>
                                 <pattern>nl.minjus.nfi.dt.jhashtools.*</pattern>
                                 <branchRate>90</branchRate>
@@ -107,6 +137,28 @@
                 <version>2.2</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.0-beta-3</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>true</doCheck>
+                    <doUpdate>true</doUpdate>
+                    <format>{0,date,yyyy-MM-dd_HH-mm}_{1}</format>
+                    <items>
+                        <item>timestamp</item>
+                        <item>${user.name}</item>
+                    </items>
                 </configuration>
             </plugin>
         </plugins>

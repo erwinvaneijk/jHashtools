@@ -27,6 +27,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
+import nl.minjus.nfi.dt.jhashtools.utils.Version;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -51,6 +52,8 @@ public class App {
 
         DirHasher directoryHasher = createDirectoryHasher(line);
 
+        getLogger(App.class.getName()).log(Level.INFO, "Version: " + Version.getVersion());
+        
         DirHasherResult digests = new DirHasherResult();
         for (String filename : filesToProcess) {
             getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);

@@ -1,29 +1,30 @@
 /*
  * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
+
+import nl.minjus.nfi.dt.jhashtools.utils.Version;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -36,7 +37,7 @@ public class ConstructionInfo {
 
     private String username;
 
-    private String userid;
+    private String versionInformation;
 
     private String operatingSystem;
 
@@ -46,9 +47,7 @@ public class ConstructionInfo {
         this.constructionDate = Calendar.getInstance().getTime();
         this.username = System.getProperty("user.name");
         this.operatingSystem = System.getProperty("os.name") + ":" + System.getProperty("os.version");
-        // Currently, I do not know how we can get the userid of the currently
-        // running user.
-        this.userid = "unknown";
+        this.versionInformation = Version.getVersion();
     }
 
     /**
@@ -66,17 +65,17 @@ public class ConstructionInfo {
     }
 
     /**
-     * @return the userid
+     * @return the versionInformation
      */
-    public String getUserid() {
-        return userid;
+    public String getVersionInformation() {
+        return versionInformation;
     }
 
     /**
-     * @param userid the userid to set
+     * @param versionInformation the versionInformation to set
      */
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setVersionInformation(String versionInformation) {
+        this.versionInformation = versionInformation;
     }
 
     /**
