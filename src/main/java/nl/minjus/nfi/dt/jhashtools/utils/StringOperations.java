@@ -64,4 +64,17 @@ public final class StringOperations {
     public static byte[] hexToBytes(String hex) {
         return hexToBytes(hex.toCharArray());
     }
+
+    public static String split(String s, int splitSize) {
+        StringBuilder builder = new StringBuilder(s.length() + (s.length()/4));
+        int i = 0;
+        while (i<s.length()) {
+            builder.append(s.charAt(i));
+            i++;
+            if (((i % splitSize) == 0) && (i < s.length())) {
+                builder.append(' ');
+            }
+        }
+        return builder.toString();
+    }
 }

@@ -81,6 +81,10 @@ public class Digest implements Comparable<Digest> {
         return this.algorithm + joinChar + StringOperations.hexify(content);
     }
 
+    public String prettyPrint(char joinChar) {
+        return this.algorithm + joinChar + StringOperations.split(StringOperations.hexify(content), 4);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

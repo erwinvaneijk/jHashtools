@@ -33,7 +33,8 @@ import java.util.List;
 /**
  * This class offers a 'walker' that will go through a directory and offer
  * the resulting files to one or more visitors.
- * @author kojak
+ *
+ * @author Erwin van Eijk
  */
 public class FileWalker {
     private FileFilter fileFilter;

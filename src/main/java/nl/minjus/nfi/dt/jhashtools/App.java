@@ -72,11 +72,7 @@ public class App {
 
     private static void outputDigests(PrintStream out, DirHasherResult resultFileDigests) {
         out.printf("Generated with hashtree (java) by %s\n", System.getProperty("user.name"));
-        out.printf("%s\n", resultFileDigests.firstKey());
-        DigestResult res = resultFileDigests.firstEntry().getValue();
-        for (Digest d: res) {
-            out.printf("\t%s\n", d.toString('\t'));
-        }
+        resultFileDigests.prettyPrint(out);
     }
 
     private static void verifyFoundDigests(DirHasherResult digests, String filename) {
@@ -170,7 +166,13 @@ public class App {
         options.addOption(null, "md5", false, "Output a md5 digest");
         options.addOption(null, "ripemd", false, "Output a ripemd digest");
         options.addOption("v", "verbose", false, "Create verbose output");
-        options.addOption(OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o"));
+        Option outputOption =
+                OptionBuilder.withLongOpt("output")
+                    .withDescription("The file the output is written to")
+                        .hasArg()
+                        .withArgName("outputfile")
+                        .create("o");
+        options.addOption(outputOption);
         options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
         CommandLine line;
         try {

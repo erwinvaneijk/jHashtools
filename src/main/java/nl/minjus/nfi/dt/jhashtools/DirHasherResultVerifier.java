@@ -35,12 +35,13 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author kojak
+ * @author Erwin van Eijk
  */
 public class DirHasherResultVerifier {
 
     private final DirHasherResult measuredDigests;
     private DirHasherResult verificationDigests;
+    private String filename;
 
     public DirHasherResultVerifier(DirHasherResult result) {
         this.measuredDigests = result;
@@ -50,6 +51,7 @@ public class DirHasherResultVerifier {
         DirHasherResult result = null;
         InputStream stream;
         try {
+            this.filename = filename;
             File inputFile = new File(filename);
             stream = new FileInputStream(inputFile);
             Persist persist = new JsonPersister();
@@ -62,16 +64,14 @@ public class DirHasherResultVerifier {
     }
 
     public void verify(PrintStream out) {
-        DirHasherResult differences = this.verificationDigests.notIntersect(this.measuredDigests);
+        DirHasherResult differences = this.measuredDigests.notIntersect(this.verificationDigests);
         if (differences.size() == 0) {
-            out.println("There are no differences.");
+            out.println("There are no differences at all.");
         } else {
-            if (differences.containsKey("./hashes.txt")) {
+            if (differences.size() == 1 && differences.containsKey(this.filename)) {
                 out.println("There are no differences.");
-                out.println("hashes.txt:");
-                for (Digest d : differences.get("./hashes.txt")) {
-                    out.printf("\t%s\n", d.toString());
-                }
+                out.println("Printing info on the output file.");
+                differences.prettyPrint(out);
             } else {
                 out.println("There are differences.");
                 for (Map.Entry<String, DigestResult> entry : differences.entrySet()) {

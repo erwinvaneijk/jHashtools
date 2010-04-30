@@ -25,6 +25,7 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
+import java.io.PrintStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -151,5 +152,18 @@ public class DirHasherResult extends TreeMap<String, DigestResult> {
      */
     public void setConstructionInfo(ConstructionInfo constructionInfo) {
         this.constructionInfo = constructionInfo;
+    }
+
+    /**
+     * Create nice output to the <c>out</c> PrintStream.
+     *
+     * @param out where to write to.
+     */
+    public void prettyPrint(PrintStream out) {
+        out.printf("%s\n", this.firstKey());
+        DigestResult res = this.firstEntry().getValue();
+        for (Digest d: res) {
+            out.printf("\t%s\n", d.prettyPrint('\t'));
+        }
     }
 }
