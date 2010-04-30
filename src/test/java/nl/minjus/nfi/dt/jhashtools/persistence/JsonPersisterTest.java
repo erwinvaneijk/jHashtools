@@ -1,24 +1,43 @@
 /*
+ * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
+ *
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import org.junit.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
 import static org.junit.Assert.*;
 
 /**
@@ -52,7 +71,7 @@ public class JsonPersisterTest {
     }
 
     /**
-     * Test of persist method, of class JsonPersister.
+     * Test of persist method, of class JsonPersistenceProvider.
      */
     @Test
     public void testPersist() {
@@ -61,7 +80,7 @@ public class JsonPersisterTest {
             DigestResult obj = new DigestResult();
             Digest d = new Digest("sha-1", "0000111122223333444455556666777788889999aaaa");
             obj.add(d);
-            JsonPersister instance = new JsonPersister();
+            JsonPersistenceProvider instance = new JsonPersistenceProvider();
             instance.persist(out, obj);
             String str = out.toString();
             assertEquals(this.testDigestResultInJson, str);
@@ -71,13 +90,13 @@ public class JsonPersisterTest {
     }
 
     /**
-     * Test of load method, of class JsonPersister.
+     * Test of load method, of class JsonPersistenceProvider.
      */
     @Test
     public void testLoad() {
         InputStream stream = new ByteArrayInputStream(this.testDigestResultInJson.getBytes());
         Class<DigestResult> clazz = DigestResult.class;
-        JsonPersister instance = new JsonPersister();
+        JsonPersistenceProvider instance = new JsonPersistenceProvider();
         DigestResult result = (DigestResult) instance.load(stream, clazz);
         assertEquals(1, result.size());
         assertEquals("sha-1", result.digest().getAlgorithm());
@@ -93,7 +112,7 @@ public class JsonPersisterTest {
             DirHasherResult obj = new DirHasherResult();
             obj.put("myfile", digestResult);
 
-            JsonPersister instance = new JsonPersister();
+            JsonPersistenceProvider instance = new JsonPersistenceProvider();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             instance.persist(out, obj);
             String str = out.toString();
@@ -110,7 +129,7 @@ public class JsonPersisterTest {
     public void testLoadDirHasherResult() {
         InputStream stream = new ByteArrayInputStream(this.testDirHasherResultInJson.getBytes());
         Class<DirHasherResult> clazz = DirHasherResult.class;
-        JsonPersister instance = new JsonPersister();
+        JsonPersistenceProvider instance = new JsonPersistenceProvider();
         DirHasherResult result = (DirHasherResult) instance.load(stream, clazz);
         assertEquals(1, result.size());
         assertTrue("Should contain myfile", result.containsKey("myfile"));

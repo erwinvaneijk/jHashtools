@@ -24,8 +24,8 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersister;
-import nl.minjus.nfi.dt.jhashtools.persistence.Persist;
+import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersistenceProvider;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 
 import java.io.*;
@@ -53,8 +53,8 @@ public class DirHasherResultVerifier {
         try {
             this.file = new File(filename);
             stream = new FileInputStream(this.file);
-            Persist persist = new JsonPersister();
-            result = (DirHasherResult) persist.load(stream, DirHasherResult.class);
+            PersistenceProvider persistenceProvider = new JsonPersistenceProvider();
+            result = (DirHasherResult) persistenceProvider.load(stream, DirHasherResult.class);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
