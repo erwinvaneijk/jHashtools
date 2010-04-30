@@ -42,6 +42,10 @@ import static java.util.logging.Logger.getLogger;
  */
 public class App {
 
+    private static final String USAGE = "[options] dir [dir...]";
+    private static final String HEADER = "hashtree - Creating a list of digests for files and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
+    private static final String FOOTER = "";
+    
     public static void main(String[] arguments) {
         CommandLine line = App.getCommandLine(arguments);
         String[] filesToProcess = line.getArgs();
@@ -179,13 +183,14 @@ public class App {
             line = parser.parse(options, args);
             if (line.hasOption("help")) {
                 HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("hashtree [options] dir [dir...]", options);
+                formatter.setWidth(80);
+                formatter.printHelp(USAGE, HEADER, options, FOOTER);
                 System.exit(0);
             }
         } catch (ParseException ex) {
             getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("hashtree [options] dir [dir...]", options);
+            HelpFormatter helpFormatter = new HelpFormatter();
+            helpFormatter.printHelp("hashtree [options] dir [dir...]", options);
             return null;
         }
         return line;
