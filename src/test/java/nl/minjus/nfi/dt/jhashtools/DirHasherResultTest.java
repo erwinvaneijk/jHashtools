@@ -1,32 +1,32 @@
 /*
  * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
 
 import org.junit.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,14 +56,14 @@ public class DirHasherResultTest {
     @Before
     public void setUp() {
         setOne = new DirHasherResult();
-        setOne.put("one", new DigestResult(new Digest("crc", "1111")));
-        setOne.put("two", new DigestResult(new Digest("crc", "1111")));
-        setOne.put("three", new DigestResult(new Digest("crc", "2222")));
+        setOne.put(new File("one"), new DigestResult(new Digest("crc", "1111")));
+        setOne.put(new File("two"), new DigestResult(new Digest("crc", "1111")));
+        setOne.put(new File("three"), new DigestResult(new Digest("crc", "2222")));
 
         setTwo = new DirHasherResult();
-        setTwo.put("one", new DigestResult(new Digest("crc", "1111")));
-        setTwo.put("two", new DigestResult(new Digest("crc", "1111")));
-        setTwo.put("three", new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("one"), new DigestResult(new Digest("crc", "1111")));
+        setTwo.put(new File("two"), new DigestResult(new Digest("crc", "1111")));
+        setTwo.put(new File("three"), new DigestResult(new Digest("crc", "2222")));
     }
 
     @After
@@ -83,17 +83,17 @@ public class DirHasherResultTest {
 
     @Test
     public void testExcludeOneLeft() {
-        setTwo.put("four", new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
         DirHasherResult result = setTwo.exclude(setOne);
         assertEquals(1, result.size());
         assertEquals(4, setTwo.size());
         assertEquals(3, setOne.size());
-        assertTrue(result.containsKey("four"));
+        assertTrue(result.containsKey(new File("four")));
     }
 
     @Test
     public void testExcludeOneLeftOtherSize() {
-        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
         DirHasherResult result = setTwo.exclude(setOne);
         assertEquals(0, result.size());
         assertEquals(3, setTwo.size());
@@ -102,8 +102,8 @@ public class DirHasherResultTest {
 
     @Test
     public void testExcludeOneLeftWrong() {
-        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
-        setTwo.put("four", new DigestResult(new Digest("crc", "3333")));
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("four"), new DigestResult(new Digest("crc", "3333")));
 
         DirHasherResult result = setTwo.exclude(setOne);
         assertEquals(4, setTwo.size());
@@ -153,8 +153,8 @@ public class DirHasherResultTest {
 
     @Test
     public void testNotIntersectTwo() {
-        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
-        setTwo.put("five", new DigestResult(new Digest("crc", "3333")));
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("five"), new DigestResult(new Digest("crc", "3333")));
 
         DirHasherResult result = setOne.notIntersect(setTwo);
 
@@ -164,27 +164,27 @@ public class DirHasherResultTest {
 
     @Test
     public void testIntersectTwo() {
-        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
-        setTwo.put("four", new DigestResult(new Digest("crc", "3333")));
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("four"), new DigestResult(new Digest("crc", "3333")));
 
         DirHasherResult result = setOne.intersect(setTwo);
 
         assertEquals(3, result.size());
-        assertTrue(! result.containsKey("four"));
-        assertTrue(result.get("three").containsResult("crc"));
-        assertEquals(new Digest("crc", "2222"), result.get("three").getDigest("crc"));
+        assertTrue(! result.containsKey(new File("four")));
+        assertTrue(result.get(new File("three")).containsResult("crc"));
+        assertEquals(new Digest("crc", "2222"), result.get(new File("three")).getDigest("crc"));
     }
 
     @Test
     public void testIntersectTwoDifferentSets() {
-        setOne.put("four", new DigestResult(new Digest("crc", "2222")));
-        setTwo.put("five", new DigestResult(new Digest("crc", "3333")));
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("five"), new DigestResult(new Digest("crc", "3333")));
 
         DirHasherResult result = setOne.intersect(setTwo);
 
         assertEquals(3, result.size());
-        assertTrue(! result.containsKey("four"));
-        assertTrue(! result.containsKey("five"));
+        assertTrue(! result.containsKey(new File("four")));
+        assertTrue(! result.containsKey(new File("five")));
     }
 
     @Test
@@ -192,10 +192,10 @@ public class DirHasherResultTest {
         List<Digest> list = new ArrayList<Digest>();
         list.add( new Digest("crc", "eeee") );
         list.add( new Digest("md4", "1111") );
-        setOne.put("four", new DigestResult(list));
+        setOne.put(new File("four"), new DigestResult(list));
         List<Digest> list2 = new ArrayList<Digest>();
         list.add( new Digest("md4", "1111") );
-        setTwo.put("four", new DigestResult(list2));
+        setTwo.put(new File("four"), new DigestResult(list2));
 
         DirHasherResult result = setOne.intersect(setTwo);
 
