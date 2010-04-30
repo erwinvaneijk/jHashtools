@@ -22,35 +22,25 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package nl.minjus.nfi.dt.jhashtools.utils;
+package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Erwin van Eijk
- * Date: Apr 30, 2010
- * Time: 3:41:52 PM
+ * This class implements a Comparator for File where each file
+ * is deemed the same of the path would point to the same file regardless of
+ * how it is named.
  */
-public class FileOperations {
+public class FileComparator implements Comparator<File> {
 
-    public static boolean isSameFile(File first, File second) {
+    @Override
+    public int compare(File o1, File o2) {
         try {
-            if (first.exists() && second.exists()) {
-                if (first.getCanonicalFile().equals(second.getCanonicalFile())) {
-                    return true;
-                }
-            }
+            return o1.getCanonicalFile().compareTo(o2.getCanonicalFile());
         } catch (IOException ex) {
-            // Pass, as this will result in returning false anyway.
+            return o1.compareTo(o2);
         }
-        return false;
-    }
-
-    public static boolean isSameFile(String first, String second) {
-        File firstFile = new File(first);
-        File secondFile = new File(second);
-        return FileOperations.isSameFile(firstFile, secondFile);
     }
 }

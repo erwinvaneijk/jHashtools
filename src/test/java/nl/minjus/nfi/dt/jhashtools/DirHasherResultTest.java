@@ -145,6 +145,17 @@ public class DirHasherResultTest {
     }
 
     @Test
+    public void testEqualityWhileNamesAlmostDifferent() {
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("." + File.separator + "four"), new DigestResult(new Digest("crc", "2222")));
+
+        setOne.put(new File("." + File.separator + "five"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File(System.getProperty("user.dir") + File.separator + "five"), new DigestResult(new Digest("crc", "2222")));
+
+        assertEquals(setOne, setTwo);
+    }
+
+    @Test
     public void testNotIntersect() {
         DirHasherResult result = setOne.notIntersect(setTwo);
 

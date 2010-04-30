@@ -41,6 +41,7 @@ public class DirHasherResult extends TreeMap<File, DigestResult> {
      * Constructor.
      */
     public DirHasherResult() {
+        super(new FileComparator());
         this.constructionInfo = new ConstructionInfo();
     }
 
