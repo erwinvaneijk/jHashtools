@@ -92,23 +92,26 @@ public class App {
         try {
             directoryHasher = new DirHasher(FileHasher.NO_ALGORITHM);
 
-            if (line.hasOption("sha-256")) {
+            if (line.hasOption("all") || line.hasOption("sha-256")) {
                 directoryHasher.addAlgorithm("sha-256");
             }
-            if (line.hasOption("sha-1")) {
+            if (line.hasOption("all") || line.hasOption("sha-1")) {
                 directoryHasher.addAlgorithm("sha-1");
             }
-            if (line.hasOption("sha-512")) {
+            if (line.hasOption("all") || line.hasOption("sha-384")) {
+                directoryHasher.addAlgorithm("sha-384");
+            }
+            if (line.hasOption("all") || line.hasOption("sha-512")) {
                 directoryHasher.addAlgorithm("sha-512");
             }
-            if (line.hasOption("md5")) {
+            if (line.hasOption("all") || line.hasOption("md5")) {
                 directoryHasher.addAlgorithm("md5");
             }
-            if (line.hasOption("ripemd")) {
-                directoryHasher.addAlgorithm("ripemd");
+            if (line.hasOption("all") || line.hasOption("md2")) {
+                directoryHasher.addAlgorithm("md2");
             }
         } catch (NoSuchAlgorithmException ex) {
-            getLogger(App.class.getName()).log(Level.SEVERE, "Algoritm not found", ex);
+            getLogger(App.class.getName()).log(Level.SEVERE, "Algorithm not found", ex);
         } finally {
             try {
                 if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
@@ -166,11 +169,13 @@ public class App {
         Options options = new Options();
 
         options.addOption("h", "help", false, "Get help on the supported commandline options");
-        options.addOption("2", "sha-256", false, "Output a sha-256 digest (Default if none given)");
         options.addOption("1", "sha-1", false, "Output a sha-1 digest");
+        options.addOption("2", "sha-256", false, "Output a sha-256 digest (Default if none given)");
+        options.addOption(null, "sha-384", false, "Output a sha-384 digest");
         options.addOption(null, "sha-512", false, "Output a sha-512 digest");
         options.addOption(null, "md5", false, "Output a md5 digest");
-        options.addOption(null, "ripemd", false, "Output a ripemd digest");
+        options.addOption(null, "md2", false, "Output a md2 digest (should not be used!)");
+        options.addOption("a", "all", false, "Include all available digest algorithms");
         options.addOption("v", "verbose", false, "Create verbose output");
         Option outputOption =
                 OptionBuilder.withLongOpt("output")
