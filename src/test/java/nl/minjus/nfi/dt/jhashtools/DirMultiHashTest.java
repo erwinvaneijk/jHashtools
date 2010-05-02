@@ -73,8 +73,8 @@ public class DirMultiHashTest {
             dirHasher.addAlgorithm("sha-1");
             dirHasher.addAlgorithm("md5");
             DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
-            assertEquals(10, digests.size());
-            assertEquals(knownDigests.size(), 10);
+            assertEquals(11, digests.size());
+            assertEquals(knownDigests.size(), 11);
             assertEquals(knownDigests.getByAlgorithm("sha-256").size(), digests.size());
             assertEquals(knownDigests.getByAlgorithm("sha-1").size(), digests.size());
             assertEquals(knownDigests.getByAlgorithm("md5").size(), digests.size());

@@ -24,8 +24,10 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersistenceProvider;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 
 import java.io.*;
@@ -42,8 +44,10 @@ public class DirHasherResultVerifier {
     private final DirHasherResult measuredDigests;
     private DirHasherResult verificationDigests;
     private File file;
+    private PersistenceStyle persistenceStyle;
 
-    public DirHasherResultVerifier(DirHasherResult result) {
+    public DirHasherResultVerifier(DirHasherResult result, PersistenceStyle persistenceStyle) {
+        this.persistenceStyle = persistenceStyle;
         this.measuredDigests = result;
     }
 
@@ -53,10 +57,14 @@ public class DirHasherResultVerifier {
         try {
             this.file = new File(filename);
             stream = new FileInputStream(this.file);
-            PersistenceProvider persistenceProvider = new JsonPersistenceProvider();
+
+            PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
+
             result = (DirHasherResult) persistenceProvider.load(stream, DirHasherResult.class);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (PersistenceException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Cannot load from file. Unfortunately", ex);
         } finally {
             this.verificationDigests = result;
         }

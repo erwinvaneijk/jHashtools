@@ -24,34 +24,20 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+public enum PersistenceStyle {
+    JSON,
+    XML,
+    OLDSTYLE;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
-/**
- * This interface can be used to do persistence.
- *
- * It's a rather shallow interface.
- * @author eijk
- */
-public interface PersistenceProvider {
-
-    /**
-     * Persist the content of <c>obj</c> to <c>out</c>.
-     * 
-     * @param out The stream to send the output to
-     * @param obj the object to persist.
-     * @throws PersistenceException thrown when a problem occurs when persisting the data.
-     */
-    public void persist(OutputStream out, Object obj) throws PersistenceException;
-
-    /**
-     * UnPersist the content of <c>obj</c> from <c>stream</c>.
-     * 
-     * @param stream
-     * @param clazz
-     * @return
-     */
-    public Object load(InputStream stream, Class clazz) throws PersistenceException;
+    public static PersistenceStyle convert(String description) {
+        if (description.equals("xml")) {
+            return XML;
+        } else if (description.equals("json")) {
+            return JSON;
+        } else if (description.equals("old")) {
+            return OLDSTYLE;
+        } else {
+            throw new RuntimeException("We do not support option " + description );
+        }
+    }
 }

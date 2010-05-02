@@ -61,6 +61,9 @@ public class FileHasherTest {
         expectedDigests = new TreeMap<Integer, String>();
         int i = 1;
         for (Map.Entry<File, DigestResult> entry: result.entrySet()) {
+            if (entry.getKey().toString().contains("oldformat")) {
+                continue;
+            }
             expectedDigests.put(i, entry.getValue().getHexDigest(FileHasher.DEFAULT_ALGORITHM));
             i += 1;
         }

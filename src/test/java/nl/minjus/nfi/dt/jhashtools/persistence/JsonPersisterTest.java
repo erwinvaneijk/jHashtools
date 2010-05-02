@@ -93,7 +93,7 @@ public class JsonPersisterTest {
      * Test of load method, of class JsonPersistenceProvider.
      */
     @Test
-    public void testLoad() {
+    public void testLoad() throws PersistenceException {
         InputStream stream = new ByteArrayInputStream(this.testDigestResultInJson.getBytes());
         Class<DigestResult> clazz = DigestResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
@@ -126,7 +126,7 @@ public class JsonPersisterTest {
     }
 
     @Test
-    public void testLoadDirHasherResult() {
+    public void testLoadDirHasherResult() throws PersistenceException {
         InputStream stream = new ByteArrayInputStream(this.testDirHasherResultInJson.getBytes());
         Class<DirHasherResult> clazz = DirHasherResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();

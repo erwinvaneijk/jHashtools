@@ -27,6 +27,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.Version;
 import org.apache.commons.cli.*;
 
@@ -67,9 +68,17 @@ public class App {
 
         if (line.hasOption("i")) {
             String filename = line.getOptionValue("i");
-            verifyFoundDigests(digests, filename);
+
+            PersistenceStyle persistenceStyle = null;
+            if (line.hasOption("style")) {
+                persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
+            } else {
+                persistenceStyle = PersistenceStyle.JSON;
+            }
+
+            verifyFoundDigests(digests, filename, persistenceStyle);
         } else if (line.hasOption("o")) {
-            DirHasherResult resultFileDigests = persistDigestsToFile(digests, line.getOptionValue("output"));
+            DirHasherResult resultFileDigests = persistDigestsToFile(digests, line.getOptionValue("output"), line.hasOption("force"));
             outputDigests(System.err, resultFileDigests);
         }
 
@@ -81,8 +90,8 @@ public class App {
         resultFileDigests.prettyPrint(out);
     }
 
-    private static void verifyFoundDigests(DirHasherResult digests, String filename) {
-        DirHasherResultVerifier verifier = new DirHasherResultVerifier(digests);
+    private static void verifyFoundDigests(DirHasherResult digests, String filename, PersistenceStyle parseNewStyle) {
+        DirHasherResultVerifier verifier = new DirHasherResultVerifier(digests, parseNewStyle);
         verifier.loadDigestsFromFile(filename);
         verifier.verify(System.out);
     }
@@ -129,11 +138,11 @@ public class App {
         return directoryHasher;
     }
 
-    private static DirHasherResult persistDigestsToFile(DirHasherResult digests, String outputFilename) {
+    private static DirHasherResult persistDigestsToFile(DirHasherResult digests, String outputFilename, boolean force) {
         OutputStream file = null;
         try {
             File outputFile = new File(outputFilename);
-            if (outputFile.exists()) {
+            if (outputFile.exists() && !force) {
                 getLogger(App.class.getName()).log(Level.SEVERE, "Output file exists. Aborting");
                 System.exit(-1);
             }
@@ -177,6 +186,7 @@ public class App {
         options.addOption(null, "md2", false, "Output a md2 digest (should not be used!)");
         options.addOption("a", "all", false, "Include all available digest algorithms");
         options.addOption("v", "verbose", false, "Create verbose output");
+        options.addOption("f", "force", false, "Force overwriting any previous output");
         Option outputOption =
                 OptionBuilder.withLongOpt("output")
                     .withDescription("The file the output is written to")
@@ -185,6 +195,7 @@ public class App {
                         .create("o");
         options.addOption(outputOption);
         options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
+        options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use").hasArg().withArgName("style").create("s"));
         CommandLine line;
         try {
             line = parser.parse(options, args);

@@ -24,34 +24,39 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-/**
- * This interface can be used to do persistence.
- *
- * It's a rather shallow interface.
- * @author eijk
- */
-public interface PersistenceProvider {
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 
-    /**
-     * Persist the content of <c>obj</c> to <c>out</c>.
-     * 
-     * @param out The stream to send the output to
-     * @param obj the object to persist.
-     * @throws PersistenceException thrown when a problem occurs when persisting the data.
-     */
-    public void persist(OutputStream out, Object obj) throws PersistenceException;
+public class OldStylePersistenceProviderTest {
 
-    /**
-     * UnPersist the content of <c>obj</c> from <c>stream</c>.
-     * 
-     * @param stream
-     * @param clazz
-     * @return
-     */
-    public Object load(InputStream stream, Class clazz) throws PersistenceException;
+    @Test
+    public void testLoadFile() {
+        try {
+            File file = new File("testdata/oldformat.txt");
+            InputStream input = new FileInputStream(file);
+            OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
+            DirHasherResult result = (DirHasherResult) provider.load(input, DirHasherResult.class);
+            assert result != null;
+            assertEquals(4, result.size());
+            assertEquals("md5:a4850cd827a34a7e54dacf6814e06f55", result.get(new File("hashtree256.py")).getDigest("md5").toString());
+            assertEquals("sha-1:23e7ace892b507b07e4dfcf1f028ee3130bc682e", result.get(new File("hashtree256.py")).getDigest("sha-1").toString());
+
+            assertEquals("md5:44af6da725a24c2d8363a42069ee110f", result.get(new File("shatest.py")).getDigest("md5").toString());
+            assertEquals("sha-256:b7e94899a85df9809030e8ede16b857e90d886279dc1d3d14562142c9303dc39", result.get(new File("shatest.py")).getDigest("sha-256").toString());
+
+        } catch (IOException ex) {
+            fail("We got an IOException. Wrong.");
+        } catch (PersistenceException e) {
+            fail(e.toString());
+        }
+    }
 }

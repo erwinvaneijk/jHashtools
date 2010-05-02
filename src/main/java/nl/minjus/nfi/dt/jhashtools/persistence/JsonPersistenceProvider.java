@@ -68,7 +68,7 @@ public class JsonPersistenceProvider implements PersistenceProvider {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public Object load(InputStream stream, Class clazz) {
+    public Object load(InputStream stream, Class clazz) throws PersistenceException {
         Gson gson = this.gsonBuilder.create();
         Reader reader = new InputStreamReader(stream);
         return gson.fromJson(reader, clazz);
