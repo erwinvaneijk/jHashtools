@@ -35,10 +35,35 @@ import java.util.Comparator;
  */
 public class FileComparator implements Comparator<File> {
 
+    private boolean ignoreCase;
+
+    public FileComparator() {
+        this.ignoreCase = false;
+    }
+
+    public FileComparator(boolean isIgnoringCase) {
+        this.ignoreCase = isIgnoringCase;
+    }
+
+    public void setIgnoreCase(boolean ignoreCase) {
+        this.ignoreCase = ignoreCase;
+    }
+
+    public boolean isIgnoringCase() {
+        return this.ignoreCase;
+    }
+
     @Override
     public int compare(File o1, File o2) {
         try {
-            return o1.getCanonicalFile().compareTo(o2.getCanonicalFile());
+            String filename1 = o1.getCanonicalPath();
+            String filename2 = o2.getCanonicalPath();
+
+            if (! this.isIgnoringCase()) {
+                return filename1.compareTo(filename2);
+            } else {
+                return filename1.compareToIgnoreCase(filename2);
+            }
         } catch (IOException ex) {
             return o1.compareTo(o2);
         }

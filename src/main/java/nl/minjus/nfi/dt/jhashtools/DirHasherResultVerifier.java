@@ -31,6 +31,7 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 
 import java.io.*;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,14 +42,24 @@ import java.util.logging.Logger;
  */
 public class DirHasherResultVerifier {
 
-    private final DirHasherResult measuredDigests;
+    private DirHasherResult measuredDigests;
     private DirHasherResult verificationDigests;
     private File file;
     private PersistenceStyle persistenceStyle;
+    private boolean ignoreCase;
 
     public DirHasherResultVerifier(DirHasherResult result, PersistenceStyle persistenceStyle) {
         this.persistenceStyle = persistenceStyle;
         this.measuredDigests = result;
+        this.ignoreCase = false;
+    }
+
+    public void setIgnoreCase(boolean ignoreCase) {
+        this.ignoreCase = ignoreCase;
+    }
+
+    public boolean isIgnoringCase() {
+        return this.ignoreCase;
     }
 
     public void loadDigestsFromFile(String filename) {
@@ -71,17 +82,38 @@ public class DirHasherResultVerifier {
     }
 
     public void verify(PrintStream out) {
+        if (this.isIgnoringCase()) {
+            DirHasherResult ignoredCaseMeasurements = new DirHasherResult(this.isIgnoringCase());
+            ignoredCaseMeasurements.putAll(this.measuredDigests);
+            DirHasherResult ignoredCaseVerifications = new DirHasherResult(this.isIgnoringCase());
+            ignoredCaseVerifications.putAll(this.verificationDigests);
+
+            this.verificationDigests = ignoredCaseVerifications;
+            this.measuredDigests = ignoredCaseMeasurements;
+        }
+        
         DirHasherResult differences = this.measuredDigests.notIntersect(this.verificationDigests);
+        out.printf("*** %s ***\n", Calendar.getInstance().getTime().toString());
         if (differences.size() == 0) {
-            out.println("There are no differences at all.");
+            out.println("*** PASSED VERIFICATION ***");
         } else {
-            if (differences.size() == 1 && FileOperations.isSameFile(differences.firstKey(), this.file)
-                    ) {
-                out.println("There are no differences.");
-                out.println("Printing info on the output file.");
+            if (differences.size() == 1 && FileOperations.isSameFile(differences.firstKey(), this.file)) {
+                out.println("*** PASSED VERIFICATION ***");
+                out.println("Printing info on " + this.file.getName());
                 differences.prettyPrint(out);
             } else {
                 out.println("There are differences.");
+                // First calculate the files measured, but missing in the verification.
+                differences = this.measuredDigests.missing(this.verificationDigests);
+                out.println("These entries are seen, but missing in the " + this.file.getName() + " list");
+                for (Map.Entry<File, DigestResult> entry : differences.entrySet()) {
+                    out.println(entry.getKey().toString());
+                    for (Digest d : entry.getValue()) {
+                        out.printf("\t%s\n", d.toString('\t'));
+                    }
+                }
+
+                out.println("These entries are in the " + this.file.getName() + " list, but not in the directory and/or files.");
                 for (Map.Entry<File, DigestResult> entry : differences.entrySet()) {
                     out.println(entry.getKey().toString());
                     for (Digest d : entry.getValue()) {
@@ -91,6 +123,4 @@ public class DirHasherResultVerifier {
             }
         }
     }
-
-    
 }

@@ -160,6 +160,9 @@ public class DirHasherResultTest {
         DirHasherResult result = setOne.notIntersect(setTwo);
 
         assertEquals(0, result.size());
+
+        result = setTwo.notIntersect(setOne);
+        assertEquals(0, result.size());
     }
 
     @Test
@@ -169,8 +172,12 @@ public class DirHasherResultTest {
 
         DirHasherResult result = setOne.notIntersect(setTwo);
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertTrue(result.containsKey("four"));
+        assertTrue(result.containsKey("five"));
+
+        DirHasherResult result2 = setTwo.notIntersect(setOne);
+        assertEquals(result, result2);
     }
 
     @Test
@@ -184,6 +191,9 @@ public class DirHasherResultTest {
         assertTrue(! result.containsKey(new File("four")));
         assertTrue(result.get(new File("three")).containsResult("crc"));
         assertEquals(new Digest("crc", "2222"), result.get(new File("three")).getDigest("crc"));
+
+        DirHasherResult result2 = setTwo.intersect(setOne);
+        assertEquals(result, result2);
     }
 
     @Test
@@ -196,6 +206,9 @@ public class DirHasherResultTest {
         assertEquals(3, result.size());
         assertTrue(! result.containsKey(new File("four")));
         assertTrue(! result.containsKey(new File("five")));
+
+        DirHasherResult result2 = setTwo.intersect(setOne);
+        assertEquals(result, result2);
     }
 
     @Test
@@ -214,6 +227,9 @@ public class DirHasherResultTest {
         assertTrue(! result.containsKey("four"));
         assertTrue(! result.containsKey("five"));
         assertTrue(result.get("three").containsResult("crc"));
+
+        DirHasherResult result2 = setTwo.intersect(setOne);
+        assertEquals(result, result2);
     }
 
     @Test
@@ -238,4 +254,16 @@ public class DirHasherResultTest {
         assertTrue(result.containsKey("four"));
     }
 
+        @Test
+    public void testMissing() {
+        setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File("five"), new DigestResult(new Digest("crc", "3333")));
+
+        // get all the entries that are in one, but not in two.
+        DirHasherResult result = setOne.missing(setTwo);
+
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("four"));
+        assertTrue(! result.containsKey("five"));
+    }
 }

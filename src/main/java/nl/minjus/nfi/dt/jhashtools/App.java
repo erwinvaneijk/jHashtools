@@ -76,7 +76,7 @@ public class App {
                 persistenceStyle = PersistenceStyle.JSON;
             }
 
-            verifyFoundDigests(digests, filename, persistenceStyle);
+            verifyFoundDigests(digests, filename, persistenceStyle, line.hasOption("ignorecase"));
         } else if (line.hasOption("o")) {
             DirHasherResult resultFileDigests = persistDigestsToFile(digests, line.getOptionValue("output"), line.hasOption("force"));
             outputDigests(System.err, resultFileDigests);
@@ -90,8 +90,9 @@ public class App {
         resultFileDigests.prettyPrint(out);
     }
 
-    private static void verifyFoundDigests(DirHasherResult digests, String filename, PersistenceStyle parseNewStyle) {
+    private static void verifyFoundDigests(DirHasherResult digests, String filename, PersistenceStyle parseNewStyle, boolean ignoreCase) {
         DirHasherResultVerifier verifier = new DirHasherResultVerifier(digests, parseNewStyle);
+        verifier.setIgnoreCase(ignoreCase);
         verifier.loadDigestsFromFile(filename);
         verifier.verify(System.out);
     }
@@ -185,6 +186,7 @@ public class App {
         options.addOption(null, "md5", false, "Output a md5 digest");
         options.addOption(null, "md2", false, "Output a md2 digest (should not be used!)");
         options.addOption("a", "all", false, "Include all available digest algorithms");
+        options.addOption("n", "ignorecase", false, "Ignore the case on the file, only used when verifying.");
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
         Option outputOption =

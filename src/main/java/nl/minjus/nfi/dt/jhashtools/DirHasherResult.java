@@ -41,7 +41,16 @@ public class DirHasherResult extends TreeMap<File, DigestResult> {
      * Constructor.
      */
     public DirHasherResult() {
-        super(new FileComparator());
+        this(false);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param ignoreCase if set to true, the case is ignored on the file when comparing two files for equality.
+     */
+    public DirHasherResult(boolean ignoreCase) {
+        super(new FileComparator(ignoreCase));
         this.constructionInfo = new ConstructionInfo();
     }
 
@@ -168,6 +177,31 @@ public class DirHasherResult extends TreeMap<File, DigestResult> {
                 result.put(key, value);
             }
         }
+        for (Map.Entry<File, DigestResult> entry : o.entrySet()) {
+            File key = entry.getKey();
+            DigestResult value = entry.getValue();
+            if (! (this.containsKey(key) && value.equals(this.get(key)))) {
+                result.put(key, value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Return the set of results that are in this set, but are missing from
+     * the other set.
+     * @param other
+     * @return
+     */
+    public DirHasherResult missing(DirHasherResult other) {
+        DirHasherResult result = new DirHasherResult();
+        for (Map.Entry<File, DigestResult> entry : this.entrySet()) {
+            File key = entry.getKey();
+            DigestResult value = entry.getValue();
+            if (! (other.containsKey(key) && value.equals(other.get(key)))) {
+                result.put(key, value);
+            }
+        }
         return result;
     }
 
@@ -197,4 +231,5 @@ public class DirHasherResult extends TreeMap<File, DigestResult> {
             out.printf("\t%s\n", d.prettyPrint('\t'));
         }
     }
+
 }
