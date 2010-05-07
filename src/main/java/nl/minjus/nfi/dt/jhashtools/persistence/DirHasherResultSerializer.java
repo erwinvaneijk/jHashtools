@@ -36,7 +36,7 @@ import java.util.Map;
 
 /**
  *
- * @author eijk
+ * @author Erwin van Eijk
  */
 public class DirHasherResultSerializer 
         implements JsonDeserializer<DirHasherResult>,
