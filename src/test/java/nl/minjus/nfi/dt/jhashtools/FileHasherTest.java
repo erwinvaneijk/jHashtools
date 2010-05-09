@@ -60,7 +60,7 @@ public class FileHasherTest {
         DirHasherResult result = KnownDigests.getKnownResults();
         expectedDigests = new TreeMap<Integer, String>();
         int i = 1;
-        for (Map.Entry<File, DigestResult> entry: result.entrySet()) {
+        for (Map.Entry<File, DigestResult> entry: result) {
             if (entry.getKey().toString().contains("oldformat")) {
                 continue;
             }

@@ -24,53 +24,53 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.deser.CustomDeserializerFactory;
+import org.codehaus.jackson.map.deser.StdDeserializerProvider;
+import org.codehaus.jackson.map.ser.CustomSerializerFactory;
 
 import java.io.*;
-import java.lang.reflect.Type;
 
 /**
  *
- * @author eijk
+ * @author Erwin van Eijk
  */
 public class JsonPersistenceProvider implements PersistenceProvider {
 
-    private final GsonBuilder gsonBuilder;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonPersistenceProvider() {
-        // pass
-        gsonBuilder = new GsonBuilder();
-        this.gsonBuilder.setPrettyPrinting();
-        Type digestType=new TypeToken<Digest>() {}.getType();
-        this.gsonBuilder.registerTypeAdapter(digestType, new DigestSerializer());
-        Type fullDigestList=new TypeToken<DirHasherResult>() {}.getType();
-        Type digestResultType=new TypeToken<DigestResult>() {}.getType();
-        this.gsonBuilder.registerTypeAdapter(digestResultType, new DigestResultSerializer());
-        this.gsonBuilder.registerTypeAdapter(fullDigestList, new DirHasherResultSerializer());
+    static {
+        CustomSerializerFactory sf = new CustomSerializerFactory();
+        sf.addGenericMapping(DirHasherResult.class, new DirHasherResultSerializer());
+        sf.addGenericMapping(DigestResult.class, new DigestResultSerializer());
+        objectMapper.setSerializerFactory(sf);
+
+        CustomDeserializerFactory df = new CustomDeserializerFactory();
+        df.addSpecificMapping(DirHasherResult.class, new DirHasherResultDeserializer());
+        df.addSpecificMapping(DigestResult.class, new DigestResultDeserializer());
+        objectMapper.setDeserializerProvider(new StdDeserializerProvider(df));
     }
 
     @Override
     public void persist(OutputStream out, Object obj) throws PersistenceException {
         try {
-            Gson gson = this.gsonBuilder.create();
-            String result = gson.toJson(obj);
-            out.write(result.getBytes());
-        } catch (IOException ex) {
+            objectMapper.writeValue(out, obj);
+       } catch (IOException ex) {
             throw new PersistenceException(ex);
-        }
+       }
     }
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public Object load(InputStream stream, Class clazz) throws PersistenceException {
-        Gson gson = this.gsonBuilder.create();
-        Reader reader = new InputStreamReader(stream);
-        return gson.fromJson(reader, clazz);
+    public Object load(Reader reader, Class clazz) throws PersistenceException {
+        try {
+            return objectMapper.readValue(reader, clazz);
+        } catch (IOException ex) {
+            throw new PersistenceException(ex);
+        }
     }
 }

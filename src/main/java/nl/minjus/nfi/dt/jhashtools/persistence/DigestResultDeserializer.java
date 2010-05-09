@@ -25,36 +25,34 @@
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.JavaType;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.TreeMap;
 
-/**
- *
- * @author Erwin van Eijk
- */
-public class DirHasherResultSerializer 
-        extends
-        JsonSerializer<DirHasherResult>
-{
-     @Override
-    public void serialize(DirHasherResult dirHasherResult, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jsonGenerator.writeStartObject();
-        jsonGenerator.writeFieldName("constructionInfo");
-        jsonGenerator.writeObject(dirHasherResult.getConstructionInfo());
+public class DigestResultDeserializer extends JsonDeserializer<DigestResult> {
 
-        jsonGenerator.writeFieldName("content");
-        JavaType mapType = TypeFactory.mapType(TreeMap.class, File.class, DigestResult.class);
-        JsonSerializer<Object> ser = serializerProvider.findValueSerializer(mapType);
-        ser.serialize(dirHasherResult.getContent(), jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndObject();
+    @Override
+    public DigestResult deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+        DigestResult result = new DigestResult();
+        return result;
     }
+
+    /*
+
+    @Override
+    public DigestResult deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        DigestResult digestResult = new DigestResult();
+        JsonArray array = json.getAsJsonArray();
+        for (int i=0; i<array.size(); ++i) {
+            JsonElement a = array.get(i);
+            Type digestType = new TypeToken<Digest>() {}.getType();
+            Digest digest = context.deserialize(a, digestType);
+            digestResult.add(digest);
+        }
+        return digestResult;
+    }
+    */
 }

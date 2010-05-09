@@ -32,20 +32,26 @@ import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.*;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.junit.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 /**
- *
  * @author eijk
  */
 public class JsonPersisterTest {
 
+    private String testDigestInJson;
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;
 
@@ -62,12 +68,148 @@ public class JsonPersisterTest {
 
     @Before
     public void setUp() {
-        this.testDigestResultInJson = "[[\"sha-1\",\"0000111122223333444455556666777788889999aaaa\"]]\n";
-        this.testDirHasherResultInJson = "{\"myfile\":[[\"sha-1\",\"0000111122223333444455556666777788889999aaaa\"]]}\n";
+        this.testDigestInJson = "\"sha-1:0000111122223333444455556666777788889999aaaa\"";
+        this.testDigestResultInJson = "[\"sha-1:0000111122223333444455556666777788889999aaaa\"]";
+        this.testDirHasherResultInJson = "{\"constructionInfo\":{\"constructionDate\":1273412558116,\"operatingSystem\":\"Mac OS X:10.6.3\",\"versionInformation\":\"1.0-unknown\",\"username\":\"eijk\"},\"content\":{\"myfile\":[\"sha-1:0000111122223333444455556666777788889999aaaa\"]}}";
     }
 
     @After
     public void tearDown() {
+    }
+
+    static class LargeArrayClass {
+
+        List<Long> set;
+
+        public LargeArrayClass() {
+            this(0);
+        }
+
+        public LargeArrayClass(int n) {
+            this.set = new ArrayList<Long>(n);
+            for (long i = 0; i < n; i++) {
+                set.add((int) i, i);
+            }
+        }
+
+        public List<Long> getSet() {
+            return this.set;
+        }
+
+        public void setSet(List<Long> set) {
+            this.set = set;
+        }
+    }
+
+    static class LargeArraySerializer extends JsonSerializer<LargeArrayClass> {
+
+        @Override
+        public void serialize(LargeArrayClass largeArrayClass, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeArrayFieldStart("set");
+            for (Long l : largeArrayClass.set) {
+                jsonGenerator.writeNumber(l);
+            }
+            jsonGenerator.writeEndArray();
+        }
+    }
+
+    static class LargeArrayDeserializer extends JsonDeserializer<LargeArrayClass> {
+
+        @Override
+        public LargeArrayClass deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+            LargeArrayClass instance = new LargeArrayClass(10);
+            jp.nextToken();
+            while (jp.nextToken() != JsonToken.END_OBJECT) {
+                String fieldName = jp.getCurrentName();
+                List l = new LinkedList<Long>();
+                if ("set".equals(fieldName)) {
+                    while (jp.nextToken() != JsonToken.END_ARRAY) {
+                        l.add(jp.getLongValue());
+                    }
+                }
+                instance.setSet(l);
+            }
+            return instance;
+        }
+    }
+
+    @JsonSerialize(using = LargeArraySerializer.class)
+    @JsonDeserialize(using = LargeArrayDeserializer.class)
+    class LargeArrayClassMixIn {
+    }
+
+    @Test
+    public void testLargeArray() throws Exception {
+        StringWriter out = new StringWriter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.getSerializationConfig().addMixInAnnotations(LargeArrayClass.class, LargeArrayClassMixIn.class);
+
+        LargeArrayClass a = new LargeArrayClass(10);
+        objectMapper.writeValue(out, a);
+
+        StringReader reader = new StringReader(out.toString());
+        LargeArrayClass b = objectMapper.readValue(reader, LargeArrayClass.class);
+        assertEquals(a.getSet().size(), b.getSet().size());
+        assertEquals(a.getSet(), b.getSet());
+    }
+
+
+    @Test
+    public void testSmallSets() {
+        try {
+            Set<Integer> mySet = new TreeSet<Integer>();
+            for (int i = 0; i < 5; i++) {
+                mySet.add(i);
+            }
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            JsonPersistenceProvider provider = new JsonPersistenceProvider();
+            provider.persist(out, mySet);
+
+            Reader input = new StringReader(out.toString());
+            Set<Integer> otherSet = (Set<Integer>) provider.load(input, Set.class);
+            assertEquals(mySet.size(), otherSet.size());
+            Iterator<Integer> it1 = mySet.iterator();
+            Iterator<Integer> it2 = otherSet.iterator();
+            while ((it1.hasNext() && it2.hasNext())) {
+                int val1 = it1.next();
+                int val2 = it2.next();
+                assertEquals(val1, val2);
+            }
+            assertTrue(!it1.hasNext());
+            assertTrue(!it2.hasNext());
+
+        } catch (PersistenceException ex) {
+            fail("Should not get here");
+        }
+    }
+
+    @Test
+    public void testLargeSets() {
+        try {
+            Set<Integer> mySet = new TreeSet<Integer>();
+            for (Integer i = 0; i < 50000; i++) {
+                mySet.add(i);
+            }
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            JsonPersistenceProvider provider = new JsonPersistenceProvider();
+            provider.persist(out, mySet);
+
+            Reader reader = new StringReader(out.toString());
+            Set<Integer> otherSet = (Set<Integer>) provider.load(reader, mySet.getClass());
+            assertEquals(mySet.size(), otherSet.size());
+            Iterator<Integer> it1 = mySet.iterator();
+            Iterator<Integer> it2 = otherSet.iterator();
+            while ((it1.hasNext() && it2.hasNext())) {
+                Integer val1 = it1.next();
+                Integer val2 = it2.next();
+                assertEquals(val1, val2);
+            }
+            assertTrue(!it1.hasNext());
+            assertTrue(!it2.hasNext());
+        } catch (PersistenceException ex) {
+            fail("Should not get here");
+        }
     }
 
     /**
@@ -94,7 +236,7 @@ public class JsonPersisterTest {
      */
     @Test
     public void testLoad() throws PersistenceException {
-        InputStream stream = new ByteArrayInputStream(this.testDigestResultInJson.getBytes());
+        Reader stream = new StringReader(this.testDigestResultInJson);
         Class<DigestResult> clazz = DigestResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
         DigestResult result = (DigestResult) instance.load(stream, clazz);
@@ -104,30 +246,28 @@ public class JsonPersisterTest {
     }
 
     @Test
-    public void testPersistDirHasherResult() {
-        try {
-            Digest d = new Digest("sha-1", "0000111122223333444455556666777788889999aaaa");
-            DigestResult digestResult = new DigestResult();
-            digestResult.add(d);
-            DirHasherResult obj = new DirHasherResult();
-            obj.put("myfile", digestResult);
+    public void testPersistDirHasherResult() throws PersistenceException {
+        Digest d = new Digest("sha-1", "0000111122223333444455556666777788889999aaaa");
+        DigestResult digestResult = new DigestResult();
+        digestResult.add(d);
+        DirHasherResult obj = new DirHasherResult();
+        obj.put("myfile", digestResult);
 
-            JsonPersistenceProvider instance = new JsonPersistenceProvider();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            instance.persist(out, obj);
-            String str = out.toString();
+        JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        instance.persist(out, obj);
+        String str = out.toString();
 
-            InputStream stream = new ByteArrayInputStream(str.getBytes());
-            DirHasherResult res = (DirHasherResult) instance.load(stream, DirHasherResult.class);
-            assertEquals(obj, res);
-        } catch (PersistenceException ex) {
-            fail("Persistence not good.");
-        }
+        System.out.println("The result: " + str);
+
+        Reader reader = new StringReader(str);
+        DirHasherResult res = (DirHasherResult) instance.load(reader, DirHasherResult.class);
+        assertEquals(obj, res);
     }
 
     @Test
     public void testLoadDirHasherResult() throws PersistenceException {
-        InputStream stream = new ByteArrayInputStream(this.testDirHasherResultInJson.getBytes());
+        Reader stream = new StringReader(this.testDirHasherResultInJson);
         Class<DirHasherResult> clazz = DirHasherResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
         DirHasherResult result = (DirHasherResult) instance.load(stream, clazz);

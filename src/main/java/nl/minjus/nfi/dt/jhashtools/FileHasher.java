@@ -40,6 +40,8 @@ public class FileHasher {
 
     public static final String DEFAULT_ALGORITHM = "sha-256";
     public static final String NO_ALGORITHM = "none";
+    public static final int BLOCK_READ_SIZE = 1024*1024;
+
     private List<MessageDigest> digests;
 
     public static DigestResult computeDigest(File file, String algorithm)
@@ -104,9 +106,9 @@ public class FileHasher {
         }
         FileInputStream stream = new FileInputStream(file);
         try {
-            byte[] buf = new byte[8192];
+            byte[] buf = new byte[BLOCK_READ_SIZE];
             int bytesRead = 0;
-            while ((bytesRead = stream.read(buf, 0, 8192)) != -1) {
+            while ((bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE)) != -1) {
                 for (MessageDigest digest : digests) {
                     digest.update(buf, 0, bytesRead);
                 }

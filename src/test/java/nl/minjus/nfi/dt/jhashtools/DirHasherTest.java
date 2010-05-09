@@ -215,11 +215,26 @@ public class DirHasherTest {
         }
     }
 
+    // @Test
+    public void testLargeTree() {
+        try {
+            DirHasher dirHasher = new DirHasher("sha-256");
+            dirHasher.addAlgorithm("md5");
+            dirHasher.addAlgorithm("sha-1");
+            DirHasherResult digests = dirHasher.getDigests(new File("../boost_1_42_0"));
+            assert digests.size() > 0;
+        }
+        catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString() + " should not happen");
+        }
+    }
+
+    @SuppressWarnings("unused")
     @Test
     public void testGetDirectoryDigestRaisedIllegalArgument() {
         try {
             DirHasher dirHasher = new DirHasher("sha-256");
-            Map<File, DigestResult> digests = dirHasher.getDigests(new File("does-not-exist"));
+            DirHasherResult digests = dirHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
         }
         catch (NoSuchAlgorithmException ex) {

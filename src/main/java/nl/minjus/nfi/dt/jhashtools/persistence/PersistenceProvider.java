@@ -28,12 +28,13 @@ import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 
 /**
  * This interface can be used to do persistence.
  *
  * It's a rather shallow interface.
- * @author eijk
+ * @author Erwin van Eijk
  */
 public interface PersistenceProvider {
 
@@ -47,11 +48,11 @@ public interface PersistenceProvider {
     public void persist(OutputStream out, Object obj) throws PersistenceException;
 
     /**
-     * UnPersist the content of <c>obj</c> from <c>stream</c>.
+     * UnPersist the content of <c>obj</c> from <c>reader</c>.
      * 
-     * @param stream
+     * @param reader
      * @param clazz
      * @return
      */
-    public Object load(InputStream stream, Class clazz) throws PersistenceException;
+    public Object load(Reader reader, Class clazz) throws PersistenceException;
 }

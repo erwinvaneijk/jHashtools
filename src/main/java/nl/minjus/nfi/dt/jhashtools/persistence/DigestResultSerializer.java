@@ -25,44 +25,33 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.type.TypeFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Set;
 
 /**
  *
  * @author eijk
  */
-class DigestResultSerializer
-        implements JsonSerializer<DigestResult>, JsonDeserializer<DigestResult>
+public class DigestResultSerializer
+        extends JsonSerializer<DigestResult>
 {
 
     public DigestResultSerializer() {
     }
 
     @Override
-    public JsonElement serialize(DigestResult src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonArray arr =  new JsonArray();
-        for (Digest d : src) {
-            JsonElement valueElement = context.serialize(d, d.getClass());
-            arr.add(valueElement);
-        }
-        return arr;
-    }
-
-    @Override
-    public DigestResult deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        DigestResult digestResult = new DigestResult();
-        JsonArray array = json.getAsJsonArray();
-        for (int i=0; i<array.size(); ++i) {
-            JsonElement a = array.get(i);
-            Type digestType = new TypeToken<Digest>() {}.getType();
-            Digest digest = context.deserialize(a, digestType);
-            digestResult.add(digest);
-        }
-        return digestResult;
+    public void serialize(DigestResult digestResult, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+        JsonSerializer arraySerializer = serializerProvider.findValueSerializer(TypeFactory.collectionType(Set.class, Digest.class));
+        arraySerializer.serialize(digestResult, jsonGenerator, serializerProvider);
     }
 }

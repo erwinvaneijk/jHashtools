@@ -142,6 +142,7 @@ public class App {
     private static DirHasherResult persistDigestsToFile(DirHasherResult digests, String outputFilename, boolean force) {
         OutputStream file = null;
         try {
+            getLogger(App.class.getName()).log(Level.INFO, "Writing the results to " + outputFilename);
             File outputFile = new File(outputFilename);
             if (outputFile.exists() && !force) {
                 getLogger(App.class.getName()).log(Level.SEVERE, "Output file exists. Aborting");

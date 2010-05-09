@@ -64,14 +64,14 @@ public class DirHasherResultVerifier {
 
     public void loadDigestsFromFile(String filename) {
         DirHasherResult result = null;
-        InputStream stream;
+        Reader reader;
         try {
             this.file = new File(filename);
-            stream = new FileInputStream(this.file);
+            reader = new FileReader(this.file);
 
             PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
 
-            result = (DirHasherResult) persistenceProvider.load(stream, DirHasherResult.class);
+            result = (DirHasherResult) persistenceProvider.load(reader, DirHasherResult.class);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (PersistenceException ex) {
@@ -97,7 +97,7 @@ public class DirHasherResultVerifier {
         if (differences.size() == 0) {
             out.println("*** PASSED VERIFICATION ***");
         } else {
-            if (differences.size() == 1 && FileOperations.isSameFile(differences.firstKey(), this.file)) {
+            if (differences.size() == 1 && FileOperations.isSameFile(differences.iterator().next().getKey(), this.file)) {
                 out.println("*** PASSED VERIFICATION ***");
                 out.println("Printing info on " + this.file.getName());
                 differences.prettyPrint(out);
@@ -106,7 +106,7 @@ public class DirHasherResultVerifier {
                 // First calculate the files measured, but missing in the verification.
                 differences = this.measuredDigests.missing(this.verificationDigests);
                 out.println("These entries are seen, but missing in the " + this.file.getName() + " list");
-                for (Map.Entry<File, DigestResult> entry : differences.entrySet()) {
+                for (Map.Entry<File, DigestResult> entry : differences) {
                     out.println(entry.getKey().toString());
                     for (Digest d : entry.getValue()) {
                         out.printf("\t%s\n", d.toString('\t'));
@@ -114,7 +114,7 @@ public class DirHasherResultVerifier {
                 }
 
                 out.println("These entries are in the " + this.file.getName() + " list, but not in the directory and/or files.");
-                for (Map.Entry<File, DigestResult> entry : differences.entrySet()) {
+                for (Map.Entry<File, DigestResult> entry : differences) {
                     out.println(entry.getKey().toString());
                     for (Digest d : entry.getValue()) {
                         out.printf("\t%s\n", d.toString('\t'));

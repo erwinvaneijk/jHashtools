@@ -82,7 +82,7 @@ public class DirMultiHashTest {
             assertEquals(digests.getByAlgorithm("sha-256").size(), digests.size());
             assertEquals(digests.getByAlgorithm("sha-1").size(), digests.size());
 
-            for (Map.Entry<File, DigestResult> entry : knownDigests.entrySet()) {
+            for (Map.Entry<File, DigestResult> entry : knownDigests) {
                 File filename = entry.getKey();
                 DigestResult knownResults = entry.getValue();
                 assertTrue(digests.containsKey(filename));

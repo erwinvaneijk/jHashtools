@@ -31,6 +31,12 @@
     <version>1.0-SNAPSHOT</version>
     <name>jHashtools</name>
     <url>http://maven.apache.org</url>
+    <licenses>
+        <license>
+            <name>BSD</name>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <build>
         <plugins>
             <!-- Added test excludes for Abstract -->
@@ -177,11 +183,8 @@
     </build>
     <repositories>
         <repository>
-            <id>gson</id>
-            <url>http://google-gson.googlecode.com/svn/mavenrepo</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>jackson</id>
+            <url>http://repository.codehaus.org/org/codehaus/jackson</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -195,12 +198,23 @@
             <type>jar</type>
             <scope>test</scope>
         </dependency>
-        <!--  Gson: Java to Json conversion -->
+        <!-- we use jackson to serialize from and to JSON -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>1.4</version>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.5.2</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.5.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
+            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

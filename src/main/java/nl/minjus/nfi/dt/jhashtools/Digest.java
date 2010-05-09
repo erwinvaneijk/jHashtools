@@ -29,12 +29,15 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonValue;
 
 import java.util.Arrays;
 
 /**
  *
- * @author kojak
+ * @author Erwin van Eijk
  */
 public class Digest implements Comparable<Digest> {
 
@@ -49,6 +52,13 @@ public class Digest implements Comparable<Digest> {
     public Digest(String algorithm, String hexValue) {
         this.algorithm = algorithm;
         this.content = StringOperations.hexToBytes(hexValue);
+    }
+
+    @JsonCreator
+    public Digest(String value) {
+        String[] parts = value.split(":");
+        this.algorithm = parts[0];
+        this.content = StringOperations.hexToBytes(parts[1]);
     }
 
     public void setAlgorithm(final String algorithm) {
@@ -71,7 +81,7 @@ public class Digest implements Comparable<Digest> {
         return StringOperations.hexify(content);
     }
 
-    @Override
+    @JsonValue
     public String toString() {
         return this.toString(':');
     }

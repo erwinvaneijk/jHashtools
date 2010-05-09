@@ -28,10 +28,7 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
@@ -42,7 +39,7 @@ public class OldStylePersistenceProviderTest {
     public void testLoadFile() {
         try {
             File file = new File("testdata/oldformat.txt");
-            InputStream input = new FileInputStream(file);
+            Reader input = new FileReader(file);
             OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
             DirHasherResult result = (DirHasherResult) provider.load(input, DirHasherResult.class);
             assert result != null;

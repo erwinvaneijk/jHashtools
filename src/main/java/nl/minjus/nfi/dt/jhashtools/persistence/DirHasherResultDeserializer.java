@@ -21,40 +21,45 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.JavaType;
-
 import java.io.File;
+import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
+
 import java.io.IOException;
-import java.util.TreeMap;
+import java.util.Map;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.type.TypeReference;
 
 /**
- *
- * @author Erwin van Eijk
+ * Arrange the deserialization of the JSON structure for DirHasherResult
  */
-public class DirHasherResultSerializer 
-        extends
-        JsonSerializer<DirHasherResult>
-{
-     @Override
-    public void serialize(DirHasherResult dirHasherResult, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jsonGenerator.writeStartObject();
-        jsonGenerator.writeFieldName("constructionInfo");
-        jsonGenerator.writeObject(dirHasherResult.getConstructionInfo());
+public class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult> {
 
-        jsonGenerator.writeFieldName("content");
-        JavaType mapType = TypeFactory.mapType(TreeMap.class, File.class, DigestResult.class);
-        JsonSerializer<Object> ser = serializerProvider.findValueSerializer(mapType);
-        ser.serialize(dirHasherResult.getContent(), jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndObject();
+    @Override
+    public DirHasherResult deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+        DirHasherResult result = new DirHasherResult();
+        //if (jp.nextToken() != JsonToken.START_OBJECT) {
+        //    throw new JsonParseException("Did not find a START_OBJECT marker", jp.getTokenLocation());
+        //}
+        while (jp.nextToken() != JsonToken.END_OBJECT) {
+            String fieldName = jp.getCurrentName();
+            if ("constructionInfo".equals(fieldName)) {
+                jp.nextToken();
+                result.setConstructionInfo(jp.readValueAs(ConstructionInfo.class));
+            }
+            if ("content".equals(fieldName)) {
+                jp.nextToken();
+                result.putAll((Map<File, DigestResult>) jp.readValueAs(new TypeReference<Map<File, DigestResult>>() { }));
+            }
+        }
+        return result;
     }
 }

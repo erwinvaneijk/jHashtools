@@ -52,7 +52,7 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
             DirHasherResult directoryHasherResult = (DirHasherResult) obj;
             PrintStream stream = new PrintStream(out);
             stream.println("Generated with " + directoryHasherResult.getConstructionInfo().toString() + " " + Calendar.getInstance().getTime().toString());
-            for (Map.Entry<File, DigestResult> entry: directoryHasherResult.entrySet()) {
+            for (Map.Entry<File, DigestResult> entry: directoryHasherResult) {
                 stream.println(entry.getKey().toString());
                 for (Digest d: entry.getValue()) {
                     stream.println("\t" + d.prettyPrint(":\t"));
@@ -64,11 +64,10 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Object load(InputStream stream, Class clazz) throws PersistenceException {
+    public Object load(Reader reader, Class clazz) throws PersistenceException {
         if (clazz.equals(DirHasherResult.class)) {
             DirHasherResult directoryHasherResult = new DirHasherResult();
             try {
-                Reader reader = new InputStreamReader(stream);
                 LineNumberReader lineNumberReader = new LineNumberReader(reader);
                 String line = lineNumberReader.readLine();
                 // FIXME
