@@ -51,6 +51,7 @@ import static org.junit.Assert.*;
  */
 public class JsonPersisterTest {
 
+    @SuppressWarnings({"FieldCanBeLocal"})
     private String testDigestInJson;
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;

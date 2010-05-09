@@ -33,7 +33,7 @@ import java.util.Comparator;
  * is deemed the same of the path would point to the same file regardless of
  * how it is named.
  */
-public class FileComparator implements Comparator<File> {
+class FileComparator implements Comparator<File> {
 
     private boolean ignoreCase;
 
@@ -58,11 +58,10 @@ public class FileComparator implements Comparator<File> {
         try {
             String filename1 = o1.getCanonicalPath();
             String filename2 = o2.getCanonicalPath();
-
-            if (! this.isIgnoringCase()) {
-                return filename1.compareTo(filename2);
-            } else {
+            if (this.isIgnoringCase()) {
                 return filename1.compareToIgnoreCase(filename2);
+            } else {
+                return filename1.compareTo(filename2);
             }
         } catch (IOException ex) {
             return o1.compareTo(o2);

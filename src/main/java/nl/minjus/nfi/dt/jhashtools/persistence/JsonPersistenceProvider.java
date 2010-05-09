@@ -24,16 +24,16 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.deser.CustomDeserializerFactory;
 import org.codehaus.jackson.map.deser.StdDeserializerProvider;
 import org.codehaus.jackson.map.ser.CustomSerializerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Reader;
 
 /**
  *
@@ -46,12 +46,10 @@ public class JsonPersistenceProvider implements PersistenceProvider {
     static {
         CustomSerializerFactory sf = new CustomSerializerFactory();
         sf.addGenericMapping(DirHasherResult.class, new DirHasherResultSerializer());
-        sf.addGenericMapping(DigestResult.class, new DigestResultSerializer());
         objectMapper.setSerializerFactory(sf);
 
         CustomDeserializerFactory df = new CustomDeserializerFactory();
         df.addSpecificMapping(DirHasherResult.class, new DirHasherResultDeserializer());
-        df.addSpecificMapping(DigestResult.class, new DigestResultDeserializer());
         objectMapper.setDeserializerProvider(new StdDeserializerProvider(df));
     }
 
@@ -66,9 +64,9 @@ public class JsonPersistenceProvider implements PersistenceProvider {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public Object load(Reader reader, Class clazz) throws PersistenceException {
+    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException {
         try {
-            return objectMapper.readValue(reader, clazz);
+            return (T) objectMapper.readValue(reader, clazz);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }

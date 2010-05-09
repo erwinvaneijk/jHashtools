@@ -45,7 +45,7 @@ public class DirHasherResultVerifier {
     private DirHasherResult measuredDigests;
     private DirHasherResult verificationDigests;
     private File file;
-    private PersistenceStyle persistenceStyle;
+    private final PersistenceStyle persistenceStyle;
     private boolean ignoreCase;
 
     public DirHasherResultVerifier(DirHasherResult result, PersistenceStyle persistenceStyle) {
