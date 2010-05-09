@@ -49,15 +49,6 @@ public class DirVisitor implements WalkerVisitor {
         this.verbose = false;
     }
 
-    public DirVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException {
-        resultMap = new DirHasherResult();
-        this.algorithms = new TreeSet<String>();
-        for (String algorithm: algorithms) {
-            this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
-        }
-        this.verbose = verbose;
-    }
-
     public DirVisitor(String algorithm) throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
         this.algorithms = new TreeSet<String>();
@@ -65,9 +56,18 @@ public class DirVisitor implements WalkerVisitor {
         this.verbose = false;
     }
 
-    DirVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException {
+    public DirVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException {
         this(algorithms, false);
         this.resultMap = digests;
+    }
+
+    public DirVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException {
+        resultMap = new DirHasherResult();
+        this.algorithms = new TreeSet<String>();
+        for (String algorithm: algorithms) {
+            this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
+        }
+        this.verbose = verbose;
     }
 
     @Override

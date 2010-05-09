@@ -26,7 +26,6 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 
@@ -50,9 +49,9 @@ public interface PersistenceProvider {
     /**
      * UnPersist the content of <c>obj</c> from <c>reader</c>.
      * 
-     * @param reader
-     * @param clazz
-     * @return
+     * @param reader A Reader to read the content from.
+     * @param clazz The class to finally deliver.
+     * @return an instance of clazz or null.
      */
-    public Object load(Reader reader, Class clazz) throws PersistenceException;
+    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException;
 }

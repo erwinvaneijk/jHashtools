@@ -59,17 +59,21 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
                 }
             }
         } else {
-            throw new PersistenceException("There is no persistence method defined for class " + obj.getClass().toString());
+            if (obj != null) {
+                throw new PersistenceException("There is no persistence method defined for class " + obj.getClass().toString());
+            } else {
+                throw new PersistenceException("There is no persistence method defined for null class");
+            }
         }
     }
 
     @Override
-    public Object load(Reader reader, Class clazz) throws PersistenceException {
+    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException {
         if (clazz.equals(DirHasherResult.class)) {
             DirHasherResult directoryHasherResult = new DirHasherResult();
             try {
                 LineNumberReader lineNumberReader = new LineNumberReader(reader);
-                String line = lineNumberReader.readLine();
+                @SuppressWarnings({"UnusedAssignment"}) String line = lineNumberReader.readLine();
                 // FIXME
                 // We should check for the proper format of the first line.
                 try {
@@ -105,7 +109,7 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
                 } catch (EOFException ex) {
                     // pass, was expected.
                 }
-                return directoryHasherResult;
+                return (T) directoryHasherResult;
             } catch (IOException ex) {
                 throw new PersistenceException(ex);
             }
@@ -118,7 +122,6 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
         CharStream stream = new ANTLRStringStream(testString);
         OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        OldStyleHashesParser parser = new OldStyleHashesParser(tokens);
-        return parser;
+        return new OldStyleHashesParser(tokens);
     }
 }

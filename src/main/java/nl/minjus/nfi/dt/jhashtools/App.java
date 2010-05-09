@@ -69,7 +69,7 @@ public class App {
         if (line.hasOption("i")) {
             String filename = line.getOptionValue("i");
 
-            PersistenceStyle persistenceStyle = null;
+            PersistenceStyle persistenceStyle;
             if (line.hasOption("style")) {
                 persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
             } else {

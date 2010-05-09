@@ -39,7 +39,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
 
     private ConstructionInfo constructionInfo;
 
-    private TreeMap<File, DigestResult> content;
+    private final TreeMap<File, DigestResult> content;
 
     /**
      * Constructor.
@@ -81,7 +81,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Put all the elements in <c>map</c> into our content.
      * 
-     * @param map
+     * @param map the map to get all the content from.
      */
     public void putAll(Map<? extends File, ? extends DigestResult> map) {
         this.content.putAll(map);
@@ -90,7 +90,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Put all the elements in <c>other</c> into our content.
      *
-     * @param other
+     * @param other the other party to get all the results from.
      */
     public void putAll(DirHasherResult other) {
         this.content.putAll(other.content);
@@ -109,7 +109,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * used to check that a file with name exists.
      *
-     * @param name the name to check.
+     * @param file the file to check.
      * @return true if it exists.
      */
     public boolean containsKey(File file) {
@@ -140,7 +140,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
      * Get the results by using only the algorithm mentioned.
      * 
      * @param algorithm the algorithm to look for.
-     * @return
+     * @return the subset of this instance with only entries which have the correct algorithm defined.
      */
     public DirHasherResult getByAlgorithm(String algorithm) {
         DirHasherResult result = new DirHasherResult();
@@ -150,6 +150,13 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
         return result;
     }
 
+    /**
+     * Compare this instance with another instance for equality. The content of the ConstructionInfo member
+     * is <i>ignored</i>.
+     *
+     * @param other the instance to compare to.
+     * @return true if all elements contained are the same.
+     */
     @Override
     public boolean equals(Object other) {
         if (this != other && other instanceof DirHasherResult) {
@@ -188,7 +195,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Get the first entry of our conent.
      * 
-     * @return
+     * @return a map entry.
      */
     public Map.Entry<File, DigestResult> firstEntry() {
         return this.content.firstEntry();
@@ -220,8 +227,8 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Like exclude, but only include entries from <c>o</c> that are
      * in this, but are wrong.
-     * @param o
-     * @return
+     * @param o the other result to compare this to.
+     * @return the correct subset.
      */
     public DirHasherResult includeWrong(DirHasherResult o) {
         DirHasherResult result = new DirHasherResult();
@@ -238,8 +245,8 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Get the entries that are in both selections.
      *
-     * @param o
-     * @return
+     * @param o the other result to compare this to.
+     * @return the correct subset.
      */
     public DirHasherResult intersect(DirHasherResult o) {
         DirHasherResult result = new DirHasherResult();
@@ -261,8 +268,8 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Get all the entries that are in a or b but not in both.
      * 
-     * @param o
-     * @return
+     * @param o the other result to compare this to.
+     * @return the correct subset.
      */
     public DirHasherResult notIntersect(DirHasherResult o) {
         DirHasherResult result = new DirHasherResult();
@@ -286,8 +293,8 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     /**
      * Return the set of results that are in this set, but are missing from
      * the other set.
-     * @param other
-     * @return
+     * @param other the other result to compare this to.
+     * @return the correct subset.
      */
     public DirHasherResult missing(DirHasherResult other) {
         DirHasherResult result = new DirHasherResult();

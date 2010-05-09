@@ -41,7 +41,7 @@ public class Version {
         String pathToClass = clazz.getResource(classFileName).toString();
 
         int mark = pathToClass.indexOf("!");
-        String pathToManifest = pathToClass.toString().substring(0, mark + 1) + "/META-INF/MANIFEST.MF";
+        String pathToManifest = pathToClass.substring(0, mark + 1) + "/META-INF/MANIFEST.MF";
         try {
             Manifest manifest = new Manifest(new URL(pathToManifest).openStream());
             Attributes attributes = manifest.getMainAttributes();

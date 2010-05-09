@@ -41,7 +41,7 @@ import java.util.TreeMap;
  *
  * @author Erwin van Eijk
  */
-public class DirHasherResultSerializer 
+class DirHasherResultSerializer 
         extends
         JsonSerializer<DirHasherResult>
 {

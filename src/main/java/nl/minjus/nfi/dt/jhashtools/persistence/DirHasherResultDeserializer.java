@@ -21,27 +21,27 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import java.io.File;
 import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.type.TypeReference;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.type.TypeReference;
 
 /**
  * Arrange the deserialization of the JSON structure for DirHasherResult
  */
-public class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult> {
+class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult> {
 
     @Override
     public DirHasherResult deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
