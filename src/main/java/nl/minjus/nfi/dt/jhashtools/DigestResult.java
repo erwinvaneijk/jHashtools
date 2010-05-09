@@ -114,17 +114,18 @@ public class DigestResult extends TreeSet<Digest> {
      * @return true when this matches other.
      */
     boolean matches(DigestResult other) {
-        if ((other != null)) {
-            boolean found = false;
+	if ((other != null)) {
             for (Digest d : other) {
-                found = found || this.contains(d);
+		if (this.contains(d)) {
+		    return true;
+		}
             }
             for (Digest d : this) {
-                found = found || other.contains(d);
+		if (other.contains(d)) {
+		    return true;
+		}
             }
-            return found;
-        } else {
-            return false;
         }
+	return false;
     }
 }
