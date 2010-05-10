@@ -26,6 +26,7 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -327,7 +328,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
      *
      * @param out where to write to.
      */
-    public void prettyPrint(PrintStream out) {
+    public void prettyPrint(PrintWriter out) {
         out.printf("%s\n", this.content.firstKey());
         DigestResult res = this.content.firstEntry().getValue();
         for (Digest d: res) {

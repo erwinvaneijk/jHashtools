@@ -34,6 +34,7 @@ import org.codehaus.jackson.map.ser.CustomSerializerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import org.codehaus.jackson.map.SerializationConfig.Feature;
 
 /**
  *
@@ -42,6 +43,15 @@ import java.io.Reader;
 public class JsonPersistenceProvider implements PersistenceProvider {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public JsonPersistenceProvider(boolean prettyPrint) {
+        objectMapper.getSerializationConfig().set(Feature.INDENT_OUTPUT, prettyPrint);
+        objectMapper.getSerializationConfig().set(Feature.WRITE_DATES_AS_TIMESTAMPS, ! prettyPrint);
+    }
+
+    public JsonPersistenceProvider() {
+        this(false);
+    }
 
     static {
         CustomSerializerFactory sf = new CustomSerializerFactory();
