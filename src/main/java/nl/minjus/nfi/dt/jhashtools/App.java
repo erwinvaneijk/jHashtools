@@ -23,22 +23,21 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
-import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersistenceProvider;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.Version;
 import org.apache.commons.cli.*;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.util.logging.Logger.getLogger;
 
 /**
- * Hello world!
+ * Entrypoint of the cli version of the tooling.
  *
  */
 public class App {

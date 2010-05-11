@@ -25,7 +25,6 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
      * @param ignoreCase if set to true, the case is ignored on the file when comparing two files for equality.
      */
     public DirHasherResult(boolean ignoreCase) {
-        this.content = new TreeMap(new FileComparator(ignoreCase));
+        this.content = new TreeMap<File, DigestResult>(new FileComparator(ignoreCase));
         this.constructionInfo = new ConstructionInfo();
     }
 
@@ -81,7 +80,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
 
     /**
      * Put all the elements in <c>map</c> into our content.
-     * 
+     *
      * @param map the map to get all the content from.
      */
     public void putAll(Map<? extends File, ? extends DigestResult> map) {
@@ -126,7 +125,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     public DigestResult get(String name) {
         return this.content.get(new File(name));
     }
-    
+
     /**
      * Get the digestresult by file.
      *
@@ -139,7 +138,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
 
     /**
      * Get the results by using only the algorithm mentioned.
-     * 
+     *
      * @param algorithm the algorithm to look for.
      * @return the subset of this instance with only entries which have the correct algorithm defined.
      */
@@ -169,8 +168,24 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     }
 
     /**
+     * Compare this instance with another instance for equality. The content of the ConstructionInfo member
+     * is <i>ignored</i>.
+     *
+     * @param other the instance to compare to.
+     * @return true if all elements contained are the same.
+     */
+    public boolean matches(DirHasherResult other) {
+        for (Map.Entry<File, DigestResult> entry: this) {
+            if (!(other.containsKey(entry.getKey()) && entry.getValue().matches(other.get(entry.getKey())))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Get this structure as a ordinary Map.
-     * 
+     *
      * @return a map. Do not touch!
      */
     public final Map<File, DigestResult> getContent() {
@@ -179,7 +194,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
 
     /**
      * Get the number of elements available.
-     * 
+     *
      * @return the number of elements.
      */
     public int size() {
@@ -195,27 +210,27 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
 
     /**
      * Get the first entry of our conent.
-     * 
+     *
      * @return a map entry.
      */
     public Map.Entry<File, DigestResult> firstEntry() {
         return this.content.firstEntry();
     }
-    
+
     /**
      * Exclude all entries that are in o from this set and return
      * the resulting set.
-     * 
-     * @param o
+     *
+     * @param o the other set to compare <c>this</c> to.
      * @return the set of all entries in this, but not in <c>o</c>.
      */
     public DirHasherResult exclude(DirHasherResult o) {
         DirHasherResult result = new DirHasherResult();
-        for (Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
+        for (Map.Entry<File, DigestResult> entry : this) {
             File key = entry.getKey();
             DigestResult value = entry.getValue();
             if (o.containsKey(key)) {
-                if (!value.equals(o.get(key))) {
+                if (!value.matches(o.get(key))) {
                     result.put(key, value);
                 }
             } else {
@@ -236,7 +251,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
         for (Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
             File key = entry.getKey();
             DigestResult value = entry.getValue();
-            if (o.containsKey(key) && !value.equals(o.get(key))) {
+            if (o.containsKey(key) && !value.matches(o.get(key))) {
                 result.put(key, value);
             }
         }
@@ -268,7 +283,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
 
     /**
      * Get all the entries that are in a or b but not in both.
-     * 
+     *
      * @param o the other result to compare this to.
      * @return the correct subset.
      */
@@ -277,14 +292,14 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
         for (Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
             File key = entry.getKey();
             DigestResult value = entry.getValue();
-            if (! (o.containsKey(key) && value.equals(o.get(key)))) {
+            if (! (o.containsKey(key) && value.matches(o.get(key)))) {
                 result.put(key, value);
             }
         }
         for (Map.Entry<File, DigestResult> entry : o.content.entrySet()) {
             File key = entry.getKey();
             DigestResult value = entry.getValue();
-            if (! (this.containsKey(key) && value.equals(this.get(key)))) {
+            if (! (this.containsKey(key) && value.matches(this.get(key)))) {
                 result.put(key, value);
             }
         }

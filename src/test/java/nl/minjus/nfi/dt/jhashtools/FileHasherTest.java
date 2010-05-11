@@ -64,6 +64,10 @@ public class FileHasherTest {
             if (entry.getKey().toString().contains("oldformat")) {
                 continue;
             }
+            if (entry.getKey().toString().contains("include")) {
+                continue;
+            }
+
             expectedDigests.put(i, entry.getValue().getHexDigest(FileHasher.DEFAULT_ALGORITHM));
             i += 1;
         }

@@ -134,6 +134,7 @@ public class DirHasherResultTest {
     public void testEquals() {
         assertTrue(setOne != setTwo);
         assertEquals(setOne, setTwo);
+        assertEquals(setTwo, setOne);
     }
     
     @Test
@@ -142,6 +143,7 @@ public class DirHasherResultTest {
 
         assertEquals(3, result.size());
         assertEquals(setOne, result);
+        assertEquals(result, setOne);
     }
 
     @Test

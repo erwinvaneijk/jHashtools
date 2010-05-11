@@ -95,7 +95,6 @@ public class FileWalkerTest {
             return this.number;
         }
 
-        @Override
         public void visit(File file) {
             number += 1;
         }
@@ -110,9 +109,9 @@ public class FileWalkerTest {
         FileWalker instance = new FileWalker();
         WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        int expResult = 11;
+        int expResult = 13;
         int result = instance.walk(file);
         assertEquals(expResult, result);
-        assertEquals(11, visitor.getNumber());
+        assertEquals(13, visitor.getNumber());
     }
 }

@@ -108,6 +108,19 @@ public class KnownDigests {
         dr.add(new Digest("md5", "af5d3dfecc364ff1bc1177d24ada7137"));
         knownResults.put("testdata/oldformat.txt", dr);
 
+        dr = new DigestResult();
+        dr.add(new Digest("md5", "0efcde993ca6f8bcd71671dfe927788c"));
+        dr.add(new Digest("sha-1", "b4497e1822a51079df54b54e2e38a8262d752851"));
+        dr.add(new Digest("sha-256", "220408cd9b16d0b025fb0c822a70b340b02f1344e59b19ddff8deef0cc6e7031"));
+        knownResults.put("testdata/include-md5-sha1.txt", dr);
+
+
+        dr = new DigestResult();
+        dr.add(new Digest("md5", "bed8e0d55ab120d38325af63da19125f "));
+        dr.add(new Digest("sha-1", "2b3a601a1ee759eec30ddcde458d459aa26ba78f"));
+        dr.add(new Digest("sha-256", "8072761bd9f0147042bed6f2328f62c964707baa2cfb5cc449bd376b55ff525e"));
+        knownResults.put("testdata/include-sha1-sha256-sha512.txt", dr);
+
         return knownResults;
     }
 }
