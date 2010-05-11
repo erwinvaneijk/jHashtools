@@ -51,7 +51,7 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
         if (obj != null && obj instanceof DirHasherResult) {
             DirHasherResult directoryHasherResult = (DirHasherResult) obj;
             PrintStream stream = new PrintStream(out);
-            stream.println("Generated with " + directoryHasherResult.getConstructionInfo().toString() + " " + Calendar.getInstance().getTime().toString());
+            stream.println("Generated with: " + directoryHasherResult.getConstructionInfo().toString() + " " + Calendar.getInstance().getTime().toString());
             for (Map.Entry<File, DigestResult> entry: directoryHasherResult) {
                 stream.println(entry.getKey().toString());
                 for (Digest d: entry.getValue()) {
@@ -73,9 +73,10 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
             DirHasherResult directoryHasherResult = new DirHasherResult();
             try {
                 LineNumberReader lineNumberReader = new LineNumberReader(reader);
-                @SuppressWarnings({"UnusedAssignment"}) String line = lineNumberReader.readLine();
-                // FIXME
-                // We should check for the proper format of the first line.
+                String line = lineNumberReader.readLine();
+                if (! line.startsWith("Generated with: ")) {
+                    throw new PersistenceException("The first line is not ok.");
+                }
                 try {
                     String currentFileName = "";
                     DigestResult result = new DigestResult();

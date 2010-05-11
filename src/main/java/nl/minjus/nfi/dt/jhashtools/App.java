@@ -21,9 +21,9 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package nl.minjus.nfi.dt.jhashtools;
 
+import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.persistence.JsonPersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
@@ -46,7 +46,7 @@ public class App {
     private static final String USAGE = "[options] dir [dir...]";
     private static final String HEADER = "hashtree - Creating a list of digests for files and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
     private static final String FOOTER = "";
-    
+
     public static void main(String[] arguments) {
         CommandLine line = App.getCommandLine(arguments);
         String[] filesToProcess = line.getArgs();
@@ -54,47 +54,65 @@ public class App {
         DirHasher directoryHasher = createDirectoryHasher(line);
 
         getLogger(App.class.getName()).log(Level.INFO, "Version: " + Version.getVersion());
-        
-        DirHasherResult digests = new DirHasherResult();
-        for (String filename : filesToProcess) {
-            getLogger(App.class.getName()).log(Level.INFO, "Handling directory or file " + filename);
-            directoryHasher.updateDigests(digests, new File(filename));
-        }
 
         if (line.hasOption("i") && line.hasOption("o")) {
             getLogger(App.class.getName()).log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
         }
 
+        PersistenceStyle persistenceStyle = getPersistenceStyle(line);
         if (line.hasOption("i")) {
             String filename = line.getOptionValue("i");
-
-            PersistenceStyle persistenceStyle;
-            if (line.hasOption("style")) {
-                persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
-            } else {
-                persistenceStyle = PersistenceStyle.JSON;
-            }
-
-            verifyFoundDigests(digests, filename, persistenceStyle, line.hasOption("ignorecase"));
+            processFileAndVerify(directoryHasher, persistenceStyle, line, filename, filesToProcess);
         } else if (line.hasOption("o")) {
-            DirHasherResult resultFileDigests = persistDigestsToFile(digests, line.getOptionValue("output"), line.hasOption("force"));
-            outputDigests(System.err, resultFileDigests);
+            String outputFilename = line.getOptionValue("output");
+            boolean forceOverwrite = line.hasOption("force");
+
+            processFilesAndWrite(directoryHasher, outputFilename, persistenceStyle, forceOverwrite, filesToProcess);
         }
 
         System.exit(0);
     }
 
-    private static void outputDigests(PrintStream out, DirHasherResult resultFileDigests) {
-        out.printf("Generated with hashtree (java) by %s\n", System.getProperty("user.name"));
-        resultFileDigests.prettyPrint(out);
+    private static PersistenceStyle getPersistenceStyle(CommandLine line) {
+        PersistenceStyle persistenceStyle;
+        if (line.hasOption("style")) {
+            persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
+        } else {
+            persistenceStyle = PersistenceStyle.JSON;
+        }
+        return persistenceStyle;
     }
 
-    private static void verifyFoundDigests(DirHasherResult digests, String filename, PersistenceStyle parseNewStyle, boolean ignoreCase) {
-        DirHasherResultVerifier verifier = new DirHasherResultVerifier(digests, parseNewStyle);
-        verifier.setIgnoreCase(ignoreCase);
-        verifier.loadDigestsFromFile(filename);
-        verifier.verify(System.out);
+    private static void processFilesAndWrite(DirHasher directoryHasher, String outputFile, PersistenceStyle style, boolean forceOverwrite, String[] filesToProcess) {
+        try {
+            DigestOutputCreator outputCreator =
+                    new DigestOutputCreator(System.err, directoryHasher, forceOverwrite);
+
+            outputCreator.setOutputFile(outputFile);
+            outputCreator.setPersistenceStyle(style);
+            outputCreator.generate(filesToProcess);
+            outputCreator.finish();
+        } catch (FileNotFoundException ex) {
+            System.err.println("File " + outputFile + " exists or not forced to be overwritten. Stop.");
+            System.exit(-1);
+        }
+    }
+
+    private static void processFileAndVerify(DirHasher directoryHasher, PersistenceStyle persistenceStyle, CommandLine line, String filename, String[] filesToProcess) {
+        try {
+            DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher, persistenceStyle);
+            verifier.setIgnoreCase(line.hasOption("ignorecase"));
+            verifier.loadDigestsFromFile(filename);
+            verifier.generateDigests(filesToProcess);
+            verifier.verify(new PrintWriter(System.out, true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "A file could not be found.", ex);
+            System.exit(-1);
+        } catch (PersistenceException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Could not parse the file.", ex);
+            System.exit(-2);
+        }
     }
 
     private static DirHasher createDirectoryHasher(CommandLine line) {
@@ -139,40 +157,6 @@ public class App {
         return directoryHasher;
     }
 
-    private static DirHasherResult persistDigestsToFile(DirHasherResult digests, String outputFilename, boolean force) {
-        OutputStream file = null;
-        try {
-            getLogger(App.class.getName()).log(Level.INFO, "Writing the results to " + outputFilename);
-            File outputFile = new File(outputFilename);
-            if (outputFile.exists() && !force) {
-                getLogger(App.class.getName()).log(Level.SEVERE, "Output file exists. Aborting");
-                System.exit(-1);
-            }
-            file = new FileOutputStream(outputFile);
-            PersistenceProvider persistenceProvider = new JsonPersistenceProvider();
-            persistenceProvider.persist(file, digests);
-            file.flush();
-            
-            DirHasher d = new DirHasher(digests.firstEntry().getValue().getAlgorithms());
-            return d.getDigests(outputFile);
-        } catch (PersistenceException ex) {
-            getLogger(App.class.getName()).log(Level.SEVERE, "Cannot persist content to file", ex);
-        } catch (IOException ex) {
-            getLogger(App.class.getName()).log(Level.SEVERE, "Cannot create file", ex);
-        } catch (NoSuchAlgorithmException ex) {
-            getLogger(App.class.getName()).log(Level.SEVERE, "Cannot create the algorithm", ex);
-        } finally {
-            try {
-                if (file != null) {
-                    file.close();
-                }
-            } catch (IOException ex) {
-                getLogger(App.class.getName()).log(Level.SEVERE, "Cannot close file", ex);
-            }
-        }
-        return null;
-    }
-
     @SuppressWarnings("static-access")
     private static CommandLine getCommandLine(final String[] args) {
         CommandLineParser parser = new PosixParser();
@@ -191,11 +175,7 @@ public class App {
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
         Option outputOption =
-                OptionBuilder.withLongOpt("output")
-                    .withDescription("The file the output is written to")
-                        .hasArg()
-                        .withArgName("outputfile")
-                        .create("o");
+                OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o");
         options.addOption(outputOption);
         options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
         options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use").hasArg().withArgName("style").create("s"));

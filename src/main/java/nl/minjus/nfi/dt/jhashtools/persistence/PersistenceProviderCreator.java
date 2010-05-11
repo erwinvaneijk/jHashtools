@@ -29,7 +29,7 @@ public class PersistenceProviderCreator {
         PersistenceProvider persistenceProvider = null;
         switch (persistenceStyle) {
             case JSON:
-                persistenceProvider = new JsonPersistenceProvider();
+                persistenceProvider = new JsonPersistenceProvider(true);
                 break;
             case OLDSTYLE:
                 persistenceProvider = new OldStylePersistenceProvider();

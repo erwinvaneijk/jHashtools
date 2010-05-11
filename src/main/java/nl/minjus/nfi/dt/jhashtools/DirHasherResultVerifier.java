@@ -21,7 +21,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
@@ -47,10 +46,12 @@ public class DirHasherResultVerifier {
     private File file;
     private final PersistenceStyle persistenceStyle;
     private boolean ignoreCase;
+    private final DirHasher dirHasher;
 
-    public DirHasherResultVerifier(DirHasherResult result, PersistenceStyle persistenceStyle) {
+    public DirHasherResultVerifier(DirHasher hasher, PersistenceStyle persistenceStyle) {
         this.persistenceStyle = persistenceStyle;
-        this.measuredDigests = result;
+        this.measuredDigests = new DirHasherResult();
+        this.dirHasher = hasher;
         this.ignoreCase = false;
     }
 
@@ -62,26 +63,25 @@ public class DirHasherResultVerifier {
         return this.ignoreCase;
     }
 
-    public void loadDigestsFromFile(String filename) {
-        DirHasherResult result = null;
-        Reader reader;
-        try {
-            this.file = new File(filename);
-            reader = new FileReader(this.file);
-
-            PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
-
-            result = (DirHasherResult) persistenceProvider.load(reader, DirHasherResult.class);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (PersistenceException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Cannot load from file. Unfortunately", ex);
-        } finally {
-            this.verificationDigests = result;
+    public void generateDigests(String[] filesToProcess) {
+        for (String pathname : filesToProcess) {
+            this.dirHasher.updateDigests(measuredDigests, new File(pathname));
         }
     }
 
-    public void verify(PrintStream out) {
+    public void loadDigestsFromFile(String filename) throws FileNotFoundException, PersistenceException {
+        DirHasherResult result = null;
+        Reader reader;
+        this.file = new File(filename);
+        reader = new FileReader(this.file);
+
+        PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
+
+        result = (DirHasherResult) persistenceProvider.load(reader, DirHasherResult.class);
+        this.verificationDigests = result;
+    }
+
+    public void verify(PrintWriter out) {
         if (this.isIgnoringCase()) {
             DirHasherResult ignoredCaseMeasurements = new DirHasherResult(this.isIgnoringCase());
             ignoredCaseMeasurements.putAll(this.measuredDigests);
@@ -91,7 +91,7 @@ public class DirHasherResultVerifier {
             this.verificationDigests = ignoredCaseVerifications;
             this.measuredDigests = ignoredCaseMeasurements;
         }
-        
+
         DirHasherResult differences = this.measuredDigests.notIntersect(this.verificationDigests);
         out.printf("*** %s ***\n", Calendar.getInstance().getTime().toString());
         if (differences.size() == 0) {
