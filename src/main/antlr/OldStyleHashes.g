@@ -32,7 +32,7 @@ digestValue returns [String digestString]
 
 MD5	:	'MD5:';
 
-SHA1	:	'SHA-1:';
+SHA1	:	('SHA-1:'|'SHA:');
 
 SHA256	:	'SHA-256:';
 
