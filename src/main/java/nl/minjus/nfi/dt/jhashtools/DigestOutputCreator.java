@@ -51,7 +51,7 @@ public class DigestOutputCreator {
 
     public void setOutputFile(String filename) throws FileNotFoundException {
         File file = new File(filename);
-        if (file.exists() || this.forceOverwrite) {
+        if (!file.exists() || this.forceOverwrite) {
             this.outputFile = file;
         } else {
             throw new FileNotFoundException("File ["+filename+") not found");
