@@ -21,6 +21,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
@@ -32,8 +33,6 @@ import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 import java.io.*;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -46,12 +45,12 @@ public class DirHasherResultVerifier {
     private File file;
     private final PersistenceStyle persistenceStyle;
     private boolean ignoreCase;
-    private final DirHasher dirHasher;
+    private final DirectoryHasher directoryHasher;
 
-    public DirHasherResultVerifier(DirHasher hasher, PersistenceStyle persistenceStyle) {
+    public DirHasherResultVerifier(DirectoryHasher hasher, PersistenceStyle persistenceStyle) {
         this.persistenceStyle = persistenceStyle;
         this.measuredDigests = new DirHasherResult();
-        this.dirHasher = hasher;
+        this.directoryHasher = hasher;
         this.ignoreCase = false;
     }
 
@@ -65,7 +64,7 @@ public class DirHasherResultVerifier {
 
     public void generateDigests(String[] filesToProcess) {
         for (String pathname : filesToProcess) {
-            this.dirHasher.updateDigests(measuredDigests, new File(pathname));
+            this.directoryHasher.updateDigests(measuredDigests, new File(pathname));
         }
     }
 

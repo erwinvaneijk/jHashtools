@@ -27,11 +27,8 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,20 +37,16 @@ public class DirVisitor implements WalkerVisitor {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private DirHasherResult resultMap;
     private boolean verbose;
-    private final Set<String> algorithms;
-        
-    public DirVisitor() {
-        this.resultMap = new DirHasherResult();
-        this.algorithms = new TreeSet<String>();
-        this.algorithms.add(FileHasher.DEFAULT_ALGORITHM);
-        this.verbose = false;
-    }
+    private final FileHasher fileHasher;
 
     public DirVisitor(String algorithm) throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
-        this.algorithms = new TreeSet<String>();
-        this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
         this.verbose = false;
+        this.fileHasher = new FileHasher(algorithm);
+    }
+
+    public DirVisitor() throws NoSuchAlgorithmException {
+        this(FileHasher.DEFAULT_ALGORITHM);
     }
 
     public DirVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException {
@@ -63,10 +56,7 @@ public class DirVisitor implements WalkerVisitor {
 
     public DirVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
-        this.algorithms = new TreeSet<String>();
-        for (String algorithm: algorithms) {
-            this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
-        }
+        this.fileHasher = new FileHasher(algorithms);
         this.verbose = verbose;
     }
 
@@ -78,15 +68,13 @@ public class DirVisitor implements WalkerVisitor {
             if (this.verbose) {
                 this.logger.log(Level.INFO, "Processing file [" + theFile.toString() + "]");
             }
-            
-            DigestResult res = FileHasher.computeDigest(theFile, this.algorithms);
+
+            DigestResult res = this.fileHasher.getDigest(theFile);
             resultMap.put(theFile, res);
         } catch (FileNotFoundException ex) {
             // ignore
         } catch (IOException ex) {
             this.logger.log(Level.SEVERE, "Got IOException while processing " + theFile.toString());
-        } catch (NoSuchAlgorithmException e) {
-            this.logger.log(Level.SEVERE, "Got an NoSuchAlgorithmException", e);
         }
     }
 

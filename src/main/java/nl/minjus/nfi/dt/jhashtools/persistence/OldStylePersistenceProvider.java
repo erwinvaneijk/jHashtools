@@ -32,6 +32,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+import org.codehaus.jackson.type.TypeReference;
 
 import java.io.*;
 import java.util.Calendar;
@@ -65,6 +66,11 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
                 throw new PersistenceException("There is no persistence method defined for null class");
             }
         }
+    }
+
+    @Override
+    public <T> T load(Reader reader, TypeReference<T> typeReference) throws PersistenceException {
+        throw new PersistenceException("Currently the use of TypeReference is not supported for oldstyle files");
     }
 
     @Override

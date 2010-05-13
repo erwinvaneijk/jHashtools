@@ -21,6 +21,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
@@ -50,7 +51,7 @@ public class App {
         CommandLine line = App.getCommandLine(arguments);
         String[] filesToProcess = line.getArgs();
 
-        DirHasher directoryHasher = createDirectoryHasher(line);
+        DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
         getLogger(App.class.getName()).log(Level.INFO, "Version: " + Version.getVersion());
 
@@ -83,7 +84,7 @@ public class App {
         return persistenceStyle;
     }
 
-    private static void processFilesAndWrite(DirHasher directoryHasher, String outputFile, PersistenceStyle style, boolean forceOverwrite, String[] filesToProcess) {
+    private static void processFilesAndWrite(DirectoryHasher directoryHasher, String outputFile, PersistenceStyle style, boolean forceOverwrite, String[] filesToProcess) {
         try {
             DigestOutputCreator outputCreator =
                     new DigestOutputCreator(System.err, directoryHasher, forceOverwrite);
@@ -98,7 +99,7 @@ public class App {
         }
     }
 
-    private static void processFileAndVerify(DirHasher directoryHasher, PersistenceStyle persistenceStyle, CommandLine line, String filename, String[] filesToProcess) {
+    private static void processFileAndVerify(DirectoryHasher directoryHasher, PersistenceStyle persistenceStyle, CommandLine line, String filename, String[] filesToProcess) {
         try {
             DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher, persistenceStyle);
             verifier.setIgnoreCase(line.hasOption("ignorecase"));
@@ -114,10 +115,10 @@ public class App {
         }
     }
 
-    private static DirHasher createDirectoryHasher(CommandLine line) {
-        DirHasher directoryHasher = null;
+    private static DirectoryHasher createDirectoryHasher(CommandLine line) {
+        DirectoryHasher directoryHasher = null;
         try {
-            directoryHasher = new DirHasher(FileHasher.NO_ALGORITHM);
+            directoryHasher = new DirHasherImpl(FileHasher.NO_ALGORITHM);
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
                 directoryHasher.addAlgorithm("sha-256");

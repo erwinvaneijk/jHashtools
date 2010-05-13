@@ -67,12 +67,12 @@ public class DirMultiHashTest {
     @SuppressWarnings({"MethodWithMultipleLoops"})
     @Test
     public void testGetDigests() {
-        DirHasher dirHasher = new DirHasher();
+        DirectoryHasher directoryHasher = new DirHasherImpl();
         try {
-            dirHasher.addAlgorithm("sha-256");
-            dirHasher.addAlgorithm("sha-1");
-            dirHasher.addAlgorithm("md5");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            directoryHasher.addAlgorithm("sha-256");
+            directoryHasher.addAlgorithm("sha-1");
+            directoryHasher.addAlgorithm("md5");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(13, digests.size());
             assertEquals(knownDigests.size(), 13);
             assertEquals(knownDigests.getByAlgorithm("sha-256").size(), digests.size());

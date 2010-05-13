@@ -83,7 +83,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
      *
      * @param map the map to get all the content from.
      */
-    public void putAll(Map<? extends File, ? extends DigestResult> map) {
+    public synchronized void putAll(Map<? extends File, ? extends DigestResult> map) {
         this.content.putAll(map);
     }
 
@@ -92,7 +92,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
      *
      * @param other the other party to get all the results from.
      */
-    public void putAll(DirHasherResult other) {
+    public synchronized void putAll(DirHasherResult other) {
         this.content.putAll(other.content);
     }
 
@@ -358,4 +358,5 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
     public Iterator<Entry<File, DigestResult>> iterator() {
         return this.content.entrySet().iterator();
     }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010.  Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -12,15 +12,14 @@
  *       provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
- * <COPYRIGHT HOLDER> OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
@@ -46,15 +45,15 @@ public class DigestOutputCreator {
 
     private static Logger log = getLogger(DigestOutputCreator.class.getCanonicalName());
     private PrintWriter out;
-    private DirHasher dirHasher;
+    private DirectoryHasher directoryHasher;
     private File outputFile;
     private DirHasherResult digests;
     private PersistenceStyle persistenceStyle;
     private boolean forceOverwrite;
 
-    public DigestOutputCreator(OutputStream out, DirHasher dirHasher, boolean forceOverwrite) {
+    public DigestOutputCreator(OutputStream out, DirectoryHasher directoryHasher, boolean forceOverwrite) {
         this.out = new PrintWriter(new OutputStreamWriter(out, Charset.forName("utf-8")));
-        this.dirHasher = dirHasher;
+        this.directoryHasher = directoryHasher;
         this.digests = new DirHasherResult();
         this.outputFile = null;
         this.forceOverwrite = forceOverwrite;
@@ -75,7 +74,7 @@ public class DigestOutputCreator {
 
     public void generate(String[] pathnames) {
         for (String pathname: pathnames) {
-            dirHasher.updateDigests(digests, new File(pathname));
+            directoryHasher.updateDigests(digests, new File(pathname));
         }
     }
 
@@ -94,7 +93,7 @@ public class DigestOutputCreator {
             persistenceProvider.persist(file, digests);
             file.flush();
 
-            DirHasher d = new DirHasher(digests.firstEntry().getValue().getAlgorithms());
+            DirectoryHasher d = new DirHasherImpl(digests.firstEntry().getValue().getAlgorithms());
             return d.getDigests(outputFile);
         } catch (PersistenceException ex) {
             log.log(Level.SEVERE, "Cannot persist content to file", ex);

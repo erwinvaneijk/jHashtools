@@ -33,7 +33,6 @@ import org.junit.*;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -67,8 +66,8 @@ public class DirHasherTest {
     @Test
     public void testGetDigests() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
@@ -82,9 +81,9 @@ public class DirHasherTest {
     @Test
     public void testUpdateDigests() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
             DirHasherResult digests = new DirHasherResult();
-            dirHasher.updateDigests(digests, new File("testdata"));
+            directoryHasher.updateDigests(digests, new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
@@ -98,9 +97,9 @@ public class DirHasherTest {
     @Test
     public void testUpdateDigestsUnknownDirectory() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
             DirHasherResult digests = new DirHasherResult();
-            dirHasher.updateDigests(digests, new File("does-not-exist-testdata"));
+            directoryHasher.updateDigests(digests, new File("does-not-exist-testdata"));
             fail("An IllegalArgumentException should have been thrown");
         }
         catch (NoSuchAlgorithmException ex) {
@@ -114,10 +113,10 @@ public class DirHasherTest {
     @Test
     public void testVerboseSettings() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            assertEquals("initially no verbose behaviour", false, dirHasher.isVerbose());
-            dirHasher.setVerbose(true);
-            assertTrue(dirHasher.isVerbose());
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            assertEquals("initially no verbose behaviour", false, directoryHasher.isVerbose());
+            directoryHasher.setVerbose(true);
+            assertTrue(directoryHasher.isVerbose());
         }
         catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
@@ -127,8 +126,8 @@ public class DirHasherTest {
     @Test
     public void testGetDigestsOtherWayAround() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
@@ -143,8 +142,8 @@ public class DirHasherTest {
     @Test
     public void testGetDigestsExclude() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(0, digests.exclude(knownDigestSha256).size());
@@ -157,8 +156,8 @@ public class DirHasherTest {
     @Test
     public void testGetMd5Digests() {
         try {
-            DirHasher dirHasher = new DirHasher("md5");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("md5");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
             assertEquals(knownDigestMd5, digests.intersect(knownDigestMd5));
@@ -172,8 +171,8 @@ public class DirHasherTest {
     @Test
     public void testGetShaDigests() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-1");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-1");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
             assertEquals(knownDigestSha, digests.intersect(knownDigestSha));
@@ -187,9 +186,9 @@ public class DirHasherTest {
     @Test
     public void testGetTwoOutOfThreeDigests() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            dirHasher.addAlgorithm("md5");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            directoryHasher.addAlgorithm("md5");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
@@ -203,26 +202,12 @@ public class DirHasherTest {
     @Test
     public void testGetThreeOutOfThreeDigests() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            dirHasher.addAlgorithm("md5");
-            dirHasher.addAlgorithm("sha-1");
-            DirHasherResult digests = dirHasher.getDigests(new File("testdata"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            directoryHasher.addAlgorithm("md5");
+            directoryHasher.addAlgorithm("sha-1");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
-            fail(ex.toString() + " should not happen");
-        }
-    }
-
-    // @Test
-    public void testLargeTree() {
-        try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            dirHasher.addAlgorithm("md5");
-            dirHasher.addAlgorithm("sha-1");
-            DirHasherResult digests = dirHasher.getDigests(new File("../boost_1_42_0"));
-            assert digests.size() > 0;
         }
         catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
@@ -233,8 +218,8 @@ public class DirHasherTest {
     @Test
     public void testGetDirectoryDigestRaisedIllegalArgument() {
         try {
-            DirHasher dirHasher = new DirHasher("sha-256");
-            DirHasherResult digests = dirHasher.getDigests(new File("does-not-exist"));
+            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirHasherResult digests = directoryHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
         }
         catch (NoSuchAlgorithmException ex) {

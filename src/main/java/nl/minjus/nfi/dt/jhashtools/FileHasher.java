@@ -24,7 +24,11 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -33,7 +37,7 @@ import java.util.List;
 
 /**
  *
- * @author Erwin van Eijk
+ * @Author Erwin van Eijk
  */
 class FileHasher {
 
@@ -44,7 +48,7 @@ class FileHasher {
     private List<MessageDigest> digests;
 
     public static DigestResult computeDigest(File file, String algorithm)
-            throws IOException {
+            throws IOException, NoSuchAlgorithmException {
         FileHasher hasher = new FileHasher(algorithm);
         return hasher.getDigest(file);
     }
@@ -56,18 +60,14 @@ class FileHasher {
     }
 
     public static DigestResult computeDigest(File file)
-            throws IOException {
+            throws IOException, NoSuchAlgorithmException {
         return FileHasher.computeDigest(file, "sha-256");
     }
 
-    public FileHasher(String algorithm) {
+    public FileHasher(String algorithm) throws NoSuchAlgorithmException {
         if (!algorithm.equals(NO_ALGORITHM)) {
-            try {
-                this.digests = new ArrayList<MessageDigest>();
-                this.digests.add(MessageDigest.getInstance(algorithm));
-            } catch (NoSuchAlgorithmException ex) {
-                throw new RuntimeException(ex);
-            }
+            this.digests = new ArrayList<MessageDigest>();
+            this.digests.add(MessageDigest.getInstance(algorithm));
         }
     }
 
@@ -114,23 +114,39 @@ class FileHasher {
      * @return the resulting digests.
      * @throws IOException when things go wrong with the IO.
      */
-    public DigestResult getDigest(InputStream stream) throws IOException {
-
+    public DigestResult getDigest(FileInputStream stream) throws IOException {
+        reset();
         try {
+            FileChannel channel = stream.getChannel();
+            long size = channel.size();
+            long offset = 0L;
+            long bytesLeft = size;
             byte[] buf = new byte[BLOCK_READ_SIZE];
-            int bytesRead;
-            while ((bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE)) != -1) {
+            do {
+                long bytesToRead = Math.min(bytesLeft, BLOCK_READ_SIZE);
+                //MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, offset, bytesToRead);
+                stream.read(buf, 0, (int) bytesToRead);
                 for (MessageDigest digest : digests) {
-                    digest.update(buf, 0, bytesRead);
+                    // digest.update(buffer);
+                    digest.update(buf, 0, (int) bytesToRead);
                 }
-            }
-        } catch (EOFException ex) {
+
+                bytesLeft -= bytesToRead;
+                offset += bytesToRead;
+            } while(bytesLeft > 0);
+        } catch (IOException ex) {
             // pass
         } finally {
             stream.close();
         }
 
         return finalizeDigestResult();
+    }
+
+    public void reset() {
+        for (MessageDigest digest: digests) {
+            digest.reset();
+        }
     }
 
     private DigestResult finalizeDigestResult() {

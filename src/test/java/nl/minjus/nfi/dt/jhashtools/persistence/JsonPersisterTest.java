@@ -39,6 +39,7 @@ import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.*;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.type.TypeReference;
 import org.junit.*;
 
 import java.io.*;
@@ -55,9 +56,6 @@ public class JsonPersisterTest {
     private String testDigestInJson;
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;
-
-    public JsonPersisterTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -85,7 +83,7 @@ public class JsonPersisterTest {
         public LargeArrayClass() {
             this(0);
         }
-
+        
         public LargeArrayClass(int n) {
             this.set = new ArrayList<Long>(n);
             for (long i = 0; i < n; i++) {
@@ -123,7 +121,7 @@ public class JsonPersisterTest {
             jp.nextToken();
             while (jp.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = jp.getCurrentName();
-                List l = new LinkedList<Long>();
+                List<Long> l = new LinkedList<Long>();
                 if ("set".equals(fieldName)) {
                     while (jp.nextToken() != JsonToken.END_ARRAY) {
                         l.add(jp.getLongValue());
@@ -168,7 +166,8 @@ public class JsonPersisterTest {
             provider.persist(out, mySet);
 
             Reader input = new StringReader(out.toString());
-            Set<Integer> otherSet = (Set<Integer>) provider.load(input, Set.class);
+            TypeReference<Set<Integer>> setType = new TypeReference<Set<Integer>>() {};
+            Set<Integer> otherSet = provider.load(input, setType);
             assertEquals(mySet.size(), otherSet.size());
             Iterator<Integer> it1 = mySet.iterator();
             Iterator<Integer> it2 = otherSet.iterator();
@@ -197,7 +196,8 @@ public class JsonPersisterTest {
             provider.persist(out, mySet);
 
             Reader reader = new StringReader(out.toString());
-            Set<Integer> otherSet = (Set<Integer>) provider.load(reader, mySet.getClass());
+            TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>() {};
+            Set<Integer> otherSet = provider.load(reader, setType);
             assertEquals(mySet.size(), otherSet.size());
             Iterator<Integer> it1 = mySet.iterator();
             Iterator<Integer> it2 = otherSet.iterator();
@@ -234,13 +234,15 @@ public class JsonPersisterTest {
 
     /**
      * Test of load method, of class JsonPersistenceProvider.
+     *
+     * @throws PersistenceException when problems occur with the persistence.
      */
     @Test
     public void testLoad() throws PersistenceException {
         Reader stream = new StringReader(this.testDigestResultInJson);
         Class<DigestResult> clazz = DigestResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
-        DigestResult result = (DigestResult) instance.load(stream, clazz);
+        DigestResult result = instance.load(stream, clazz);
         assertEquals(1, result.size());
         assertEquals("sha-1", result.digest().getAlgorithm());
         assertEquals("0000111122223333444455556666777788889999aaaa", result.digest().toHex());
@@ -258,8 +260,6 @@ public class JsonPersisterTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         instance.persist(out, obj);
         String str = out.toString();
-
-        System.out.println("The result: " + str);
 
         Reader reader = new StringReader(str);
         DirHasherResult res = (DirHasherResult) instance.load(reader, DirHasherResult.class);

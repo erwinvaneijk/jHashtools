@@ -100,6 +100,8 @@ public class FileHasherTest {
         } catch (IOException ex) {
             Logger.getLogger(FileHasherTest.class.getName()).log(Level.SEVERE, null, ex);
             fail(ex.toString());
+        } catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString());
         }
     }
 
@@ -114,6 +116,8 @@ public class FileHasherTest {
             fail(ex.toString());
         } catch (IOException ex) {
             fail(ex.toString());
+        } catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString());
         }
     }
 
@@ -122,7 +126,7 @@ public class FileHasherTest {
         try {
             FileHasher h = new FileHasher("foo");
             fail("Should have thrown NoSuchAlgorithmException");
-        } catch (RuntimeException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             // pass
         }
     }
@@ -150,6 +154,8 @@ public class FileHasherTest {
             // pass
         } catch (IOException ex) {
             fail("Should not get IOException");
+        } catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString());
         }
     }
 }
