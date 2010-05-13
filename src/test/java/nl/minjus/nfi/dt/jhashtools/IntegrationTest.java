@@ -34,13 +34,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.NoSuchAlgorithmException;
+import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class IntegrationTest {
 
-    //@Test
+    @Test
     public void testIncludeFiles() throws IOException, PersistenceException {
         Reader reader = new FileReader("testdata/include-md5-sha1.txt");
         PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);

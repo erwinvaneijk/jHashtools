@@ -29,20 +29,37 @@ import org.junit.Test;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Collection;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 1:34:36 PM To change this template use File | Settings
- * | File Templates.
  */
+@RunWith(Parameterized.class)
 public class ConcurrentDirectoryHasherTest {
     private final DirHasherResult knownDigests = KnownDigests.getKnownResults();
+    private int numThreads;
+
+    @Parameterized.Parameters
+    public static Collection threadsNumbers() {
+        return Arrays.asList(new Object[][] {
+            {new Integer(1)},
+            {new Integer(4)}
+        });
+    }
+
+    public ConcurrentDirectoryHasherTest(Integer numThreads) {
+        super();
+        this.numThreads = numThreads;
+    }
 
     @Test
     public void testGetDigests() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -57,7 +74,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testUpdateDigests() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             DirHasherResult digests = new DirHasherResult();
             directoryHasher.updateDigests(digests, new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
@@ -73,7 +90,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testVerboseSettings() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             assertEquals("initially no verbose behaviour", false, directoryHasher.isVerbose());
             directoryHasher.setVerbose(true);
             assertTrue(directoryHasher.isVerbose());
@@ -86,7 +103,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetDigestsOtherWayAround() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -102,7 +119,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetDigestsExclude() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -116,7 +133,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetMd5Digests() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("md5");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("md5", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
@@ -131,7 +148,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetShaDigests() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-1");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-1", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
@@ -146,7 +163,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetTwoOutOfThreeDigests() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             directoryHasher.addAlgorithm("md5");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
@@ -162,7 +179,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetThreeOutOfThreeDigests() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             directoryHasher.addAlgorithm("md5");
             directoryHasher.addAlgorithm("sha-1");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
@@ -178,7 +195,7 @@ public class ConcurrentDirectoryHasherTest {
     @Test
     public void testGetDirectoryDigestRaisedIllegalArgument() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
         }
