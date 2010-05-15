@@ -32,6 +32,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import org.junit.*;
 
 import java.io.File;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.*;
@@ -78,10 +79,10 @@ public class DirVisitorTest {
      * Test of visit method, of class DirVisitor.
      */
     @Test
-    public void testVisitNonExistant() {
+    public void testVisitNonExistant() throws NoSuchAlgorithmException {
         try {
             File theFile = new File("does-not-exist");
-            DirVisitor instance = new DirVisitor("sha-256");
+            DirVisitor instance = new DirVisitor(MessageDigest.getInstance("sha-256"));
             instance.visit(theFile);
             assertEquals(0, instance.getResults().size());
         } catch (Throwable t) {
@@ -95,7 +96,7 @@ public class DirVisitorTest {
     @Test
     public void testVisitNonExistantAlgorithm() {
         try {
-            DirVisitor instance = new DirVisitor("sha-345");
+            DirVisitor instance = new DirVisitor(MessageDigest.getInstance("sha-345"));
             fail("We should have an NoSuchAlgorithmException");
         } catch (NoSuchAlgorithmException ex) {
             // pass

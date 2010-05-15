@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
  */
 public class DirHasherTest {
 
-    private final DirHasherResult knownDigests = KnownDigests.getKnownResults();
+    private DirHasherResult knownDigests;
 
     public DirHasherTest() {
     }
@@ -57,7 +57,8 @@ public class DirHasherTest {
 
     @Before
     public void setUp() {
-    }
+        knownDigests = KnownDigests.getKnownResults();
+    }                  
 
     @After
     public void tearDown() {
@@ -66,7 +67,7 @@ public class DirHasherTest {
     @Test
     public void testGetDigests() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -81,7 +82,7 @@ public class DirHasherTest {
     @Test
     public void testUpdateDigests() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = new DirHasherResult();
             directoryHasher.updateDigests(digests, new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
@@ -97,7 +98,7 @@ public class DirHasherTest {
     @Test
     public void testUpdateDigestsUnknownDirectory() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = new DirHasherResult();
             directoryHasher.updateDigests(digests, new File("does-not-exist-testdata"));
             fail("An IllegalArgumentException should have been thrown");
@@ -113,7 +114,7 @@ public class DirHasherTest {
     @Test
     public void testVerboseSettings() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             assertEquals("initially no verbose behaviour", false, directoryHasher.isVerbose());
             directoryHasher.setVerbose(true);
             assertTrue(directoryHasher.isVerbose());
@@ -126,7 +127,7 @@ public class DirHasherTest {
     @Test
     public void testGetDigestsOtherWayAround() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -142,7 +143,7 @@ public class DirHasherTest {
     @Test
     public void testGetDigestsExclude() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -156,7 +157,7 @@ public class DirHasherTest {
     @Test
     public void testGetMd5Digests() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("md5");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("md5");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
@@ -171,7 +172,7 @@ public class DirHasherTest {
     @Test
     public void testGetShaDigests() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-1");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-1");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
@@ -186,13 +187,39 @@ public class DirHasherTest {
     @Test
     public void testGetTwoOutOfThreeDigests() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
-            directoryHasher.addAlgorithm("md5");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("md5");
+            directoryHasher.addAlgorithm("sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
-            DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             assertEquals(digests, digests.intersect(knownDigests));
+            DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
+            DirHasherResult intersected = digests.intersect(knownDigestMd5);
+            assertEquals(knownDigestMd5, intersected);
+
+            DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
+            intersected = digests.intersect(knownDigestSha256);
+            assertEquals(knownDigestSha256, intersected);
+        }
+        catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString() + " should not happen");
+        }
+    }
+
+    @Test
+    public void testGetOneOutOfThreeDigests() {
+        try {
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
+            assertEquals(knownDigests.size(), digests.size());
+            assertEquals(digests, digests.intersect(knownDigests));
+            DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
+            assertEquals(13, knownDigestMd5.size());
+            DirHasherResult intersected = digests.intersect(knownDigestMd5);
+            assertEquals(0, intersected.size());
+
+            DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
+            intersected = digests.intersect(knownDigestSha256);
+            assertEquals(knownDigestSha256, intersected);
         }
         catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
@@ -202,7 +229,7 @@ public class DirHasherTest {
     @Test
     public void testGetThreeOutOfThreeDigests() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             directoryHasher.addAlgorithm("md5");
             directoryHasher.addAlgorithm("sha-1");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
@@ -218,7 +245,7 @@ public class DirHasherTest {
     @Test
     public void testGetDirectoryDigestRaisedIllegalArgument() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
         }

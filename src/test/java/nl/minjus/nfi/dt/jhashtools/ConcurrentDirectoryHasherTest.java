@@ -25,14 +25,15 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.*;
 
@@ -40,20 +41,27 @@ import static org.junit.Assert.*;
  */
 @RunWith(Parameterized.class)
 public class ConcurrentDirectoryHasherTest {
-    private final DirHasherResult knownDigests = KnownDigests.getKnownResults();
+    private DirHasherResult knownDigests = null;
     private int numThreads;
 
     @Parameterized.Parameters
     public static Collection threadsNumbers() {
         return Arrays.asList(new Object[][] {
             {new Integer(1)},
-            {new Integer(4)}
+            {new Integer(2)},
+            {new Integer(4)},
+            {new Integer(8)}
         });
     }
 
     public ConcurrentDirectoryHasherTest(Integer numThreads) {
         super();
         this.numThreads = numThreads;
+    }
+
+    @Before
+    public void setUp() {
+        knownDigests = KnownDigests.getKnownResults();
     }
 
     @Test
@@ -63,7 +71,8 @@ public class ConcurrentDirectoryHasherTest {
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
+            DirHasherResult result = digests.intersect(knownDigestSha256);
+            assertEquals(knownDigestSha256, result);
             assertEquals(digests, digests.intersect(knownDigests));
         }
         catch (NoSuchAlgorithmException ex) {
@@ -180,8 +189,8 @@ public class ConcurrentDirectoryHasherTest {
     public void testGetThreeOutOfThreeDigests() {
         try {
             DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
-            directoryHasher.addAlgorithm("md5");
             directoryHasher.addAlgorithm("sha-1");
+            directoryHasher.addAlgorithm("md5");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             assertEquals(digests, digests.intersect(knownDigests));

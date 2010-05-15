@@ -21,19 +21,22 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.concurrent.Exchanger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,17 +46,20 @@ class FileHasher {
 
     public static final String DEFAULT_ALGORITHM = "sha-256";
     public static final String NO_ALGORITHM = "none";
-    private static final int BLOCK_READ_SIZE = 1024*1024;
-
-    private List<MessageDigest> digests;
+    private static final int BLOCK_READ_SIZE = 1024 * 1024;
+    private static final Logger log = Logger.getLogger(FileHasher.class.getName());
+    private Collection<MessageDigest> digests;
+    private ByteBuffer readBuffer;
+    private ByteBuffer writeBuffer;
+    private Exchanger<ByteBuffer> exchanger;
 
     public static DigestResult computeDigest(File file, String algorithm)
             throws IOException, NoSuchAlgorithmException {
-        FileHasher hasher = new FileHasher(algorithm);
+        FileHasher hasher = new FileHasher(MessageDigest.getInstance(algorithm));
         return hasher.getDigest(file);
     }
 
-    public static DigestResult computeDigest(File file, Collection<String> algorithms)
+    public static DigestResult computeDigest(File file, Collection<MessageDigest> algorithms)
             throws IOException, NoSuchAlgorithmException {
         FileHasher hasher = new FileHasher(algorithms);
         return hasher.getDigest(file);
@@ -64,16 +70,19 @@ class FileHasher {
         return FileHasher.computeDigest(file, "sha-256");
     }
 
-    public FileHasher(String algorithm) throws NoSuchAlgorithmException {
-        if (!algorithm.equals(NO_ALGORITHM)) {
-            this.digests = new ArrayList<MessageDigest>();
-            this.digests.add(MessageDigest.getInstance(algorithm));
-        }
+    public FileHasher() {
+        this.digests = new ArrayList<MessageDigest>();
+        this.exchanger = new Exchanger<ByteBuffer>();
     }
 
-    public FileHasher(Collection<String> algorithms) throws NoSuchAlgorithmException {
-        this.digests = new ArrayList<MessageDigest>();
-        for (String algorithm : algorithms) {
+    public FileHasher(MessageDigest digestAlgorithm) {
+        this();
+        this.digests.add(digestAlgorithm);
+    }
+
+    public FileHasher(Collection<MessageDigest> algorithms) {
+        this();
+        for (MessageDigest algorithm : algorithms) {
             addAlgorithm(algorithm);
         }
     }
@@ -84,16 +93,13 @@ class FileHasher {
      * @param algorithm the algorithm to add.
      * @throws NoSuchAlgorithmException when the algorithm is not supported by the underlying JVM.
      */
-    public void addAlgorithm(String algorithm) throws NoSuchAlgorithmException {
-        if (algorithm.equals(NO_ALGORITHM)) {
-            return;
-        }
-        this.digests.add(MessageDigest.getInstance(algorithm));
+    public void addAlgorithm(MessageDigest algorithm) {
+        this.digests.add(algorithm);
     }
 
     /**
      * Compute the digest(s) for the contents of the file.
-     * 
+     *
      * @param file the File to compute the digests for.
      * @return a DigestResult containing the result of the computation.
      * @throws FileNotFoundException thrown when <c>file</c> doesn't exist.
@@ -107,6 +113,7 @@ class FileHasher {
         return getDigest(stream);
     }
 
+
     /**
      * Compute the digest(s) for the contents of the file.
      *
@@ -115,36 +122,63 @@ class FileHasher {
      * @throws IOException when things go wrong with the IO.
      */
     public DigestResult getDigest(FileInputStream stream) throws IOException {
-        reset();
-        try {
-            FileChannel channel = stream.getChannel();
-            long size = channel.size();
-            long offset = 0L;
-            long bytesLeft = size;
-            byte[] buf = new byte[BLOCK_READ_SIZE];
-            do {
-                long bytesToRead = Math.min(bytesLeft, BLOCK_READ_SIZE);
-                //MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, offset, bytesToRead);
-                stream.read(buf, 0, (int) bytesToRead);
-                for (MessageDigest digest : digests) {
-                    // digest.update(buffer);
-                    digest.update(buf, 0, (int) bytesToRead);
-                }
+        return this.getDigestSingle(stream);
+    }
 
-                bytesLeft -= bytesToRead;
-                offset += bytesToRead;
-            } while(bytesLeft > 0);
-        } catch (IOException ex) {
-            // pass
-        } finally {
-            stream.close();
-        }
+
+    /**
+     * Compute the digest(s) for the contents of the file.
+     *
+     * @param stream the stream to read.
+     * @return the resulting digests.
+     * @throws IOException when things go wrong with the IO.
+     */
+    public DigestResult getDigestSingle(FileInputStream stream) throws IOException {
+        int bytesRead = 0;
+        byte[] buf = new byte[BLOCK_READ_SIZE];
+        do {
+            bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
+            if (bytesRead > 0) {
+                for (MessageDigest digest: digests) {
+                    digest.update(buf, 0, bytesRead);
+                }
+            }
+        } while (bytesRead > 0);
 
         return finalizeDigestResult();
     }
 
+    /**
+     * Compute the digest(s) for the contents of the file.
+     *
+     * @param stream the stream to read.
+     * @return the resulting digests.
+     * @throws IOException when things go wrong with the IO.
+     */
+    public DigestResult getDigestMulti(FileInputStream stream) throws IOException {
+        reset();
+
+        try {
+            Thread fileReaderThread = new Thread(new FileReaderThread(stream));
+            Thread digestComputerThread = new Thread(new DigestComputerThread(digests));
+
+            fileReaderThread.start();
+            digestComputerThread.start();
+
+            fileReaderThread.join();
+            digestComputerThread.join();
+
+            return finalizeDigestResult();
+        } catch (InterruptedException ex) {
+            log.log(Level.WARNING, "Execution was interrupted. Results are unreliable", ex);
+        } finally {
+            stream.close();
+        }
+        return null;
+    }
+
     public void reset() {
-        for (MessageDigest digest: digests) {
+        for (MessageDigest digest : digests) {
             digest.reset();
         }
     }
@@ -155,5 +189,61 @@ class FileHasher {
             res.add(new Digest(digest.getAlgorithm(), digest.digest()));
         }
         return res;
+    }
+
+    class FileReaderThread implements Runnable {
+
+        private FileInputStream stream;
+        private FileChannel channel;
+
+        public FileReaderThread(FileInputStream stream) {
+            this.stream = stream;
+            this.channel = stream.getChannel();
+        }
+
+        public void run() {
+            try {
+                long remaining = channel.size();
+                long offset = 0;
+                while (remaining > 0) {
+                    long bytesToRead = Math.min(BLOCK_READ_SIZE, remaining);
+                    MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, offset, bytesToRead);
+                    buffer.load();
+                    ByteBuffer buf = exchanger.exchange(buffer);
+                    offset += bytesToRead;
+                    remaining -= bytesToRead;
+                }
+                // Notify the digesting thread that we're finished.
+                exchanger.exchange(null);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FileHasher.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+    class DigestComputerThread implements Runnable {
+
+        Collection<MessageDigest> digests;
+
+        public DigestComputerThread(Collection<MessageDigest> digests) {
+            this.digests = digests;
+        }
+
+        public void run() {
+            try {
+                while (true) {
+                    ByteBuffer buf = exchanger.exchange(null);
+                    if (buf == null) {
+                        break;
+                    }
+                    for (MessageDigest digest : digests) {
+                        digest.update(buf);
+                    }
+                }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FileHasher.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

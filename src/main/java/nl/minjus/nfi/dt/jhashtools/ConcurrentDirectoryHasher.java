@@ -25,6 +25,7 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -35,11 +36,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 12:22:04 PM To change this template use File | Settings
  * | File Templates.
  */
-public class ConcurrentDirectoryHasher implements DirectoryHasher {
-
-    private Set<String> algorithms;
+public class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
     private DirHasherResult result;
-    private boolean verbose;
     private int maxThreads;
 
     static enum ProcessingStates {
@@ -50,15 +48,13 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
     };
 
     public ConcurrentDirectoryHasher() {
+        super();
         this.result = new DirHasherResult();
-        this.algorithms = new HashSet<String>();
-        this.verbose = false;
         this.maxThreads = 1;
     }
 
     public ConcurrentDirectoryHasher(String algorithm) throws NoSuchAlgorithmException {
-        this();
-        this.addAlgorithm(algorithm);
+        super(algorithm);
     }
 
     public ConcurrentDirectoryHasher(int maxThreads) {
@@ -71,11 +67,6 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
         this.maxThreads = maxThreads;
     }
 
-    @Override
-    public void addAlgorithm(String algorithm) throws NoSuchAlgorithmException {
-        this.algorithms.add(algorithm);
-    }
-
     public int getMaxThreads() {
         return this.maxThreads;
     }
@@ -84,7 +75,6 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
         this.maxThreads = maxThreads;
     }
 
-    @Override
     public DirHasherResult getDigests(File startPath) {
         DirHasherResult result = new DirHasherResult();
         this.updateDigests(result, startPath);
@@ -97,18 +87,18 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        List<Thread> threads = new LinkedList<Thread>();
+        Collection<Thread> threads = new LinkedList<Thread>();
         BlockingQueue<File> queue = new LinkedBlockingQueue<File>();
 
         ProcessingState currentState = new ProcessingState();
 
         // Fire up the first filewalker, that can already start filling up the queue.
-        FileWalkerTask d = new FileWalkerTask(startPath, queue, currentState);
-        d.call();
+        //FileWalkerTask d = new FileWalkerTask(startPath, queue, currentState);
+        //d.call();
 
         ExecutorService executor = Executors.newFixedThreadPool(this.maxThreads);
         CompletionService<DirHasherResult> completionService = new ExecutorCompletionService<DirHasherResult>(executor);
-        //Future<DirHasherResult> fileWalkerTask = completionService.submit(new FileWalkerTask(startPath, queue, currentState));
+        Future<DirHasherResult> fileWalkerTask = completionService.submit(new FileWalkerTask(startPath, queue, currentState));
         Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
         for (int i = 0; i < this.maxThreads; i++) {
             try {
@@ -120,18 +110,13 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
 
         try {
             // first, wait for the filewalkertask to finish.
-            //if (fileWalkerTask.get() != null) {
-            //    System.err.println("Something went terribly wrong!");
-            //}
+            if (fileWalkerTask.get() != null) {
+                System.err.println("Something went terribly wrong!");
+            }
 
-            System.out.println("Getting the results");
             for (Future<DirHasherResult> task : computeTasks) {
                 DirHasherResult partial = task.get();
                 if (partial != null) {
-                    System.out.println("Received " + partial.size() + " digests");
-                    for (Map.Entry<File, DigestResult> entry : partial) {
-                        System.out.println("\t" + entry.getKey().toString());
-                    }
                     digests.putAll(partial);
                 }
             }
@@ -140,21 +125,6 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
         } catch (ExecutionException ex) {
             ex.printStackTrace();
         }
-    }
-
-    @Override
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    @Override
-    public boolean isVerbose() {
-        return this.verbose;
-    }
-
-    @Override
-    public Collection<String> getAlgorithms() {
-        return this.algorithms;
     }
 
     static class ProcessingState {
@@ -187,7 +157,6 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
          *
          * @see Thread#run()
          */
-        @Override
         public DirHasherResult call() {
             try {
                 this.processingState.lock.lock();
@@ -216,7 +185,7 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
         private DirHasherResult partialResult;
         private ProcessingState processingState;
 
-        public FileDigestComputeTask(BlockingQueue<File> inputQueue, Set<String> digests, ProcessingState processingState) throws NoSuchAlgorithmException {
+        public FileDigestComputeTask(BlockingQueue<File> inputQueue, Collection<MessageDigest> digests, ProcessingState processingState) throws NoSuchAlgorithmException {
             this.inputQueue = inputQueue;
             this.fileHasher = new FileHasher(digests);
             this.partialResult = new DirHasherResult();
@@ -230,20 +199,18 @@ public class ConcurrentDirectoryHasher implements DirectoryHasher {
          *
          * @throws Exception if unable to compute a result
          */
-        @Override
         public DirHasherResult call() throws Exception {
             try {
                 while (true) {
                     try {
-                        File file = this.inputQueue.remove();
-                        this.partialResult.put(file, this.fileHasher.getDigest(file));
-                    } catch (IOException e) {
-                        // pass
-                    } catch (NoSuchElementException ignore) {
-                        if (this.processingState.currentState == ProcessingStates.FINISHED) {
-                            break;
+                        File file = this.inputQueue.poll(10, TimeUnit.MICROSECONDS);
+                        if (file != null) {
+                            this.partialResult.put(file, this.fileHasher.getDigest(file));
+                        } else if (this.processingState.currentState == ProcessingStates.FINISHED) {
+                                break;
                         }
-                        Thread.sleep(10);           // sleep 10 ms for new results to be put in the queue
+                    } catch (IOException ex) {
+                        // pass
                     }
                 }
             } catch (Exception ex) {

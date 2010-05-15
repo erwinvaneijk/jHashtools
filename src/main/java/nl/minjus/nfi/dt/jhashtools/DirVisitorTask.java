@@ -45,9 +45,7 @@ public class DirVisitorTask implements WalkerVisitor {
      *
      * @param theFile the file that is being visited.
      */
-    @Override
     public void visit(File theFile) {
-        System.out.println(num + " Outputting " + theFile.toString());
         this.queue.add(theFile);
         num ++;
     }

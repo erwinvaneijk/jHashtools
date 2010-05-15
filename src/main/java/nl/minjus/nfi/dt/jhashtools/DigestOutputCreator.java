@@ -93,7 +93,7 @@ public class DigestOutputCreator {
             persistenceProvider.persist(file, digests);
             file.flush();
 
-            DirectoryHasher d = new DirHasherImpl(digests.firstEntry().getValue().getAlgorithms());
+            DirectoryHasher d = new SerialDirectoryHasher(digests.firstEntry().getValue().getAlgorithms());
             return d.getDigests(outputFile);
         } catch (PersistenceException ex) {
             log.log(Level.SEVERE, "Cannot persist content to file", ex);

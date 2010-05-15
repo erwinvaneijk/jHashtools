@@ -80,7 +80,7 @@ public class IntegrationTest {
     // @Test(timeout=120000)
     public void testLargeTree() {
         try {
-            DirectoryHasher directoryHasher = new DirHasherImpl("sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             directoryHasher.addAlgorithm("md5");
             directoryHasher.addAlgorithm("sha-1");
             DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));

@@ -35,10 +35,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -88,9 +89,35 @@ public class FileHasherTest {
     @Test
     public void testGetDigest() {
         try {
-            FileHasher instance = new FileHasher(FileHasher.DEFAULT_ALGORITHM);
+            FileHasher instance = new FileHasher(MessageDigest.getInstance("sha-256"));
             String expResult = expectedDigests.get(1);
             DigestResult results = instance.getDigest(this.testFile);
+            assertEquals(1, results.size());
+            assertNotNull(results.getDigest(FileHasher.DEFAULT_ALGORITHM));
+            String digest = results.getHexDigest(FileHasher.DEFAULT_ALGORITHM);
+            assertEquals("Digests are not the same", expResult, digest);
+        } catch (FileNotFoundException ex) {
+            fail(ex.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(FileHasherTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail(ex.toString());
+        } catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString());
+        }
+    }
+
+
+    /**
+     * Test of getDigest method, of class FileHasher.
+     */
+    @Test
+    public void testGetDigestMulti() {
+        try {
+            FileHasher instance = new FileHasher(MessageDigest.getInstance("sha-256"));
+            String expResult = expectedDigests.get(1);
+            FileInputStream stream = new FileInputStream(this.testFile);
+            DigestResult results = instance.getDigestMulti(stream);
+            stream.close();
             assertEquals(1, results.size());
             assertNotNull(results.getDigest(FileHasher.DEFAULT_ALGORITHM));
             String digest = results.getHexDigest(FileHasher.DEFAULT_ALGORITHM);
@@ -122,32 +149,9 @@ public class FileHasherTest {
     }
 
     @Test
-    public void testNoSuchAlgorithmOnFileHasher() {
-        try {
-            FileHasher h = new FileHasher("foo");
-            fail("Should have thrown NoSuchAlgorithmException");
-        } catch (NoSuchAlgorithmException ex) {
-            // pass
-        }
-    }
-
-    @Test
-    public void testNoSuchAlgorithmOnFileHasherCollection() {
-        try {
-            ArrayList<String> algorithms = new ArrayList<String>();
-            algorithms.add("md5");
-            algorithms.add("foo");
-            FileHasher h = new FileHasher(algorithms);
-            fail("Should have thrown NoSuchAlgorithmException");
-        } catch (NoSuchAlgorithmException ex) {
-            // pass
-        }
-    }
-
-    @Test
     public void testFileHasherUnknownFile() {
         try {
-            FileHasher h = new FileHasher("md5");
+            FileHasher h = new FileHasher(MessageDigest.getInstance("md5"));
             DigestResult d = h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
         } catch (FileNotFoundException ex) {

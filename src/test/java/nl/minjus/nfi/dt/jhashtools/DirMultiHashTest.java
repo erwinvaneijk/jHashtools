@@ -67,7 +67,7 @@ public class DirMultiHashTest {
     @SuppressWarnings({"MethodWithMultipleLoops"})
     @Test
     public void testGetDigests() {
-        DirectoryHasher directoryHasher = new DirHasherImpl();
+        DirectoryHasher directoryHasher = new SerialDirectoryHasher();
         try {
             directoryHasher.addAlgorithm("sha-256");
             directoryHasher.addAlgorithm("sha-1");

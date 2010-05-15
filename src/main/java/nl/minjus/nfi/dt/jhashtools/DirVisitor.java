@@ -27,6 +27,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -39,28 +40,29 @@ public class DirVisitor implements WalkerVisitor {
     private boolean verbose;
     private final FileHasher fileHasher;
 
-    public DirVisitor(String algorithm) throws NoSuchAlgorithmException {
+    public DirVisitor(MessageDigest algorithm) throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
         this.verbose = false;
         this.fileHasher = new FileHasher(algorithm);
     }
 
     public DirVisitor() throws NoSuchAlgorithmException {
-        this(FileHasher.DEFAULT_ALGORITHM);
+        resultMap = new DirHasherResult();
+        this.verbose = false;
+        this.fileHasher = new FileHasher();
     }
 
-    public DirVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException {
+    public DirVisitor(Collection<MessageDigest> algorithms, DirHasherResult digests) {
         this(algorithms, false);
         this.resultMap = digests;
     }
 
-    public DirVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException {
+    public DirVisitor(Collection<MessageDigest> algorithms, boolean verbose) {
         resultMap = new DirHasherResult();
         this.fileHasher = new FileHasher(algorithms);
         this.verbose = verbose;
     }
 
-    @Override
     public void visit(File theFile) {
         try {
             // FIXME

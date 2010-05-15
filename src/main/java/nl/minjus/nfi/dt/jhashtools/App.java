@@ -118,7 +118,7 @@ public class App {
     private static DirectoryHasher createDirectoryHasher(CommandLine line) {
         DirectoryHasher directoryHasher = null;
         try {
-            directoryHasher = new DirHasherImpl(FileHasher.NO_ALGORITHM);
+            directoryHasher = new SerialDirectoryHasher(FileHasher.NO_ALGORITHM);
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
                 directoryHasher.addAlgorithm("sha-256");

@@ -28,46 +28,36 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
- *
  * @author Erwin van Eijk
  */
-public class DirHasherImpl implements DirectoryHasher {
+public class SerialDirectoryHasher extends AbstractDirectoryHasher {
 
     private final DirHasherResult results;
-    private final Set<String> algorithms;
-    private boolean verbose;
 
-    public DirHasherImpl() {
+    public SerialDirectoryHasher() {
+        super();
         results = new DirHasherResult();
-        algorithms = new TreeSet<String>();
     }
 
-    public DirHasherImpl(String algorithm) throws NoSuchAlgorithmException {
+    public SerialDirectoryHasher(String algorithm) throws NoSuchAlgorithmException {
         this();
-        if (! algorithm.equals(FileHasher.NO_ALGORITHM)) {
-            this.algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
+        if (!algorithm.equals(FileHasher.NO_ALGORITHM)) {
+            this.algorithms.add(MessageDigest.getInstance(algorithm));
         }
     }
 
-    public DirHasherImpl(Collection<String> algorithms) throws NoSuchAlgorithmException {
+    public SerialDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException {
         this();
-        for (String algorithm: algorithms) {
+        for (String algorithm : algorithms) {
             this.addAlgorithm(algorithm);
         }
     }
 
     @Override
-    public void addAlgorithm(String algorithm) throws NoSuchAlgorithmException {
-        algorithms.add(MessageDigest.getInstance(algorithm).getAlgorithm());
-    }
-
-    @Override
     public DirHasherResult getDigests(final File startFile) {
-        if (! startFile.exists()) {
+        if (!startFile.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", startFile.toString()));
         }
         updateDigests(this.results, startFile);
@@ -75,35 +65,15 @@ public class DirHasherImpl implements DirectoryHasher {
     }
 
     @Override
-    public void updateDigests(DirHasherResult digests, File file) {
-        if (! file.exists()) {
+    public void updateDigests(DirHasherResult digests, final File file) {
+        if (!file.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", file.toString()));
         }
 
-        try {
-            FileWalker walker = new FileWalker();
-            DirVisitor visitor = new DirVisitor(algorithms, digests);
-            visitor.setVerbose(this.verbose);
-            walker.addWalkerVisitor(visitor);
-            walker.walk(file);
-        } catch (NoSuchAlgorithmException ex) {
-            // ignore. This should not happen, because we've already checked
-            // the algorithms in the constructor;
-        }
-    }
-
-    @Override
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    @Override
-    public boolean isVerbose() {
-        return this.verbose;
-    }
-
-    @Override
-    public Collection<String> getAlgorithms() {
-        return this.algorithms;
+        FileWalker walker = new FileWalker();
+        DirVisitor visitor = new DirVisitor(algorithms, digests);
+        visitor.setVerbose(this.isVerbose());
+        walker.addWalkerVisitor(visitor);
+        walker.walk(file);
     }
 }
