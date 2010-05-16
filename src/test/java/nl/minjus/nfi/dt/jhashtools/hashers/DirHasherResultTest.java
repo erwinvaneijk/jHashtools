@@ -22,8 +22,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import org.junit.*;
 
 import java.io.File;

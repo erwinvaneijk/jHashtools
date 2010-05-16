@@ -27,7 +27,7 @@
  * and open the template in the editor.
  */
 
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import org.junit.*;
 

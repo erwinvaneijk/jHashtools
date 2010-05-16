@@ -21,13 +21,17 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.hashers;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -187,7 +191,16 @@ public class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
 
         public FileDigestComputeTask(BlockingQueue<File> inputQueue, Collection<MessageDigest> digests, ProcessingState processingState) throws NoSuchAlgorithmException {
             this.inputQueue = inputQueue;
-            this.fileHasher = new FileHasher(digests);
+            Collection<MessageDigest> digestClones = new ArrayList<MessageDigest>(digests.size());
+            try {
+                for (MessageDigest d: digests) {
+                        digestClones.add((MessageDigest)d.clone());
+                }
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            this.fileHasher = FileHasherCreator.createFileHasher(digestClones);
             this.partialResult = new DirHasherResult();
             this.processingState = processingState;
         }

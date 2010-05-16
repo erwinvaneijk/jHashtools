@@ -25,16 +25,19 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrentDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.SerialDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.NoSuchAlgorithmException;
-import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;

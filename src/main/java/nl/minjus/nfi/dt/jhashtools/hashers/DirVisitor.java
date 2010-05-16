@@ -22,7 +22,10 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.hashers;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,13 +46,13 @@ public class DirVisitor implements WalkerVisitor {
     public DirVisitor(MessageDigest algorithm) throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
         this.verbose = false;
-        this.fileHasher = new FileHasher(algorithm);
+        this.fileHasher = FileHasherCreator.createFileHasher(algorithm);
     }
 
     public DirVisitor() throws NoSuchAlgorithmException {
         resultMap = new DirHasherResult();
         this.verbose = false;
-        this.fileHasher = new FileHasher();
+        this.fileHasher = FileHasherCreator.createFileHasher();
     }
 
     public DirVisitor(Collection<MessageDigest> algorithms, DirHasherResult digests) {
@@ -59,7 +62,7 @@ public class DirVisitor implements WalkerVisitor {
 
     public DirVisitor(Collection<MessageDigest> algorithms, boolean verbose) {
         resultMap = new DirHasherResult();
-        this.fileHasher = new FileHasher(algorithms);
+        this.fileHasher = FileHasherCreator.createFileHasher(algorithms);
         this.verbose = verbose;
     }
 

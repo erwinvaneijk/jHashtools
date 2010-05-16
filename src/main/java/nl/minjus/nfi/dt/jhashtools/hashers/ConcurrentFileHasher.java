@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,8 +20,15 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
-package nl.minjus.nfi.dt.jhashtools;
+
+package nl.minjus.nfi.dt.jhashtools.hashers;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,133 +38,46 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Exchanger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @Author Erwin van Eijk
- */
-class FileHasher {
+public class ConcurrentFileHasher extends AbstractFileHasher {
+    private final static Logger log = Logger.getLogger(ConcurrentFileHasher.class.getName());
 
-    public static final String DEFAULT_ALGORITHM = "sha-256";
-    public static final String NO_ALGORITHM = "none";
-    private static final int BLOCK_READ_SIZE = 1024 * 1024;
-    private static final Logger log = Logger.getLogger(FileHasher.class.getName());
-    private Collection<MessageDigest> digests;
-    private ByteBuffer readBuffer;
-    private ByteBuffer writeBuffer;
     private Exchanger<ByteBuffer> exchanger;
 
-    public static DigestResult computeDigest(File file, String algorithm)
-            throws IOException, NoSuchAlgorithmException {
-        FileHasher hasher = new FileHasher(MessageDigest.getInstance(algorithm));
-        return hasher.getDigest(file);
-    }
-
-    public static DigestResult computeDigest(File file, Collection<MessageDigest> algorithms)
-            throws IOException, NoSuchAlgorithmException {
-        FileHasher hasher = new FileHasher(algorithms);
-        return hasher.getDigest(file);
-    }
-
-    public static DigestResult computeDigest(File file)
-            throws IOException, NoSuchAlgorithmException {
-        return FileHasher.computeDigest(file, "sha-256");
-    }
-
-    public FileHasher() {
-        this.digests = new ArrayList<MessageDigest>();
+    public ConcurrentFileHasher() {
+        super();
         this.exchanger = new Exchanger<ByteBuffer>();
     }
 
-    public FileHasher(MessageDigest digestAlgorithm) {
-        this();
-        this.digests.add(digestAlgorithm);
+    public ConcurrentFileHasher(MessageDigest digest) {
+        super(digest);
+        this.exchanger = new Exchanger<ByteBuffer>();
     }
 
-    public FileHasher(Collection<MessageDigest> algorithms) {
-        this();
-        for (MessageDigest algorithm : algorithms) {
-            addAlgorithm(algorithm);
-        }
+    public ConcurrentFileHasher(Collection<MessageDigest> digests) {
+        super(digests);
+        this.exchanger = new Exchanger<ByteBuffer>();
     }
-
-    /**
-     * Add an algorithm to the set of supported algorithms.
-     *
-     * @param algorithm the algorithm to add.
-     * @throws NoSuchAlgorithmException when the algorithm is not supported by the underlying JVM.
-     */
-    public void addAlgorithm(MessageDigest algorithm) {
-        this.digests.add(algorithm);
-    }
-
     /**
      * Compute the digest(s) for the contents of the file.
      *
      * @param file the File to compute the digests for.
+     *
      * @return a DigestResult containing the result of the computation.
-     * @throws FileNotFoundException thrown when <c>file</c> doesn't exist.
-     * @throws IOException thrown when some IOException occurs.
+     *
+     * @throws java.io.FileNotFoundException thrown when <c>file</c> doesn't exist.
+     * @throws java.io.IOException           thrown when some IOException occurs.
      */
     public DigestResult getDigest(File file) throws FileNotFoundException, IOException {
         if (!file.exists()) {
             throw new FileNotFoundException(String.format("File %s does not exist", file.toString()));
         }
+
         FileInputStream stream = new FileInputStream(file);
-        return getDigest(stream);
-    }
-
-
-    /**
-     * Compute the digest(s) for the contents of the file.
-     *
-     * @param stream the stream to read.
-     * @return the resulting digests.
-     * @throws IOException when things go wrong with the IO.
-     */
-    public DigestResult getDigest(FileInputStream stream) throws IOException {
-        return this.getDigestSingle(stream);
-    }
-
-
-    /**
-     * Compute the digest(s) for the contents of the file.
-     *
-     * @param stream the stream to read.
-     * @return the resulting digests.
-     * @throws IOException when things go wrong with the IO.
-     */
-    public DigestResult getDigestSingle(FileInputStream stream) throws IOException {
-        int bytesRead = 0;
-        byte[] buf = new byte[BLOCK_READ_SIZE];
-        do {
-            bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
-            if (bytesRead > 0) {
-                for (MessageDigest digest: digests) {
-                    digest.update(buf, 0, bytesRead);
-                }
-            }
-        } while (bytesRead > 0);
-
-        return finalizeDigestResult();
-    }
-
-    /**
-     * Compute the digest(s) for the contents of the file.
-     *
-     * @param stream the stream to read.
-     * @return the resulting digests.
-     * @throws IOException when things go wrong with the IO.
-     */
-    public DigestResult getDigestMulti(FileInputStream stream) throws IOException {
-        reset();
-
         try {
             Thread fileReaderThread = new Thread(new FileReaderThread(stream));
             Thread digestComputerThread = new Thread(new DigestComputerThread(digests));
@@ -168,27 +88,13 @@ class FileHasher {
             fileReaderThread.join();
             digestComputerThread.join();
 
-            return finalizeDigestResult();
+            return super.finalizeDigestResult();
         } catch (InterruptedException ex) {
             log.log(Level.WARNING, "Execution was interrupted. Results are unreliable", ex);
         } finally {
             stream.close();
         }
         return null;
-    }
-
-    public void reset() {
-        for (MessageDigest digest : digests) {
-            digest.reset();
-        }
-    }
-
-    private DigestResult finalizeDigestResult() {
-        DigestResult res = new DigestResult();
-        for (MessageDigest digest : digests) {
-            res.add(new Digest(digest.getAlgorithm(), digest.digest()));
-        }
-        return res;
     }
 
     class FileReaderThread implements Runnable {
@@ -206,7 +112,7 @@ class FileHasher {
                 long remaining = channel.size();
                 long offset = 0;
                 while (remaining > 0) {
-                    long bytesToRead = Math.min(BLOCK_READ_SIZE, remaining);
+                    long bytesToRead = Math.min(AbstractFileHasher.BLOCK_READ_SIZE, remaining);
                     MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, offset, bytesToRead);
                     buffer.load();
                     ByteBuffer buf = exchanger.exchange(buffer);
@@ -216,7 +122,7 @@ class FileHasher {
                 // Notify the digesting thread that we're finished.
                 exchanger.exchange(null);
             } catch (InterruptedException ex) {
-                Logger.getLogger(FileHasher.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AbstractFileHasher.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
             }
         }
@@ -231,18 +137,21 @@ class FileHasher {
         }
 
         public void run() {
+
             try {
+                int num = 0;
                 while (true) {
                     ByteBuffer buf = exchanger.exchange(null);
                     if (buf == null) {
                         break;
                     }
+                    System.out.println("Got part " + num + " " + buf.capacity());
                     for (MessageDigest digest : digests) {
                         digest.update(buf);
                     }
                 }
             } catch (InterruptedException ex) {
-                Logger.getLogger(FileHasher.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AbstractFileHasher.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

@@ -344,11 +344,15 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> 
      * @param out where to write to.
      */
     public void prettyPrint(PrintWriter out) {
-        out.printf("%s\n", this.content.firstKey());
-        DigestResult res = this.content.firstEntry().getValue();
-        for (Digest d: res) {
-            out.printf("\t%s\n", d.prettyPrint('\t'));
+        out.printf("%d elements\n", this.content.size());
+        for (Map.Entry<File, DigestResult> entry: this) {
+            out.printf("\t%s\n", entry.getKey());
+            DigestResult res = entry.getValue();
+            for (Digest d: res) {
+                out.printf("\t\t%s\n", d.prettyPrint('\t'));
+            }
         }
+        out.flush();
     }
 
     /**

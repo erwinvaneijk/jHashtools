@@ -25,6 +25,8 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.SerialDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;

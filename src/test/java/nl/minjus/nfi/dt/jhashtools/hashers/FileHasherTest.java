@@ -27,15 +27,16 @@
  * and open the template in the editor.
  */
 
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -84,12 +85,12 @@ public class FileHasherTest {
     }
 
     /**
-     * Test of getDigest method, of class FileHasher.
+     * Test of getDigest method, of class AbstractFileHasher.
      */
     @Test
     public void testGetDigest() {
         try {
-            FileHasher instance = new FileHasher(MessageDigest.getInstance("sha-256"));
+            FileHasher instance = new SerialFileHasher(MessageDigest.getInstance("sha-256"));
             String expResult = expectedDigests.get(1);
             DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
@@ -108,16 +109,14 @@ public class FileHasherTest {
 
 
     /**
-     * Test of getDigest method, of class FileHasher.
+     * Test of getDigest method, of class AbstractFileHasher.
      */
     @Test
-    public void testGetDigestMulti() {
+    public void testGetDigestMultithreaded() {
         try {
-            FileHasher instance = new FileHasher(MessageDigest.getInstance("sha-256"));
+            AbstractFileHasher instance = new ConcurrentFileHasher(MessageDigest.getInstance("sha-256"));
             String expResult = expectedDigests.get(1);
-            FileInputStream stream = new FileInputStream(this.testFile);
-            DigestResult results = instance.getDigestMulti(stream);
-            stream.close();
+            DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
             assertNotNull(results.getDigest(FileHasher.DEFAULT_ALGORITHM));
             String digest = results.getHexDigest(FileHasher.DEFAULT_ALGORITHM);
@@ -136,7 +135,7 @@ public class FileHasherTest {
     public void testComputeDigest() {
         try {
             String expResult = expectedDigests.get(1);
-            DigestResult results = FileHasher.computeDigest(this.testFile);
+            DigestResult results = FileHasherCreator.computeDigest(this.testFile);
             String result = results.digest().toHex();
             assertEquals(expResult, result);
         } catch (FileNotFoundException ex) {
@@ -151,7 +150,22 @@ public class FileHasherTest {
     @Test
     public void testFileHasherUnknownFile() {
         try {
-            FileHasher h = new FileHasher(MessageDigest.getInstance("md5"));
+            FileHasher h = new SerialFileHasher(MessageDigest.getInstance("md5"));
+            DigestResult d = h.getDigest(new File("Does not exist"));
+            fail("Should have thrown FileNotFoundException");
+        } catch (FileNotFoundException ex) {
+            // pass
+        } catch (IOException ex) {
+            fail("Should not get IOException");
+        } catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString());
+        }
+    }
+
+    @Test
+    public void testFileHasherUnknownFileConcurrent() {
+        try {
+            FileHasher h = new ConcurrentFileHasher(MessageDigest.getInstance("md5"));
             DigestResult d = h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
         } catch (FileNotFoundException ex) {

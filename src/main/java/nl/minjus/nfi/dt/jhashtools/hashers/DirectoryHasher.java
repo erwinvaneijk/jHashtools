@@ -22,31 +22,28 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package nl.minjus.nfi.dt.jhashtools;
+package nl.minjus.nfi.dt.jhashtools.hashers;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 import java.io.File;
-import java.util.concurrent.BlockingQueue;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 
 /**
- * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 12:07:14 PM To change this template use File | Settings
+ * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 12:13:46 PM To change this template use File | Settings
  * | File Templates.
  */
-public class DirVisitorTask implements WalkerVisitor {
-    private BlockingQueue<File> queue;
-    private int num;
+public interface DirectoryHasher {
+    void addAlgorithm(String algorithm) throws NoSuchAlgorithmException;
 
-    public DirVisitorTask(BlockingQueue<File> queue) {
-        this.queue = queue;
-        this.num = 1;
-    }
+    DirHasherResult getDigests(File startFile);
 
-    /**
-     * Called when a file is visited.
-     *
-     * @param theFile the file that is being visited.
-     */
-    public void visit(File theFile) {
-        this.queue.add(theFile);
-        num ++;
-    }
+    void updateDigests(DirHasherResult digests, File file);
+
+    void setVerbose(boolean verbose);
+
+    boolean isVerbose();
+
+    Collection<String> getAlgorithms();
 }
