@@ -71,7 +71,6 @@ public class ConcurrentDirectoryHasherTest {
         try {
             DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", numThreads);
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            digests.prettyPrint(new PrintWriter(System.err));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             DirHasherResult result = digests.intersect(knownDigestSha256);

@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  */
 abstract class AbstractFileHasher implements FileHasher {
 
-    public  static final int BLOCK_READ_SIZE = 1 * 1024;
+    public  static final int BLOCK_READ_SIZE = 1024 * 1024;
     private static final Logger log = Logger.getLogger(AbstractFileHasher.class.getName());
     protected Collection<MessageDigest> digests;
 

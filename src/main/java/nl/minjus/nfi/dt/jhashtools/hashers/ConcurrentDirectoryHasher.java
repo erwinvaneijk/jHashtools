@@ -191,16 +191,15 @@ public class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
 
         public FileDigestComputeTask(BlockingQueue<File> inputQueue, Collection<MessageDigest> digests, ProcessingState processingState) throws NoSuchAlgorithmException {
             this.inputQueue = inputQueue;
-            Collection<MessageDigest> digestClones = new ArrayList<MessageDigest>(digests.size());
+            this.fileHasher = FileHasherCreator.createThreadedHasher();
             try {
-                for (MessageDigest d: digests) {
-                        digestClones.add((MessageDigest)d.clone());
-                }
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-
-            this.fileHasher = FileHasherCreator.createFileHasher(digestClones);
+                            for (MessageDigest d: digests) {
+                                    this.fileHasher.addAlgorithm((MessageDigest)d.clone());
+                            }
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+            
             this.partialResult = new DirHasherResult();
             this.processingState = processingState;
         }

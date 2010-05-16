@@ -80,7 +80,7 @@ public class IntegrationTest {
         assertEquals(0, diff.size());
     }
 
-    // @Test(timeout=120000)
+    //@Test(timeout=120000)
     public void testLargeTree() {
         try {
             DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
@@ -106,7 +106,7 @@ public class IntegrationTest {
     //@Test(timeout=120000)
     public void testLargeTreeConcurrent() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", 4);
             directoryHasher.addAlgorithm("md5");
             directoryHasher.addAlgorithm("sha-1");
             DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));

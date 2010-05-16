@@ -139,13 +139,11 @@ public class ConcurrentFileHasher extends AbstractFileHasher {
         public void run() {
 
             try {
-                int num = 0;
                 while (true) {
                     ByteBuffer buf = exchanger.exchange(null);
                     if (buf == null) {
                         break;
                     }
-                    System.out.println("Got part " + num + " " + buf.capacity());
                     for (MessageDigest digest : digests) {
                         digest.update(buf);
                     }
