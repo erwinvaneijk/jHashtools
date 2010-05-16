@@ -33,7 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public abstract class AbstractDirectoryHasher implements DirectoryHasher {
+abstract class AbstractDirectoryHasher implements DirectoryHasher {
     protected final Collection<MessageDigest> algorithms;
     private boolean verbose;
 
@@ -50,6 +50,13 @@ public abstract class AbstractDirectoryHasher implements DirectoryHasher {
         this();
         for (String algorithm: algorithms) {
             this.addAlgorithm(algorithm);
+        }
+    }
+
+    public void setAlgorithms(Collection<String> algorithms) throws NoSuchAlgorithmException {
+        this.algorithms.clear();
+        for (String algorithm: algorithms) {
+            addAlgorithm(algorithm);
         }
     }
 

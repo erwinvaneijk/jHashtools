@@ -25,8 +25,9 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.SerialDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
@@ -95,7 +96,7 @@ public class DigestOutputCreator {
             persistenceProvider.persist(file, digests);
             file.flush();
 
-            DirectoryHasher d = new SerialDirectoryHasher(digests.firstEntry().getValue().getAlgorithms());
+            DirectoryHasher d = DirectoryHasherCreator.create(ConcurrencyMode.SINGLE, digests.firstEntry().getValue().getAlgorithms());
             return d.getDigests(outputFile);
         } catch (PersistenceException ex) {
             log.log(Level.SEVERE, "Cannot persist content to file", ex);

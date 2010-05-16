@@ -34,7 +34,7 @@ import java.util.Collection;
 /**
  * @author Erwin van Eijk
  */
-public class SerialDirectoryHasher extends AbstractDirectoryHasher {
+class SerialDirectoryHasher extends AbstractDirectoryHasher {
 
     private final DirHasherResult results;
 

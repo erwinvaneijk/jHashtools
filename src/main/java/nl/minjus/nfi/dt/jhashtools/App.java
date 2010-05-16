@@ -25,9 +25,7 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.FileHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.SerialDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.*;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.Version;
 import org.apache.commons.cli.*;
@@ -121,7 +119,9 @@ public class App {
     private static DirectoryHasher createDirectoryHasher(CommandLine line) {
         DirectoryHasher directoryHasher = null;
         try {
-            directoryHasher = new SerialDirectoryHasher(FileHasher.NO_ALGORITHM);
+            ConcurrencyMode concurrencyMode = (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI;
+
+            directoryHasher = DirectoryHasherCreator.create(concurrencyMode);
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
                 directoryHasher.addAlgorithm("sha-256");
@@ -177,6 +177,7 @@ public class App {
         options.addOption("n", "ignorecase", false, "Ignore the case on the file, only used when verifying.");
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
+        options.addOption("s", "single", false, "Only use single threaded execution path");
         Option outputOption =
                 OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o");
         options.addOption(outputOption);

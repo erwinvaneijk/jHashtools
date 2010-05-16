@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author eijk
+ * @author Erwin van Eijk
  */
 public class DigestResultTest {
 

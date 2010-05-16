@@ -37,13 +37,15 @@ import java.util.Collection;
 public interface DirectoryHasher {
     void addAlgorithm(String algorithm) throws NoSuchAlgorithmException;
 
-    DirHasherResult getDigests(File startFile);
+    void setAlgorithms(Collection<String> algorithms) throws NoSuchAlgorithmException;
 
-    void updateDigests(DirHasherResult digests, File file);
+    Collection<String> getAlgorithms();
 
     void setVerbose(boolean verbose);
 
     boolean isVerbose();
 
-    Collection<String> getAlgorithms();
+    DirHasherResult getDigests(File startFile);
+
+    void updateDigests(DirHasherResult digests, File file);
 }

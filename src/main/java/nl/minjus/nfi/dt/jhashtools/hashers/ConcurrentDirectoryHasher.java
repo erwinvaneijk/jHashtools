@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 12:22:04 PM To change this template use File | Settings
  * | File Templates.
  */
-public class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
+class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
     private DirHasherResult result;
     private int maxThreads;
 
@@ -54,13 +54,17 @@ public class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
     public ConcurrentDirectoryHasher() {
         super();
         this.result = new DirHasherResult();
-        this.maxThreads = 1;
+        this.maxThreads = Runtime.getRuntime().availableProcessors();
     }
 
     public ConcurrentDirectoryHasher(String algorithm) throws NoSuchAlgorithmException {
         super(algorithm);
     }
 
+    public ConcurrentDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException {
+        super(algorithms);
+    }
+    
     public ConcurrentDirectoryHasher(int maxThreads) {
         this();
         this.maxThreads = maxThreads;

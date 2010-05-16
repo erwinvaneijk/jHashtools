@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * This class computes digests of files without using multithreading.
  */
-public class SerialFileHasher extends AbstractFileHasher {
+class SerialFileHasher extends AbstractFileHasher {
 
     public SerialFileHasher() {
         super();

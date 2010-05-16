@@ -25,9 +25,9 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrentDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.SerialDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
@@ -38,6 +38,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -83,7 +85,7 @@ public class IntegrationTest {
     //@Test(timeout=120000)
     public void testLargeTree() {
         try {
-            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.SINGLE, "sha-256");
             directoryHasher.addAlgorithm("md5");
             directoryHasher.addAlgorithm("sha-1");
             DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
@@ -106,9 +108,11 @@ public class IntegrationTest {
     //@Test(timeout=120000)
     public void testLargeTreeConcurrent() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher("sha-256", 4);
-            directoryHasher.addAlgorithm("md5");
-            directoryHasher.addAlgorithm("sha-1");
+            Collection<String> algorithms = new LinkedList<String>();
+            algorithms.add("sha-256");
+            algorithms.add("md5");
+            algorithms.add("sha-1");
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(4, algorithms);
             DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
