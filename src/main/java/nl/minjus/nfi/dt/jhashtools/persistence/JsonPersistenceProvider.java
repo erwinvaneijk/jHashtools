@@ -77,7 +77,7 @@ public class JsonPersistenceProvider implements PersistenceProvider {
     @Override
     public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException {
         try {
-            return (T) objectMapper.readValue(reader, clazz);
+            return objectMapper.readValue(reader, clazz);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }

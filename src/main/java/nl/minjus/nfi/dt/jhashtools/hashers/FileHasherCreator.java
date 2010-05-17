@@ -23,7 +23,7 @@ public class FileHasherCreator {
     }
 
     public static FileHasher createFileHasher(MessageDigest algorithm) throws NoSuchAlgorithmException {
-        FileHasher hasher = null;
+        FileHasher hasher;
         if (concurrencyMode == ConcurrencyMode.SINGLE) {
             hasher = new SerialFileHasher(algorithm);
         } else {
@@ -33,7 +33,7 @@ public class FileHasherCreator {
     }
 
     public static FileHasher createFileHasher() {
-        FileHasher hasher = null;
+        FileHasher hasher;
         if (concurrencyMode == ConcurrencyMode.SINGLE) {
             hasher = new SerialFileHasher();
         } else {
@@ -43,7 +43,7 @@ public class FileHasherCreator {
     }
 
     public static FileHasher createFileHasher(Collection<MessageDigest> algorithms) {
-        FileHasher hasher = null;
+        FileHasher hasher;
         if (concurrencyMode == ConcurrencyMode.SINGLE) {
             hasher = new SerialFileHasher(algorithms);
         } else {
@@ -73,6 +73,4 @@ public class FileHasherCreator {
             throws IOException, NoSuchAlgorithmException {
         return computeDigest(file, "sha-256");
     }
-
-
 }

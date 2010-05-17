@@ -29,19 +29,21 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 12:22:04 PM To change this template use File | Settings
- * | File Templates.
+ * Use multithreading to compute the digests on all the files.
  */
 class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
-    private DirHasherResult result;
+
+    private static final Logger log = Logger.getLogger(ConcurrentDirectoryHasher.class.getName());
+
     private int maxThreads;
 
     static enum ProcessingStates {
@@ -49,11 +51,10 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
         UNINITIALIZED,
         BUSY,
         FINISHED
-    };
+    }
 
     public ConcurrentDirectoryHasher() {
         super();
-        this.result = new DirHasherResult();
         this.maxThreads = Runtime.getRuntime().availableProcessors();
     }
 
@@ -95,31 +96,29 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        Collection<Thread> threads = new LinkedList<Thread>();
         BlockingQueue<File> queue = new LinkedBlockingQueue<File>();
-
         ProcessingState currentState = new ProcessingState();
-
-        // Fire up the first filewalker, that can already start filling up the queue.
-        //FileWalkerTask d = new FileWalkerTask(startPath, queue, currentState);
-        //d.call();
 
         ExecutorService executor = Executors.newFixedThreadPool(this.maxThreads);
         CompletionService<DirHasherResult> completionService = new ExecutorCompletionService<DirHasherResult>(executor);
+        // Create the task that just walks the tree and puts the File entries in the queue
         Future<DirHasherResult> fileWalkerTask = completionService.submit(new FileWalkerTask(startPath, queue, currentState));
+
+        // Start the compute tasks that compute the digests on the data in the File's that are read from
+        // the queue.
         Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
         for (int i = 0; i < this.maxThreads; i++) {
             try {
                 computeTasks.add(completionService.submit(new FileDigestComputeTask(queue, this.algorithms, currentState)));
             } catch (NoSuchAlgorithmException e) {
-                // complain loudly.
+                log.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);
             }
         }
 
         try {
             // first, wait for the filewalkertask to finish.
             if (fileWalkerTask.get() != null) {
-                System.err.println("Something went terribly wrong!");
+                log.log(Level.SEVERE, "It should be impossibe to get a result here.");
             }
 
             for (Future<DirHasherResult> task : computeTasks) {
@@ -129,9 +128,9 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
                 }
             }
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            log.log(Level.WARNING, "Interruption has occurred.", ex);
         } catch (ExecutionException ex) {
-            ex.printStackTrace();
+            log.log(Level.WARNING, "Execution was interrupted.", ex);
         }
     }
 

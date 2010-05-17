@@ -64,21 +64,19 @@ public class DirHasherResultVerifier {
     }
 
     public void generateDigests(String[] filesToProcess) {
-        for (String pathname : filesToProcess) {
-            this.directoryHasher.updateDigests(measuredDigests, new File(pathname));
+        for (String pathName : filesToProcess) {
+            this.directoryHasher.updateDigests(measuredDigests, new File(pathName));
         }
     }
 
     public void loadDigestsFromFile(String filename) throws FileNotFoundException, PersistenceException {
-        DirHasherResult result = null;
         Reader reader;
         this.file = new File(filename);
         reader = new FileReader(this.file);
 
         PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
 
-        result = (DirHasherResult) persistenceProvider.load(reader, DirHasherResult.class);
-        this.verificationDigests = result;
+        this.verificationDigests = persistenceProvider.load(reader, DirHasherResult.class);
     }
 
     public void verify(PrintWriter out) {
