@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
@@ -36,6 +40,7 @@ import org.apache.commons.cli.*;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,25 +48,29 @@ import static java.util.logging.Logger.getLogger;
 
 /**
  * Entrypoint of the cli version of the tooling.
- *
+ * @author Erwin van Eijk
  */
-public class App {
+public class App
+{
 
     private static final String USAGE = "[options] dir [dir...]";
-    private static final String HEADER = "hashtree - Creating a list of digests for files and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
+    private static final String HEADER =
+            "hashtree - Creating a list of digests for files and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
     private static final String FOOTER = "";
-    private static final Logger log = getLogger(App.class.getName());
+    private static final Logger LOG = getLogger(App.class.getName());
+    private static final int DEFAULT_TERMINAL_WIDTH = 80;
 
-    public static void main(String[] arguments) {
+    public static void main(String[] arguments)
+    {
         CommandLine line = App.getCommandLine(arguments);
         String[] filesToProcess = line.getArgs();
 
         DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
-        log.log(Level.INFO, "Version: " + Version.getVersion());
+        LOG.log(Level.INFO, "Version: " + Version.getVersion());
 
         if (line.hasOption("i") && line.hasOption("o")) {
-            log.log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
+            LOG.log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
         }
 
@@ -79,7 +88,8 @@ public class App {
         System.exit(0);
     }
 
-    private static PersistenceStyle getPersistenceStyle(CommandLine line) {
+    private static PersistenceStyle getPersistenceStyle(CommandLine line)
+    {
         PersistenceStyle persistenceStyle;
         if (line.hasOption("style")) {
             persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
@@ -89,7 +99,12 @@ public class App {
         return persistenceStyle;
     }
 
-    private static void processFilesAndWrite(DirectoryHasher directoryHasher, String outputFile, PersistenceStyle style, boolean forceOverwrite, String[] filesToProcess) {
+    private static void processFilesAndWrite(DirectoryHasher directoryHasher,
+                                             String outputFile,
+                                             PersistenceStyle style,
+                                             boolean forceOverwrite,
+                                             String[] filesToProcess)
+    {
         try {
             DigestOutputCreator outputCreator =
                     new DigestOutputCreator(System.err, directoryHasher, forceOverwrite);
@@ -104,7 +119,12 @@ public class App {
         }
     }
 
-    private static void processFileAndVerify(DirectoryHasher directoryHasher, PersistenceStyle persistenceStyle, CommandLine line, String filename, String[] filesToProcess) {
+    private static void processFileAndVerify(DirectoryHasher directoryHasher,
+                                             PersistenceStyle persistenceStyle,
+                                             CommandLine line,
+                                             String filename,
+                                             String[] filesToProcess)
+    {
         try {
             DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher, persistenceStyle);
             verifier.setIgnoreCase(line.hasOption("ignorecase"));
@@ -112,20 +132,22 @@ public class App {
             verifier.generateDigests(filesToProcess);
             verifier.verify(new PrintWriter(System.out, true));
         } catch (FileNotFoundException ex) {
-            log.log(Level.SEVERE, "A file could not be found.", ex);
+            LOG.log(Level.SEVERE, "A file could not be found.", ex);
             System.exit(-1);
         } catch (PersistenceException ex) {
-            log.log(Level.SEVERE, "Could not parse the file.", ex);
+            LOG.log(Level.SEVERE, "Could not parse the file.", ex);
             System.exit(-2);
         }
     }
 
-    private static DirectoryHasher createDirectoryHasher(CommandLine line) {
+    private static DirectoryHasher createDirectoryHasher(CommandLine line)
+    {
         DirectoryHasher directoryHasher = null;
         try {
-            ConcurrencyMode concurrencyMode = (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI;
+            ConcurrencyMode concurrencyMode =
+                    (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI_THREADING;
 
-            directoryHasher = DirectoryHasherCreator.create(concurrencyMode);
+            directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool());
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
@@ -147,14 +169,14 @@ public class App {
                 directoryHasher.addAlgorithm("md2");
             }
         } catch (NoSuchAlgorithmException ex) {
-            log.log(Level.SEVERE, "Algorithm not found", ex);
+            LOG.log(Level.SEVERE, "Algorithm not found", ex);
         } finally {
             try {
                 if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
                     directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
                 }
             } catch (NoSuchAlgorithmException ex) {
-                log.log(Level.SEVERE, "Algorithm is not found", ex);
+                LOG.log(Level.SEVERE, "Algorithm is not found", ex);
                 System.exit(1);
             }
         }
@@ -163,7 +185,8 @@ public class App {
     }
 
     @SuppressWarnings({"static-access", "AccessStaticViaInstance"})
-    private static CommandLine getCommandLine(final String[] args) {
+    private static CommandLine getCommandLine(final String[] theArguments)
+    {
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
@@ -187,17 +210,18 @@ public class App {
         options.addOption(null, "single", false, "Only use single threaded execution path");
         CommandLine line;
         try {
-            line = parser.parse(options, args);
+            line = parser.parse(options, theArguments);
             if (line.hasOption("help")) {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.setWidth(80);
+                final HelpFormatter formatter = new HelpFormatter();
+                formatter.setWidth(DEFAULT_TERMINAL_WIDTH);
                 formatter.printHelp(USAGE, HEADER, options, FOOTER);
                 System.exit(0);
             }
         } catch (ParseException ex) {
-            log.log(Level.SEVERE, "Failed at parsing the commandline options.", ex);
-            HelpFormatter helpFormatter = new HelpFormatter();
+            LOG.log(Level.SEVERE, "Failed at parsing the commandline options.", ex);
+            final HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp("hashtree [options] dir [dir...]", options);
+            System.exit(-2);
             return null;
         }
         return line;

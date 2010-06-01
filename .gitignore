@@ -1,6 +1,9 @@
-target
-nb-configuration.xml
-nbactions.xml
-jHashtools.iml
-jHashtools.ipr
-jHashtools.iws
+/target
+/nb-configuration.xml
+/nbactions.xml
+/jHashtools.iml
+/jHashtools.ipr
+/jHashtools.iws
+/.classpath
+/.settings
+/.project

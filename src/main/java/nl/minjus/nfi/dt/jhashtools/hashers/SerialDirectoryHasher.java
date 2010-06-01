@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
@@ -27,30 +31,33 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 import java.io.File;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 /**
  * @author Erwin van Eijk
  */
-class SerialDirectoryHasher extends AbstractDirectoryHasher {
+class SerialDirectoryHasher extends AbstractDirectoryHasher
+{
 
     private final DirHasherResult results;
 
-    public SerialDirectoryHasher() {
+    public SerialDirectoryHasher()
+    {
         super();
         results = new DirHasherResult();
     }
 
-    public SerialDirectoryHasher(String algorithm) throws NoSuchAlgorithmException {
+    public SerialDirectoryHasher(String algorithm) throws NoSuchAlgorithmException
+    {
         this();
         if (!algorithm.equals(FileHasher.NO_ALGORITHM)) {
-            this.algorithms.add(MessageDigest.getInstance(algorithm));
+            this.algorithms.add(algorithm);
         }
     }
 
-    public SerialDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException {
+    public SerialDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
+    {
         this();
         for (String algorithm : algorithms) {
             this.addAlgorithm(algorithm);
@@ -58,24 +65,28 @@ class SerialDirectoryHasher extends AbstractDirectoryHasher {
     }
 
     @Override
-    public DirHasherResult getDigests(final File startFile) {
-        if (!startFile.exists()) {
-            throw new IllegalArgumentException(String.format("File %s does not exist", startFile.toString()));
-        }
+    public DirHasherResult getDigests(final File startFile)
+    {
+        this.results.clear();
         updateDigests(this.results, startFile);
         return this.results;
     }
 
     @Override
-    public void updateDigests(DirHasherResult digests, final File file) {
+    public void updateDigests(DirHasherResult digests, final File file)
+    {
         if (!file.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", file.toString()));
         }
 
-        FileWalker walker = new FileWalker();
-        DirVisitor visitor = new DirVisitor(algorithms, digests);
-        visitor.setVerbose(this.isVerbose());
-        walker.addWalkerVisitor(visitor);
-        walker.walk(file);
+        try {
+            FileWalker walker = new FileWalker();
+            DirectoryVisitor visitor = new DirectoryVisitor(algorithms, digests);
+            visitor.setVerbose(this.isVerbose());
+            walker.addWalkerVisitor(visitor);
+            walker.walk(file);
+        } catch (NoSuchAlgorithmException ex) {
+            // this cannot happen. FLW.
+        }
     }
 }

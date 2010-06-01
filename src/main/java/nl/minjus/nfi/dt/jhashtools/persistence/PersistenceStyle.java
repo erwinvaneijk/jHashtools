@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,24 +20,49 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-public enum PersistenceStyle {
+/**
+ * The definition of the various supported persistence styles.
+ * @author Erwin van Eijk
+ */
+public enum PersistenceStyle
+{
+    /**
+     * JSON.
+     */
     JSON,
+    /**
+     * XML.
+     */
     XML,
+    /**
+     * The old style of outputting the results. Pretty horrible format, really.
+     */
     OLDSTYLE;
 
-    public static PersistenceStyle convert(String description) {
-        if (description.equals("xml")) {
+    /**
+     * Convert the description into the suitable enum member.
+     *
+     * @param aDescription the description to convert.
+     * @return a PersistenceStyle
+     */
+    public static PersistenceStyle convert(String aDescription)
+    {
+        if ("xml".equals(aDescription)) {
             return XML;
-        } else if (description.equals("json")) {
+        } else if ("json".equals(aDescription)) {
             return JSON;
-        } else if (description.equals("old")) {
+        } else if ("old".equals(aDescription)) {
             return OLDSTYLE;
         } else {
-            throw new RuntimeException("We do not support option " + description );
+            throw new RuntimeException("We do not support option " + aDescription);
         }
     }
 }

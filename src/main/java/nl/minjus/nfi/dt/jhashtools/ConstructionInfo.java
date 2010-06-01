@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
@@ -30,10 +34,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * ConstructionInfo holds the information on when the app was run.
  *
  * @author Erwin van Eijk
  */
-public class ConstructionInfo {
+public class ConstructionInfo
+{
 
     private String username;
 
@@ -43,7 +49,11 @@ public class ConstructionInfo {
 
     private Date constructionDate;
 
-    public ConstructionInfo() {
+    /**
+     * Constructor.
+     */
+    public ConstructionInfo()
+    {
         this.constructionDate = Calendar.getInstance().getTime();
         this.username = System.getProperty("user.name");
         this.operatingSystem = System.getProperty("os.name") + ":" + System.getProperty("os.version");
@@ -53,57 +63,65 @@ public class ConstructionInfo {
     /**
      * @return the username
      */
-    public String getUsername() {
+    public String getUsername()
+    {
         return username;
     }
 
     /**
-     * @param username the username to set
+     * @param theUsername the username to set
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String theUsername)
+    {
+        this.username = theUsername;
     }
 
     /**
      * @return the versionInformation
      */
-    public String getVersionInformation() {
+    public String getVersionInformation()
+    {
         return versionInformation;
     }
 
     /**
-     * @param versionInformation the versionInformation to set
+     * @param theVersionInformation the versionInformation to set
      */
-    public void setVersionInformation(String versionInformation) {
-        this.versionInformation = versionInformation;
+    public void setVersionInformation(String theVersionInformation)
+    {
+        this.versionInformation = theVersionInformation;
     }
 
     /**
      * @return the constructionDate
      */
-    public Date getConstructionDate() {
+    public Date getConstructionDate()
+    {
         return this.constructionDate;
     }
 
     /**
-     * @param constructionDate the constructionDate to set
+     * @param theConstructionDate the constructionDate to set
      */
-    public void setConstructionDate(Date constructionDate) {
-        this.constructionDate = constructionDate;
+    public void setConstructionDate(Date theConstructionDate)
+    {
+        this.constructionDate = theConstructionDate;
     }
 
     /**
      * @return the operatingSystem
      */
-    public String getOperatingSystem() {
+    public String getOperatingSystem()
+    {
         return operatingSystem;
     }
 
     /**
-     * @param operatingSystem the operatingSystem to set
+     * @param theOperatingSystem the operatingSystem to set
      */
-    public void setOperatingSystem(String operatingSystem) {
-        this.operatingSystem = operatingSystem;
+    public void setOperatingSystem(String theOperatingSystem)
+    {
+        this.operatingSystem = theOperatingSystem;
     }
 
 

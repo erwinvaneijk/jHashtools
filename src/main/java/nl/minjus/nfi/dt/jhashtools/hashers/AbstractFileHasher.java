@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
@@ -36,65 +40,72 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
- *
- * @Author Erwin van Eijk
+ * @author Erwin van Eijk
  */
-abstract class AbstractFileHasher implements FileHasher {
+abstract class AbstractFileHasher implements FileHasher
+{
+    public static final int BLOCK_READ_SIZE = 1024 * 1024;
+    private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
+    protected Collection<String> digests;
 
-    public  static final int BLOCK_READ_SIZE = 64 * 1024;
-    private static final Logger log = Logger.getLogger(AbstractFileHasher.class.getName());
-    protected Collection<MessageDigest> digests;
-
-    public AbstractFileHasher() {
-        this.digests = new ArrayList<MessageDigest>();
+    public AbstractFileHasher()
+    {
+        this.digests = new ArrayList<String>();
     }
 
-    public AbstractFileHasher(MessageDigest digestAlgorithm) {
+    public AbstractFileHasher(String digestAlgorithm) throws NoSuchAlgorithmException
+    {
         this();
-        this.digests.add(digestAlgorithm);
+        this.addAlgorithm(digestAlgorithm);
     }
 
-    public AbstractFileHasher(Collection<MessageDigest> algorithms) {
+    public AbstractFileHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
+    {
         this();
-        for (MessageDigest algorithm : algorithms) {
-            addAlgorithm(algorithm);
+        for (String algorithmName : algorithms) {
+            this.addAlgorithm(algorithmName);
         }
     }
 
     /**
      * Add an algorithm to the set of supported algorithms.
      *
-     * @param algorithm the algorithm to add.
+     * @param algorithmName the algorithm to add.
+     *
      * @throws NoSuchAlgorithmException when the algorithm is not supported by the underlying JVM.
      */
     @Override
-    public void addAlgorithm(MessageDigest algorithm) {
-        this.digests.add(algorithm);
+    public void addAlgorithm(String algorithmName) throws NoSuchAlgorithmException
+    {
+        if (SupportedDigestAlgorithms.isSupportedAlgorithm(algorithmName)) {
+            this.digests.add(algorithmName);
+        } else {
+            throw new NoSuchAlgorithmException("Algorithm " + algorithmName + " is not supported");
+        }
     }
 
     /**
      * Compute the digest(s) for the contents of the file.
      *
      * @param file the File to compute the digests for.
+     *
      * @return a DigestResult containing the result of the computation.
+     *
      * @throws FileNotFoundException thrown when <c>file</c> doesn't exist.
-     * @throws IOException thrown when some IOException occurs.
+     * @throws IOException           thrown when some IOException occurs.
      */
     @Override
     public abstract DigestResult getDigest(File file) throws FileNotFoundException, IOException;
 
-    @Override
-    public void reset() {
-        for (MessageDigest digest : digests) {
-            digest.reset();
+    protected Collection<MessageDigest> getMessageDigests() {
+        Collection<MessageDigest> messageDigests = new ArrayList<MessageDigest>(this.digests.size());
+        for (String algorithmName : this.digests) {
+            try {
+                messageDigests.add(MessageDigest.getInstance(algorithmName));
+            } catch (NoSuchAlgorithmException ex) {
+                ex.printStackTrace();           // this cannot happen, we've already checked them before.
+            }
         }
-    }
-
-    protected DigestResult finalizeDigestResult() {
-        DigestResult res = new DigestResult();
-        for (MessageDigest digest : digests) {
-            res.add(new Digest(digest.getAlgorithm(), digest.digest()));
-        }
-        return res;
+        return messageDigests;
     }
 }
