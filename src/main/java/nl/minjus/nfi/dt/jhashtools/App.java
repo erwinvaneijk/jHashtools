@@ -177,12 +177,12 @@ public class App {
         options.addOption("n", "ignorecase", false, "Ignore the case on the file, only used when verifying.");
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
-        options.addOption("s", "single", false, "Only use single threaded execution path");
         Option outputOption =
                 OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o");
         options.addOption(outputOption);
         options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
         options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use").hasArg().withArgName("style").create("s"));
+        options.addOption(null, "single", false, "Only use single threaded execution path");
         CommandLine line;
         try {
             line = parser.parse(options, args);

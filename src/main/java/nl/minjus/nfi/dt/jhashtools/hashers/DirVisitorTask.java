@@ -46,7 +46,11 @@ public class DirVisitorTask implements WalkerVisitor {
      * @param theFile the file that is being visited.
      */
     public void visit(File theFile) {
-        this.queue.add(theFile);
-        num ++;
+        try {
+            this.queue.put(theFile);
+            num ++;
+        } catch (InterruptedException ex) {
+            // pass, nothing else to do.
+        }
     }
 }

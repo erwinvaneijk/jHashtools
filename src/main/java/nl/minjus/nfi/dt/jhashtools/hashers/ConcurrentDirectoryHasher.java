@@ -96,7 +96,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
         }
 
         Collection<Thread> threads = new LinkedList<Thread>();
-        BlockingQueue<File> queue = new LinkedBlockingQueue<File>();
+        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(16);
 
         ProcessingState currentState = new ProcessingState();
 
@@ -197,12 +197,12 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
             this.inputQueue = inputQueue;
             this.fileHasher = FileHasherCreator.createThreadedHasher();
             try {
-                            for (MessageDigest d: digests) {
-                                    this.fileHasher.addAlgorithm((MessageDigest)d.clone());
-                            }
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                        }
+                for (MessageDigest d: digests) {
+                     this.fileHasher.addAlgorithm((MessageDigest)d.clone());
+                }
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             
             this.partialResult = new DirHasherResult();
             this.processingState = processingState;
