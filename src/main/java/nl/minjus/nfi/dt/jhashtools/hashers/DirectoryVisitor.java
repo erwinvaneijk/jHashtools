@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
@@ -30,50 +34,51 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DirVisitor implements WalkerVisitor {
-
+/**
+ * Visit all the files in a directory tree.
+ */
+public class DirectoryVisitor implements WalkerVisitor
+{
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private DirHasherResult resultMap;
     private boolean verbose;
     private final FileHasher fileHasher;
 
-    public DirVisitor(MessageDigest algorithm) throws NoSuchAlgorithmException {
+    public DirectoryVisitor(String algorithm) throws NoSuchAlgorithmException
+    {
         resultMap = new DirHasherResult();
         this.verbose = false;
-        this.fileHasher = FileHasherCreator.createFileHasher(algorithm);
+        this.fileHasher = FileHasherCreator.create(null, algorithm);
     }
 
-    public DirVisitor() throws NoSuchAlgorithmException {
+    public DirectoryVisitor() throws NoSuchAlgorithmException
+    {
         resultMap = new DirHasherResult();
         this.verbose = false;
-        this.fileHasher = FileHasherCreator.createFileHasher();
+        this.fileHasher = FileHasherCreator.create(null);
     }
 
-    public DirVisitor(Collection<MessageDigest> algorithms, DirHasherResult digests) {
+    public DirectoryVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException
+    {
         this(algorithms, false);
         this.resultMap = digests;
     }
 
-    public DirVisitor(Collection<MessageDigest> algorithms, boolean verbose) {
+    public DirectoryVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException
+    {
         resultMap = new DirHasherResult();
-        this.fileHasher = FileHasherCreator.createFileHasher(algorithms);
+        this.fileHasher = FileHasherCreator.createSimple(algorithms);
         this.verbose = verbose;
     }
 
-    public void visit(File theFile) {
+    public void visit(File theFile)
+    {
         try {
-            // FIXME
-            // This should better be handled with an aspect, instead of this clutter.
-            if (this.verbose) {
-                this.logger.log(Level.INFO, "Processing file [" + theFile.toString() + "]");
-            }
-
             DigestResult res = this.fileHasher.getDigest(theFile);
             resultMap.put(theFile, res);
         } catch (FileNotFoundException ex) {
@@ -83,21 +88,24 @@ public class DirVisitor implements WalkerVisitor {
         }
     }
 
-    public final DirHasherResult getResults() {
+    public final DirHasherResult getResults()
+    {
         return this.resultMap;
     }
 
     /**
      * @return get the verbosity
      */
-    public boolean isVerbose() {
+    public boolean isVerbose()
+    {
         return verbose;
     }
 
     /**
      * @param verbose set the verbosity of this visitor.
      */
-    public void setVerbose(boolean verbose) {
+    public void setVerbose(boolean verbose)
+    {
         this.verbose = verbose;
     }
 }
