@@ -35,8 +35,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.concurrent.Exchanger;
@@ -79,13 +77,33 @@ public class ConcurrentFileHasher extends AbstractFileHasher {
 
         FileInputStream stream = new FileInputStream(file);
         try {
-            Thread fileReaderThread = new Thread(new FileReaderThread(stream));
             Thread digestComputerThread = new Thread(new DigestComputerThread(digests));
 
-            fileReaderThread.start();
             digestComputerThread.start();
 
-            fileReaderThread.join();
+            try {
+                int bytesRead;
+                byte[] buf = new byte[BLOCK_READ_SIZE];
+                ByteBuffer buffer = ByteBuffer.wrap(buf);
+                do {
+                    bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
+                    if (bytesRead > 0) {
+                        if (bytesRead != BLOCK_READ_SIZE) {
+                            buffer.limit(bytesRead);
+                        }
+                        buffer = exchanger.exchange(buffer);
+                        buf = buffer.array();
+                    }
+                } while (bytesRead > 0);
+
+                // Notify the digesting thread that we're finished.
+                exchanger.exchange(null);
+            } catch (InterruptedException ex) {
+                log.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                log.log(Level.SEVERE, "Cannot read anymore. Whoops.", ex);
+            }
+
             digestComputerThread.join();
 
             return super.finalizeDigestResult();
@@ -95,37 +113,6 @@ public class ConcurrentFileHasher extends AbstractFileHasher {
             stream.close();
         }
         return null;
-    }
-
-    class FileReaderThread implements Runnable {
-
-        private FileInputStream stream;
-        private FileChannel channel;
-
-        public FileReaderThread(FileInputStream stream) {
-            this.stream = stream;
-            this.channel = stream.getChannel();
-        }
-
-        public void run() {
-            try {
-                long remaining = channel.size();
-                long offset = 0;
-                while (remaining > 0) {
-                    long bytesToRead = Math.min(AbstractFileHasher.BLOCK_READ_SIZE, remaining);
-                    MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, offset, bytesToRead);
-                    buffer.load();
-                    ByteBuffer buf = exchanger.exchange(buffer);
-                    offset += bytesToRead;
-                    remaining -= bytesToRead;
-                }
-                // Notify the digesting thread that we're finished.
-                exchanger.exchange(null);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(AbstractFileHasher.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-            }
-        }
     }
 
     class DigestComputerThread implements Runnable {
@@ -139,17 +126,19 @@ public class ConcurrentFileHasher extends AbstractFileHasher {
         public void run() {
 
             try {
+                byte[] buf = new byte[BLOCK_READ_SIZE];
+                ByteBuffer buffer = ByteBuffer.wrap(buf, 0, BLOCK_READ_SIZE);
                 while (true) {
-                    ByteBuffer buf = exchanger.exchange(null);
-                    if (buf == null) {
+                    buffer = exchanger.exchange(buffer);
+                    if (buffer == null) {
                         break;
                     }
                     for (MessageDigest digest : digests) {
-                        digest.update(buf);
+                        digest.update(buffer);
                     }
                 }
             } catch (InterruptedException ex) {
-                Logger.getLogger(AbstractFileHasher.class.getName()).log(Level.SEVERE, null, ex);
+                log.log(Level.SEVERE, "Execution was aborted.", ex);
             }
         }
     }

@@ -55,7 +55,7 @@ class SerialFileHasher extends AbstractFileHasher {
      * @throws java.io.IOException when things go wrong with the IO.
      */
     private DigestResult getDigestSingle(FileInputStream stream) throws IOException {
-        int bytesRead = 0;
+        int bytesRead;
         byte[] buf = new byte[BLOCK_READ_SIZE];
         do {
             bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);

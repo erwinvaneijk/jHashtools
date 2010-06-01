@@ -25,7 +25,10 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.*;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
+import nl.minjus.nfi.dt.jhashtools.hashers.FileHasher;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.Version;
 import org.apache.commons.cli.*;
@@ -47,6 +50,7 @@ public class App {
     private static final String USAGE = "[options] dir [dir...]";
     private static final String HEADER = "hashtree - Creating a list of digests for files and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
     private static final String FOOTER = "";
+    private static final Logger log = getLogger(App.class.getName());
 
     public static void main(String[] arguments) {
         CommandLine line = App.getCommandLine(arguments);
@@ -54,10 +58,10 @@ public class App {
 
         DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
-        getLogger(App.class.getName()).log(Level.INFO, "Version: " + Version.getVersion());
+        log.log(Level.INFO, "Version: " + Version.getVersion());
 
         if (line.hasOption("i") && line.hasOption("o")) {
-            getLogger(App.class.getName()).log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
+            log.log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
         }
 
@@ -108,10 +112,10 @@ public class App {
             verifier.generateDigests(filesToProcess);
             verifier.verify(new PrintWriter(System.out, true));
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "A file could not be found.", ex);
+            log.log(Level.SEVERE, "A file could not be found.", ex);
             System.exit(-1);
         } catch (PersistenceException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Could not parse the file.", ex);
+            log.log(Level.SEVERE, "Could not parse the file.", ex);
             System.exit(-2);
         }
     }
@@ -122,6 +126,7 @@ public class App {
             ConcurrencyMode concurrencyMode = (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI;
 
             directoryHasher = DirectoryHasherCreator.create(concurrencyMode);
+            directoryHasher.setVerbose(line.hasOption("verbose"));
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
                 directoryHasher.addAlgorithm("sha-256");
@@ -142,25 +147,22 @@ public class App {
                 directoryHasher.addAlgorithm("md2");
             }
         } catch (NoSuchAlgorithmException ex) {
-            getLogger(App.class.getName()).log(Level.SEVERE, "Algorithm not found", ex);
+            log.log(Level.SEVERE, "Algorithm not found", ex);
         } finally {
             try {
                 if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
                     directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
                 }
             } catch (NoSuchAlgorithmException ex) {
-                getLogger(App.class.getName()).log(Level.SEVERE, "Algorithm is not found", ex);
+                log.log(Level.SEVERE, "Algorithm is not found", ex);
                 System.exit(1);
             }
         }
 
-        if ((directoryHasher != null) && line.hasOption("verbose")) {
-            directoryHasher.setVerbose(true);
-        }
         return directoryHasher;
     }
 
-    @SuppressWarnings("static-access")
+    @SuppressWarnings({"static-access", "AccessStaticViaInstance"})
     private static CommandLine getCommandLine(final String[] args) {
         CommandLineParser parser = new PosixParser();
 
@@ -193,7 +195,7 @@ public class App {
                 System.exit(0);
             }
         } catch (ParseException ex) {
-            getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, "Failed at parsing the commandline options.", ex);
             HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp("hashtree [options] dir [dir...]", options);
             return null;

@@ -72,20 +72,28 @@ class FileWalker {
     public int getVisited() {
         return this.visited;
     }
-    
+
     private void walkTheFile(File file) {
         if (! file.exists()) {
             return;
         }
         if (file.isFile()) {
-            for (WalkerVisitor visitor: this.visitors) {
-                visitor.visit(file);
-                visited += 1;
-            }
+            fireVisitorsWith(file);
         } else if (file.isDirectory()) {
             for (File child: file.listFiles(this.fileFilter)) {
-                walkTheFile(child);
+                if (child.isFile()) {
+                    fireVisitorsWith(child);
+                } else {
+                    walkTheFile(child);
+                }
             }
         }
+    }
+
+    private void fireVisitorsWith(File file) {
+        for (WalkerVisitor visitor: this.visitors) {
+            visitor.visit(file);
+        }
+        visited += 1;
     }
 }
