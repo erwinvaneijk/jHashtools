@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
@@ -28,7 +32,6 @@ import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
@@ -39,25 +42,41 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Arrange the deserialization of the JSON structure for DirHasherResult
+ * Arrange the deserialization of the JSON structure for DirHasherResult.
+ *
+ * @author Erwin van Eijk
  */
-class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult> {
-
+class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
+{
+    /**
+     * Deserialize a DirHasherResult.
+     *
+     * @param aJsonParser             the JsonParser to use.
+     * @param aDeserializationContext the current context.
+     *
+     * @return the prepared DirHasherResult.
+     *
+     * @throws IOException when the requested IO cannot be performed.
+     */
     @Override
-    public DirHasherResult deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-        DirHasherResult result = new DirHasherResult();
-        //if (jp.nextToken() != JsonToken.START_OBJECT) {
-        //    throw new JsonParseException("Did not find a START_OBJECT marker", jp.getTokenLocation());
-        //}
-        while (jp.nextToken() != JsonToken.END_OBJECT) {
-            String fieldName = jp.getCurrentName();
+    public DirHasherResult deserialize(final JsonParser aJsonParser,
+                                       final DeserializationContext aDeserializationContext)
+            throws IOException
+    {
+        final DirHasherResult result = new DirHasherResult();
+        while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
+            final String fieldName = aJsonParser.getCurrentName();
             if ("constructionInfo".equals(fieldName)) {
-                jp.nextToken();
-                result.setConstructionInfo(jp.readValueAs(ConstructionInfo.class));
+                aJsonParser.nextToken();
+                result.setConstructionInfo(aJsonParser.readValueAs(ConstructionInfo.class));
             }
             if ("content".equals(fieldName)) {
-                jp.nextToken();
-                result.putAll((Map<File, DigestResult>) jp.readValueAs(new TypeReference<Map<File, DigestResult>>() { }));
+                aJsonParser.nextToken();
+                result.putAll(
+                        (Map<File, DigestResult>) aJsonParser.readValueAs(
+                                new TypeReference<Map<File, DigestResult>>()
+                                {
+                                }));
             }
         }
         return result;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
@@ -38,19 +42,21 @@ import java.io.OutputStream;
 import java.io.Reader;
 
 /**
- *
  * @author Erwin van Eijk
  */
-public class JsonPersistenceProvider implements PersistenceProvider {
+public class JsonPersistenceProvider implements PersistenceProvider
+{
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonPersistenceProvider(boolean prettyPrint) {
+    public JsonPersistenceProvider(boolean prettyPrint)
+    {
         objectMapper.getSerializationConfig().set(Feature.INDENT_OUTPUT, prettyPrint);
-        objectMapper.getSerializationConfig().set(Feature.WRITE_DATES_AS_TIMESTAMPS, ! prettyPrint);
+        objectMapper.getSerializationConfig().set(Feature.WRITE_DATES_AS_TIMESTAMPS, !prettyPrint);
     }
 
-    public JsonPersistenceProvider() {
+    public JsonPersistenceProvider()
+    {
         this(false);
     }
 
@@ -65,17 +71,19 @@ public class JsonPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public void persist(OutputStream out, Object obj) throws PersistenceException {
+    public void persist(OutputStream out, Object obj) throws PersistenceException
+    {
         try {
             objectMapper.writeValue(out, obj);
-       } catch (IOException ex) {
+        } catch (IOException ex) {
             throw new PersistenceException(ex);
-       }
+        }
     }
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException {
+    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException
+    {
         try {
             return objectMapper.readValue(reader, clazz);
         } catch (IOException ex) {
@@ -84,7 +92,8 @@ public class JsonPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException {
+    public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException
+    {
         try {
             return (T) objectMapper.readValue(reader, type);
         } catch (IOException ex) {

@@ -1,28 +1,58 @@
+/*
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
+ *
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
+ */
+
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 /**
  * This class computes digests of files without using multithreading.
  */
-class SerialFileHasher extends AbstractFileHasher {
+class SerialFileHasher extends AbstractFileHasher
+{
 
-    public SerialFileHasher() {
+    public SerialFileHasher()
+    {
         super();
     }
 
-    public SerialFileHasher(MessageDigest digest) {
+    public SerialFileHasher(String digest) throws NoSuchAlgorithmException
+    {
         super(digest);
     }
 
-    public SerialFileHasher(Collection<MessageDigest> digests) {
+    public SerialFileHasher(Collection<String> digests) throws NoSuchAlgorithmException
+    {
         super(digests);
     }
 
@@ -38,12 +68,13 @@ class SerialFileHasher extends AbstractFileHasher {
      * @throws java.io.IOException           thrown when some IOException occurs.
      */
     @Override
-    public DigestResult getDigest(File file) throws FileNotFoundException, IOException {
-        if (! file.exists()) {
+    public DigestResult getDigest(File file) throws FileNotFoundException, IOException
+    {
+        if (!file.exists()) {
             throw new FileNotFoundException(file.toString());
         }
         FileInputStream inputStream = new FileInputStream(file);
-        return getDigestSingle(inputStream);
+        return getDigest(inputStream);
     }
 
 
@@ -51,21 +82,23 @@ class SerialFileHasher extends AbstractFileHasher {
      * Compute the digest(s) for the contents of the file.
      *
      * @param stream the stream to read.
+     *
      * @return the resulting digests.
+     *
      * @throws java.io.IOException when things go wrong with the IO.
      */
-    private DigestResult getDigestSingle(FileInputStream stream) throws IOException {
+    public DigestResult getDigest(InputStream stream) throws IOException
+    {
+        Collection<MessageDigest> digestInstances = this.getMessageDigests();
         int bytesRead;
         byte[] buf = new byte[BLOCK_READ_SIZE];
-        do {
-            bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
-            if (bytesRead > 0) {
-                for (MessageDigest digest: digests) {
-                    digest.update(buf, 0, bytesRead);
-                }
+        bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
+        while (bytesRead > 0) {
+            for (MessageDigest digest : digestInstances) {
+                digest.update(buf, 0, bytesRead);
             }
-        } while (bytesRead > 0);
-
-        return finalizeDigestResult();
+            bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
+        }
+        return new DigestResult(digestInstances);
     }
 }

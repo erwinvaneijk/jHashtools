@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,12 +20,15 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
@@ -41,12 +44,14 @@ import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 
 /**
+ * Construct the output that can later on be used for verification.
  *
  * @author Erwin van Eijk
  */
-public class DigestOutputCreator {
+public class DigestOutputCreator
+{
 
-    private static Logger log = getLogger(DigestOutputCreator.class.getCanonicalName());
+    private static final Logger LOG = getLogger(DigestOutputCreator.class.getCanonicalName());
     private PrintWriter out;
     private DirectoryHasher directoryHasher;
     private File outputFile;
@@ -54,63 +59,85 @@ public class DigestOutputCreator {
     private PersistenceStyle persistenceStyle;
     private boolean forceOverwrite;
 
-    public DigestOutputCreator(OutputStream out, DirectoryHasher directoryHasher, boolean forceOverwrite) {
-        this.out = new PrintWriter(new OutputStreamWriter(out, Charset.forName("utf-8")));
-        this.directoryHasher = directoryHasher;
+    /**
+     * Constructor.
+     *
+     * @param anOutputStream the outputstream to write the final result to.
+     * @param aDirectoryHasher the directoryHasher to get the results from.
+     * @param theOverwriteOption whether or not to force overwriting.
+     */
+    public DigestOutputCreator(OutputStream anOutputStream, DirectoryHasher aDirectoryHasher, boolean theOverwriteOption)
+    {
+        this.out = new PrintWriter(new OutputStreamWriter(anOutputStream, Charset.forName("utf-8")));
+        this.directoryHasher = aDirectoryHasher;
         this.digests = new DirHasherResult();
         this.outputFile = null;
-        this.forceOverwrite = forceOverwrite;
+        this.forceOverwrite = theOverwriteOption;
     }
 
-    public void setPersistenceStyle(PersistenceStyle style) {
-        this.persistenceStyle = style;
+    public void setPersistenceStyle(PersistenceStyle thePersistenceStyle)
+    {
+        this.persistenceStyle = thePersistenceStyle;
     }
 
-    public void setOutputFile(String filename) throws FileNotFoundException {
-        File file = new File(filename);
+    public void setOutputFile(String aFilename) throws FileNotFoundException
+    {
+        final File file = new File(aFilename);
         if (!file.exists() || this.forceOverwrite) {
             this.outputFile = file;
         } else {
-            throw new FileNotFoundException("File ["+filename+") not found");
+            throw new FileNotFoundException("File [" + aFilename + ") not found");
         }
     }
 
-    public void generate(String[] pathnames) {
-        for (String pathname: pathnames) {
+    /**
+     * Gnerate the digests for the algorithms starting at <c>anArrayOfPathNames<c>.
+     * @param anArrayOfPathNames
+     */
+    public void generate(String[] anArrayOfPathNames)
+    {
+        for (String pathname : anArrayOfPathNames) {
             directoryHasher.updateDigests(digests, new File(pathname));
         }
     }
 
-    public void finish() {
-        DirHasherResult result = this.persistDigestsToFile();
+    /**
+     * Finish the computation, and write the the finalizing information to <c>DigestOutputCreator#out<c>.
+     */
+    public void finish()
+    {
+        final DirHasherResult result = this.persistDigestsToFile();
         this.out.printf("Generated with hashtree (java) by %s\n", System.getProperty("user.name"));
         result.prettyPrint(this.out);
     }
 
-    private DirHasherResult persistDigestsToFile() {
+    private DirHasherResult persistDigestsToFile()
+    {
         FileOutputStream file = null;
         try {
-            log.log(Level.INFO, "Writing the results to " + outputFile.getName());
+            LOG.log(Level.INFO, "Writing the results to " + outputFile.getName());
             file = new FileOutputStream(outputFile);
-            PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
+            final PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
             persistenceProvider.persist(file, digests);
             file.flush();
 
-            DirectoryHasher d = DirectoryHasherCreator.create(ConcurrencyMode.SINGLE, digests.firstEntry().getValue().getAlgorithms());
-            return d.getDigests(outputFile);
+            final DirectoryHasher directoryHasher = 
+                    DirectoryHasherCreator.create(null,
+                                                  digests.firstEntry().getValue().getAlgorithms());
+            return directoryHasher.getDigests(outputFile);
         } catch (PersistenceException ex) {
-            log.log(Level.SEVERE, "Cannot persist content to file", ex);
+            LOG.log(Level.SEVERE, "Cannot persist content to file", ex);
         } catch (IOException ex) {
-            log.log(Level.SEVERE, "Cannot create file", ex);
+            LOG.log(Level.SEVERE, "Cannot create file", ex);
         } catch (NoSuchAlgorithmException ex) {
-            log.log(Level.SEVERE, "Cannot create the algorithm", ex);
+            LOG.log(Level.SEVERE, "Cannot create the algorithm", ex);
         } finally {
             try {
                 if (file != null) {
                     file.close();
                 }
             } catch (IOException ex) {
-                log.log(Level.SEVERE, "Cannot close file", ex);
+                LOG.log(Level.SEVERE, "Cannot close file", ex);
             }
         }
         return null;

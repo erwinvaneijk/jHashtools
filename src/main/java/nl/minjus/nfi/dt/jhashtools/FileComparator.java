@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
@@ -29,32 +33,37 @@ import java.io.IOException;
 import java.util.Comparator;
 
 /**
- * This class implements a Comparator for File where each file
- * is deemed the same of the path would point to the same file regardless of
- * how it is named.
+ * This class implements a Comparator for File where each file is deemed the same of the path would point to the same
+ * file regardless of how it is named.
  */
-class FileComparator implements Comparator<File> {
+class FileComparator implements Comparator<File>
+{
 
     private boolean ignoreCase;
 
-    public FileComparator() {
+    public FileComparator()
+    {
         this.ignoreCase = false;
     }
 
-    public FileComparator(boolean isIgnoringCase) {
+    public FileComparator(boolean isIgnoringCase)
+    {
         this.ignoreCase = isIgnoringCase;
     }
 
-    public void setIgnoreCase(boolean ignoreCase) {
+    public void setIgnoreCase(boolean ignoreCase)
+    {
         this.ignoreCase = ignoreCase;
     }
 
-    public boolean isIgnoringCase() {
+    public boolean isIgnoringCase()
+    {
         return this.ignoreCase;
     }
 
     @Override
-    public int compare(File o1, File o2) {
+    public int compare(File o1, File o2)
+    {
         try {
             String filename1 = o1.getCanonicalPath();
             String filename2 = o2.getCanonicalPath();
