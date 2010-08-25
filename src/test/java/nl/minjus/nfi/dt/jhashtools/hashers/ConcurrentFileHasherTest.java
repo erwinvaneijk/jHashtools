@@ -28,17 +28,30 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
+import static junit.framework.Assert.assertEquals;
+
 /**
- * An enum describing the ConcurrencyMode that is used.
+ * Created by IntelliJ IDEA. User: eijk Date: May 22, 2010 Time: 5:45:24 PM To change this template use File | Settings
+ * | File Templates.
  */
-public enum ConcurrencyMode
+public class ConcurrentFileHasherTest
 {
-    /**
-     * Do not use multithreading options.
-     */
-    SINGLE,
-    /**
-     * Do use multithreading options.
-     */
-    MULTI_THREADING
+    @Test
+    public void testGetDigest() throws NoSuchAlgorithmException, IOException
+    {
+        String content = "foo";
+        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
+        FileHasher serialFileHasher = new ConcurrentFileHasher("sha-256");
+        DigestResult result = serialFileHasher.getDigest(stream);
+
+        assertEquals("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+                     result.getDigest("sha-256").toString());
+    }
 }

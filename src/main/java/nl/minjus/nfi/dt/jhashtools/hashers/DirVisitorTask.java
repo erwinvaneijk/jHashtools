@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
@@ -28,25 +32,34 @@ import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Created by IntelliJ IDEA. User: eijk Date: May 12, 2010 Time: 12:07:14 PM To change this template use File | Settings
- * | File Templates.
+ * This task will be used to add items to visit into a BlockingQueue.
+ *
+ * @author Erwin van Eijk
  */
-public class DirVisitorTask implements WalkerVisitor {
+public class DirVisitorTask implements WalkerVisitor
+{
+    /**
+     * A BlockingQueue to put the File's into.
+     */
     private BlockingQueue<File> queue;
-    private int num;
 
-    public DirVisitorTask(BlockingQueue<File> queue) {
-        this.queue = queue;
-        this.num = 1;
+    /**
+     * Constructor.
+     *
+     * @param aQueue the Queue to write File-instances that should be visited to.
+     */
+    public DirVisitorTask(final BlockingQueue<File> aQueue)
+    {
+        this.queue = aQueue;
     }
 
     /**
      * Called when a file is visited.
      *
-     * @param theFile the file that is being visited.
+     * @param aFile the file that is being visited.
      */
-    public void visit(File theFile) {
-        this.queue.add(theFile);
-        num ++;
+    public final void visit(final File aFile)
+    {
+        this.queue.add(aFile);
     }
 }

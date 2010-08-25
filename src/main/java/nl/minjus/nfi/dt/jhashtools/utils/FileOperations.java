@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.utils;
@@ -28,29 +32,43 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Erwin van Eijk
- * Date: Apr 30, 2010
- * Time: 3:41:52 PM
+ * Utility class for operations on files.
+ * @author Erwin van Eijk
  */
-public class FileOperations {
-
-    public static boolean isSameFile(File first, File second) {
+public class FileOperations
+{
+    /**
+     * Determine whether or not aFirstFile and aSecondFile really are the same file.
+     *
+     * @param aFirstFile the first file to compare
+     * @param aSecondFile the second file to compare
+     * @return true if they access the same file.
+     */
+    public static boolean isSameFile(final File aFirstFile, final File aSecondFile)
+    {
         try {
-            if (first.exists() && second.exists()) {
-                if (first.getCanonicalFile().equals(second.getCanonicalFile())) {
+            if (aFirstFile.exists() && aSecondFile.exists()) {
+                if (aFirstFile.getCanonicalFile().equals(aSecondFile.getCanonicalFile())) {
                     return true;
                 }
             }
         } catch (IOException ex) {
-            // Pass, as this will result in returning false anyway.
+            return false;
         }
         return false;
     }
 
-    public static boolean isSameFile(String first, String second) {
-        File firstFile = new File(first);
-        File secondFile = new File(second);
+    /**
+     * Determine whether or not aFirstFile and aSecondFile really are the same file.
+     *
+     * @param aFirstFile the first file to compare
+     * @param aSecondFile the second file to compare to.
+     * @return true of they point to the same file.
+     */
+    public static boolean isSameFile(final String aFirstFile, final String aSecondFile)
+    {
+        final File firstFile = new File(aFirstFile);
+        final File secondFile = new File(aSecondFile);
         return FileOperations.isSameFile(firstFile, secondFile);
     }
 }

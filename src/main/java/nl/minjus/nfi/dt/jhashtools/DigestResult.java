@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,36 +20,49 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
 /**
- *
  * @author Erwin van Eijk
  */
-public class DigestResult extends TreeSet<Digest> {
+public class DigestResult extends TreeSet<Digest>
+{
 
-    public DigestResult() {
+    public DigestResult()
+    {
     }
 
-    public DigestResult(Digest value) {
+    public DigestResult(Digest value)
+    {
         this.add(value);
     }
 
-    public DigestResult(Collection<Digest> coll) {
-        for (Digest d : coll) {
-            this.add(d);
+    public DigestResult(Collection<? extends Object> coll)
+    {
+        for (Object d : coll) {
+            if (d instanceof MessageDigest) {
+                this.add(new Digest((MessageDigest) d));
+            } else if (d instanceof Digest) {
+                this.add((Digest) d);
+            }
         }
     }
 
-    public Collection<String> getAlgorithms() {
+    public Collection<String> getAlgorithms()
+    {
         Collection<String> coll = new ArrayList<String>();
         for (Digest d : this) {
             coll.add(d.getAlgorithm());
@@ -57,7 +70,8 @@ public class DigestResult extends TreeSet<Digest> {
         return coll;
     }
 
-    public boolean containsResult(String key) {
+    public boolean containsResult(String key)
+    {
         for (Digest e : this) {
             if (e.getAlgorithm().equals(key)) {
                 return true;
@@ -66,7 +80,8 @@ public class DigestResult extends TreeSet<Digest> {
         return false;
     }
 
-    public Digest getDigest(String key) {
+    public Digest getDigest(String key)
+    {
         for (Digest e : this) {
             if (e.getAlgorithm().equals(key)) {
                 return e;
@@ -75,20 +90,24 @@ public class DigestResult extends TreeSet<Digest> {
         throw new AlgorithmNotFoundException("Algorithm " + key + " not found");
     }
 
-    public String getHexDigest(String digestName) {
+    public String getHexDigest(String digestName)
+    {
         return this.getDigest(digestName).toHex();
     }
 
-    public void setDigest(Digest value) {
+    public void setDigest(Digest value)
+    {
         this.add(value);
     }
 
-    public Digest digest() {
+    public Digest digest()
+    {
         return this.iterator().next();
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if ((o != null) && (o instanceof DigestResult)) {
             DigestResult other = (DigestResult) o;
             for (Digest d : this) {
@@ -103,29 +122,29 @@ public class DigestResult extends TreeSet<Digest> {
     }
 
     /**
-     * matches returns true if the digests available on both
-     * arguments (this) and (o) are equal. If a digest algorithm on one
-     * side is available, that is not available on the other it is not
-     * compared.
-     *
+     * matches returns true if the digests available on both arguments (this) and (o) are equal. If a digest algorithm
+     * on one side is available, that is not available on the other it is not compared.
+     * <p/>
      * When there is no match in algorithm, matches returns false.
      *
      * @param other the other side to compare to.
+     *
      * @return true when this matches other.
      */
-    boolean matches(DigestResult other) {
-	if ((other != null)) {
+    boolean matches(DigestResult other)
+    {
+        if ((other != null)) {
             for (Digest d : other) {
-		if (this.contains(d)) {
-		    return true;
-		}
+                if (this.contains(d)) {
+                    return true;
+                }
             }
             for (Digest d : this) {
-		if (other.contains(d)) {
-		    return true;
-		}
+                if (other.contains(d)) {
+                    return true;
+                }
             }
         }
-	return false;
+        return false;
     }
 }

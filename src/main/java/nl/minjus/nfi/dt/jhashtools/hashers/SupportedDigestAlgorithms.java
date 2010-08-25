@@ -28,17 +28,20 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
- * An enum describing the ConcurrencyMode that is used.
+ * @author Erwin van Eijk
  */
-public enum ConcurrencyMode
+class SupportedDigestAlgorithms
 {
-    /**
-     * Do not use multithreading options.
-     */
-    SINGLE,
-    /**
-     * Do use multithreading options.
-     */
-    MULTI_THREADING
+    public static boolean isSupportedAlgorithm(String algorithm) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance(algorithm);
+            return true;
+        } catch (NoSuchAlgorithmException ex) {
+            return false;
+        }
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools;
@@ -38,8 +42,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.Executors;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -85,9 +91,11 @@ public class IntegrationTest {
     //@Test(timeout=120000)
     public void testLargeTree() {
         try {
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.SINGLE, "sha-256");
-            directoryHasher.addAlgorithm("md5");
-            directoryHasher.addAlgorithm("sha-1");
+            Collection<String> digestAlgorithms = new ArrayList<String>();
+            digestAlgorithms.add("sha-256");
+            digestAlgorithms.add("md5");
+            digestAlgorithms.add("sha-1");
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(), digestAlgorithms);
             DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
@@ -112,7 +120,7 @@ public class IntegrationTest {
             algorithms.add("sha-256");
             algorithms.add("md5");
             algorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(4, algorithms);
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(), algorithms);
             DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 

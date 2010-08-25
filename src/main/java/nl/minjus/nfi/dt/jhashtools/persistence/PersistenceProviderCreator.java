@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,14 +20,31 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-public class PersistenceProviderCreator {
-    public static PersistenceProvider create(PersistenceStyle persistenceStyle) {
+/**
+ * Utility class for construction of PersistenceProviders.
+ *
+ * @author Erwin van Eijk
+ */
+public class PersistenceProviderCreator
+{
+    /**
+     * Create a new PersistenceProvider for <c>thePersistenceStyle<c>.
+     *
+     * @param thePersistenceStyle the style to create persistency for.
+     * @return a provider.
+     */
+    public static PersistenceProvider create(PersistenceStyle thePersistenceStyle)
+    {
         PersistenceProvider persistenceProvider = null;
-        switch (persistenceStyle) {
+        switch (thePersistenceStyle) {
             case JSON:
                 persistenceProvider = new JsonPersistenceProvider(true);
                 break;
@@ -36,6 +53,8 @@ public class PersistenceProviderCreator {
                 break;
             case XML:
                 throw new RuntimeException("XML is not yet supported.");
+            default:
+                throw new UnsupportedOperationException("We know nothing of persistenceStyle " + thePersistenceStyle);    
         }
         return persistenceProvider;
     }

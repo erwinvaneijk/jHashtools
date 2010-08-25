@@ -27,18 +27,3 @@
  */
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
-
-/**
- * An enum describing the ConcurrencyMode that is used.
- */
-public enum ConcurrencyMode
-{
-    /**
-     * Do not use multithreading options.
-     */
-    SINGLE,
-    /**
-     * Do use multithreading options.
-     */
-    MULTI_THREADING
-}

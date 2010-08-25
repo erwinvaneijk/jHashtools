@@ -28,77 +28,74 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
-import java.io.*;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Exchanger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.util.logging.Logger.getLogger;
 
 /**
- * This class computes digests of files without using multithreading.
+ * This callable can be use to create a thread that is able to compute digests in
+ * a separate thread.
+ *
+ * @author Erwin van Eijk
  */
-class SerialFileHasher extends AbstractFileHasher
+class DigestComputerThread implements Callable<DigestResult>
 {
-
-    public SerialFileHasher()
-    {
-        super();
-    }
-
-    public SerialFileHasher(String digest) throws NoSuchAlgorithmException
-    {
-        super(digest);
-    }
-
-    public SerialFileHasher(Collection<String> digests) throws NoSuchAlgorithmException
-    {
-        super(digests);
-    }
-
+    private static final Logger LOG = getLogger(DigestComputerThread.class.getName());
+    private Collection<MessageDigest> digests;
+    private Exchanger<ByteBuffer> exchanger;
 
     /**
-     * Compute the digest(s) for the contents of the file.
+     * Constructor.
      *
-     * @param file the File to compute the digests for.
-     *
-     * @return a DigestResult containing the result of the computation.
-     *
-     * @throws java.io.FileNotFoundException thrown when <c>file</c> doesn't exist.
-     * @throws java.io.IOException           thrown when some IOException occurs.
+     * @param digests the digests to use.
+     * @param exchanger the exchanger to get the data from.
      */
-    @Override
-    public DigestResult getDigest(File file) throws FileNotFoundException, IOException
+    public DigestComputerThread(final Collection<MessageDigest> digests, Exchanger<ByteBuffer> exchanger)
     {
-        if (!file.exists()) {
-            throw new FileNotFoundException(file.toString());
-        }
-        FileInputStream inputStream = new FileInputStream(file);
-        return getDigest(inputStream);
+        this.digests = digests;
+        this.exchanger = exchanger;
     }
 
-
     /**
-     * Compute the digest(s) for the contents of the file.
+     * The entry point for the thread.
      *
-     * @param stream the stream to read.
+     * @see Callable#call
      *
-     * @return the resulting digests.
-     *
-     * @throws java.io.IOException when things go wrong with the IO.
+     * @return a DigestResult instance.
      */
-    public DigestResult getDigest(InputStream stream) throws IOException
+    public DigestResult call()
     {
-        Collection<MessageDigest> digestInstances = this.getMessageDigests();
-        int bytesRead;
-        byte[] buf = new byte[BLOCK_READ_SIZE];
-        bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
-        while (bytesRead > 0) {
-            for (MessageDigest digest : digestInstances) {
-                digest.update(buf, 0, bytesRead);
+        try {
+            byte[] buf = new byte[AbstractFileHasher.BLOCK_READ_SIZE];
+            ByteBuffer buffer = ByteBuffer.wrap(buf, 0, AbstractFileHasher.BLOCK_READ_SIZE);
+            while (true) {
+                buffer = this.exchanger.exchange(buffer);
+                if (buffer == null) {
+                    break;
+                }
+                for (MessageDigest digest : this.digests) {
+                    digest.update(buffer);
+                }
             }
-            bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
+            final DigestResult res = new DigestResult();
+            for (MessageDigest digest : this.digests) {
+                res.add(new Digest(digest));
+            }
+            return res;
+        } catch (InterruptedException ex) {
+            LOG.log(Level.SEVERE, "Execution was aborted.", ex);
+            return null;
         }
-        return new DigestResult(digestInstances);
     }
 }

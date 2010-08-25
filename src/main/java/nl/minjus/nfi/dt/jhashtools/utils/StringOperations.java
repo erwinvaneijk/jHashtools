@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,32 +20,50 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.utils;
 
 /**
- *
- * @author kojak
+ * @author Erwin van Eijk
  */
-public final class StringOperations {
+public final class StringOperations
+{
 
     private static final String HEXES = "0123456789abcdef";
-    private static final char[] kDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
-        'b', 'c', 'd', 'e', 'f'};
+    private static final char[] THE_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
+            'b', 'c', 'd', 'e', 'f', };
 
-    public static String hexify(final byte[] raw) {
-        if (raw == null) {
+    /**
+     * Create a base-16 encoding of the given raw bytes.
+     *
+     * @param aRawValue the value to encode.
+     * @return a String.
+     */
+    public static String hexify(final byte[] aRawValue)
+    {
+        if (aRawValue == null) {
             return null;
         }
-        final StringBuilder hex = new StringBuilder(2 * raw.length);
-        for (final byte b : raw) {
+        final StringBuilder hex = new StringBuilder(2 * aRawValue.length);
+        for (final byte b : aRawValue) {
             hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
         }
         return hex.toString();
     }
 
-    private static byte[] hexToBytes(char[] hex) {
+    /**
+     * Convert the hex values to real-life bytes.
+     *
+     * @param hex the values to convert.
+     * @return a byte array.
+     */
+    private static byte[] hexToBytes(char[] hex)
+    {
         int length = hex.length / 2;
         byte[] raw = new byte[length];
         for (int i = 0; i < length; i++) {
@@ -60,17 +78,24 @@ public final class StringOperations {
         return raw;
     }
 
-    public static byte[] hexToBytes(String hex) {
-        return hexToBytes(hex.toCharArray());
+    /**
+     * Convert a base-16 encoded String into the binary version.
+     * @param aHexString the String to convert.
+     * @return the binary version.
+     */
+    public static byte[] hexToBytes(String aHexString)
+    {
+        return hexToBytes(aHexString.toCharArray());
     }
 
-    public static String split(String s, int splitSize) {
-        StringBuilder builder = new StringBuilder(s.length() + (s.length()/4));
+    public static String split(String aString, int theSplitSize)
+    {
+        StringBuilder builder = new StringBuilder(aString.length() + (aString.length() / 4));
         int i = 0;
-        while (i<s.length()) {
-            builder.append(s.charAt(i));
+        while (i < aString.length()) {
+            builder.append(aString.charAt(i));
             i++;
-            if (((i % splitSize) == 0) && (i < s.length())) {
+            if (((i % theSplitSize) == 0) && (i < aString.length())) {
                 builder.append(' ');
             }
         }

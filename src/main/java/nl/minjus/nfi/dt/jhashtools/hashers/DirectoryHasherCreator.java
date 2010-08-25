@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Erwin van Eijk.  All rights reserved.
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -28,40 +28,51 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
 
-public class DirectoryHasherCreator {
+/**
+ * This utility class knows how to create new instances of DirectoryHasher's.
+ *
+ * @author Erwin van Eijk
+ */
+public class DirectoryHasherCreator
+{
 
-    public static DirectoryHasher create(ConcurrencyMode mode) {
-        if (mode == ConcurrencyMode.SINGLE) {
+    /**
+     * Make it impossible to create an instance of this class.
+     */
+    protected DirectoryHasherCreator()
+    {
+    }
+
+    public static DirectoryHasher create(ExecutorService anExecutorService)
+    {
+        if (anExecutorService == null) {
             return new SerialDirectoryHasher();
         } else {
-            return new ConcurrentDirectoryHasher();
+            return new ConcurrentDirectoryHasher(anExecutorService);
         }
     }
 
-    public static DirectoryHasher create(ConcurrencyMode mode, Collection<String> algorithms) throws NoSuchAlgorithmException {
-        if (mode == ConcurrencyMode.SINGLE) {
-            return new SerialDirectoryHasher(algorithms);
+    public static DirectoryHasher create(ExecutorService anExecutorService, Collection<String> digests)
+            throws NoSuchAlgorithmException
+    {
+        if (anExecutorService == null) {
+            return new SerialDirectoryHasher(digests);
         } else {
-            return new ConcurrentDirectoryHasher(algorithms);
+            return new ConcurrentDirectoryHasher(anExecutorService, digests);
         }
     }
 
-    public static DirectoryHasher create(int maxThreads, Collection<String> algorithms) throws NoSuchAlgorithmException {
-        if (maxThreads == 1) {
-            return new SerialDirectoryHasher(algorithms);
-        } else {
-            DirectoryHasher hasher = new ConcurrentDirectoryHasher(maxThreads);
-            hasher.setAlgorithms(algorithms);
-            return hasher;
-        }
-    }
-
-    public static DirectoryHasher create(ConcurrencyMode mode, String algorithm) throws NoSuchAlgorithmException {
-        DirectoryHasher directoryHasher = DirectoryHasherCreator.create(mode);
-        directoryHasher.addAlgorithm(algorithm);
-        return directoryHasher;
+    public static DirectoryHasher create(ExecutorService anExecutorService, String digestAlgorithm)
+            throws NoSuchAlgorithmException
+    {
+        Collection<String> digestAlgorithms = new ArrayList<String>();
+        digestAlgorithms.add(digestAlgorithm);
+        return create(anExecutorService, digestAlgorithms);
     }
 }

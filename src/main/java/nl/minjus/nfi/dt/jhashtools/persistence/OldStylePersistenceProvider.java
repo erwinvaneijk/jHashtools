@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Erwin van Eijk <erwin.vaneijk@gmail.com>
+ * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -20,6 +20,10 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of <copyright holder>.
  */
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
@@ -39,23 +43,24 @@ import java.util.Calendar;
 import java.util.Map;
 
 /**
- * This class supports the Old Style hashes.txt files that are now generated
- * using JSON. The old format should be abolished, but backwards compatibility
- * is a must.
+ * This class supports the Old Style hashes.txt files that are now generated using JSON. The old format should be
+ * abolished, but backwards compatibility is a must.
  *
  * @author Erwin van Eijk
  */
-public class OldStylePersistenceProvider implements PersistenceProvider {
+public class OldStylePersistenceProvider implements PersistenceProvider
+{
 
     @Override
-    public void persist(OutputStream out, Object obj) throws PersistenceException {
+    public void persist(OutputStream out, Object obj) throws PersistenceException
+    {
         if (obj != null && obj instanceof DirHasherResult) {
             DirHasherResult directoryHasherResult = (DirHasherResult) obj;
             PrintStream stream = new PrintStream(out);
             stream.println("Generated with: " + directoryHasherResult.getConstructionInfo().toString() + " " + Calendar.getInstance().getTime().toString());
-            for (Map.Entry<File, DigestResult> entry: directoryHasherResult) {
+            for (Map.Entry<File, DigestResult> entry : directoryHasherResult) {
                 stream.println(entry.getKey().toString());
-                for (Digest d: entry.getValue()) {
+                for (Digest d : entry.getValue()) {
                     stream.println("\t" + d.prettyPrint(":\t"));
                 }
             }
@@ -69,52 +74,50 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public <T> T load(Reader reader, TypeReference<T> typeReference) throws PersistenceException {
+    public <T> T load(Reader reader, TypeReference<T> typeReference) throws PersistenceException
+    {
         throw new PersistenceException("Currently the use of TypeReference is not supported for oldstyle files");
     }
 
     @Override
-    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException {
+    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException
+    {
         if (clazz.equals(DirHasherResult.class)) {
             DirHasherResult directoryHasherResult = new DirHasherResult();
             try {
                 LineNumberReader lineNumberReader = new LineNumberReader(reader);
                 String line = lineNumberReader.readLine();
-                if (! line.startsWith("Generated with: ")) {
+                if (!line.startsWith("Generated with: ")) {
                     throw new PersistenceException("The first line is not ok.");
                 }
-                try {
-                    String currentFileName = "";
-                    DigestResult result = new DigestResult();
+                String currentFileName = "";
+                DigestResult result = new DigestResult();
 
-                    while (true) {
-                        line = lineNumberReader.readLine();
-                        if (line == null) {
-                            if (!currentFileName.isEmpty()) {
-                                directoryHasherResult.put(currentFileName, result);
-                            }
-                            break;
+                while (true) {
+                    line = lineNumberReader.readLine();
+                    if (line == null) {
+                        if (!currentFileName.isEmpty()) {
+                            directoryHasherResult.put(currentFileName, result);
                         }
+                        break;
+                    }
 
-                        if (line.charAt(0) != '\t') {
-                            if (!currentFileName.isEmpty()) {
-                                directoryHasherResult.put(currentFileName, result);
-                            }
-                            currentFileName = line;
-                            result = new DigestResult();
-                        } else {
-                            try {
-                                OldStyleHashesParser parser = createParser(line);
-                                Digest theDigest = parser.digest();
-                                result.add(theDigest);
-                            } catch (RecognitionException ex) {
-                                // FIXME
-                                // Output a proper error message and continue.
-                            }
+                    if (line.charAt(0) != '\t') {
+                        if (!currentFileName.isEmpty()) {
+                            directoryHasherResult.put(currentFileName, result);
+                        }
+                        currentFileName = line;
+                        result = new DigestResult();
+                    } else {
+                        try {
+                            OldStyleHashesParser parser = createParser(line);
+                            Digest theDigest = parser.digest();
+                            result.add(theDigest);
+                        } catch (RecognitionException ex) {
+                            // FIXME
+                            // Output a proper error message and continue.
                         }
                     }
-                } catch (EOFException ex) {
-                    // pass, was expected.
                 }
                 return (T) directoryHasherResult;
             } catch (IOException ex) {
@@ -125,7 +128,8 @@ public class OldStylePersistenceProvider implements PersistenceProvider {
         }
     }
 
-    private OldStyleHashesParser createParser(String testString) throws IOException {
+    private OldStyleHashesParser createParser(String testString) throws IOException
+    {
         CharStream stream = new ANTLRStringStream(testString);
         OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

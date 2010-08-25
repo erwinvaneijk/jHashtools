@@ -28,17 +28,19 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import org.junit.Test;
+
+import java.util.Set;
+
 /**
- * An enum describing the ConcurrencyMode that is used.
+ * @author Erwin van Eijk
  */
-public enum ConcurrencyMode
+public class SupportedDigestAlgorithmsTest
 {
-    /**
-     * Do not use multithreading options.
-     */
-    SINGLE,
-    /**
-     * Do use multithreading options.
-     */
-    MULTI_THREADING
+    @Test
+    public void testGetAllSupportedAlgorithms() {
+        assert SupportedDigestAlgorithms.isSupportedAlgorithm("sha");
+        assert SupportedDigestAlgorithms.isSupportedAlgorithm("sha-1");
+        assert SupportedDigestAlgorithms.isSupportedAlgorithm("sha1");
+    }
 }
