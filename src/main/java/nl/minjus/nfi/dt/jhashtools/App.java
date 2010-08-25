@@ -83,6 +83,9 @@ public class App
             boolean forceOverwrite = line.hasOption("force");
 
             processFilesAndWrite(directoryHasher, outputFilename, persistenceStyle, forceOverwrite, filesToProcess);
+        } else {
+        	LOG.log(Level.WARNING, "You need either -i or -o");
+        	System.exit(2);
         }
 
         System.exit(0);
