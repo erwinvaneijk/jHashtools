@@ -179,7 +179,7 @@ public class App {
         options.addOption("n", "ignorecase", false, "Ignore the case on the file, only used when verifying.");
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
-        options.addOption("s", "single", false, "Only use single threaded execution path");
+        options.addOption(null, "single", false, "Only use single threaded execution path");
         Option outputOption =
                 OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o");
         options.addOption(outputOption);
