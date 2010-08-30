@@ -83,6 +83,9 @@ public class App
             boolean forceOverwrite = line.hasOption("force");
 
             processFilesAndWrite(directoryHasher, outputFilename, persistenceStyle, forceOverwrite, filesToProcess);
+        } else {
+        	LOG.log(Level.WARNING, "You need either -i or -o");
+        	System.exit(2);
         }
 
         System.exit(0);
@@ -202,8 +205,14 @@ public class App
         options.addOption("n", "ignorecase", false, "Ignore the case on the file, only used when verifying.");
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
-        Option outputOption =
-                OptionBuilder.withLongOpt("output").withDescription("The file the output is written to").hasArg().withArgName("outputfile").create("o");
+        options.addOption(null, "single", false, "Only use single threaded execution path");
+        final Option outputOption =
+                OptionBuilder
+                        .withLongOpt("output")
+                        .withDescription("The file the output is written to")
+                        .hasArg()
+                        .withArgName("outputfile")
+                        .create("o");
         options.addOption(outputOption);
         options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
         options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use").hasArg().withArgName("style").create("s"));

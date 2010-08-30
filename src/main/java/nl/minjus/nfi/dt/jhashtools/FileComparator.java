@@ -31,6 +31,9 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This class implements a Comparator for File where each file is deemed the same of the path would point to the same
@@ -38,7 +41,15 @@ import java.util.Comparator;
  */
 class FileComparator implements Comparator<File>
 {
-
+	private static Map<File, String> filenameCache = 
+		new LinkedHashMap<File, String>(1024, 0.75f, true) {
+			// (an anonymous inner class)
+	      	private static final long serialVersionUID = 1;
+	      	@Override protected boolean removeEldestEntry (Map.Entry<File,String> eldest) {
+	      		return size() > 1024; 
+	      	}
+		};
+	
     private boolean ignoreCase;
 
     public FileComparator()
@@ -65,8 +76,8 @@ class FileComparator implements Comparator<File>
     public int compare(File o1, File o2)
     {
         try {
-            String filename1 = o1.getCanonicalPath();
-            String filename2 = o2.getCanonicalPath();
+            String filename1 = getCanonicalPath(o1);
+            String filename2 = getCanonicalPath(o2);
             if (this.isIgnoringCase()) {
                 return filename1.compareToIgnoreCase(filename2);
             } else {
@@ -75,5 +86,16 @@ class FileComparator implements Comparator<File>
         } catch (IOException ex) {
             return o1.compareTo(o2);
         }
+    }
+    
+    private String getCanonicalPath(File file) throws IOException {
+    	String path = filenameCache.get(file);
+    	if (path == null) {
+    		path = file.getCanonicalPath();
+    		filenameCache.put(file, path);
+    		return path;
+    	} else {
+    		return path;
+    	}
     }
 }

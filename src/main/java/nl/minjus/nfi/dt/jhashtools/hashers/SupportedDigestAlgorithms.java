@@ -30,17 +30,28 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Erwin van Eijk
  */
 class SupportedDigestAlgorithms
 {
-    public static boolean isSupportedAlgorithm(String algorithm) {
+	private static Map<String, Boolean> supportedMap = new HashMap<String, Boolean>();
+	
+	public static boolean isSupportedAlgorithm(String algorithm) {
         try {
-            MessageDigest digest = MessageDigest.getInstance(algorithm);
-            return true;
+        	Boolean cachedValue = supportedMap.get(algorithm);
+        	if (cachedValue != null) {
+        		return cachedValue;
+        	} else {
+        		MessageDigest digest = MessageDigest.getInstance(algorithm);
+        		supportedMap.put(algorithm, true);
+        		return true;
+        	}
         } catch (NoSuchAlgorithmException ex) {
+        	supportedMap.put(algorithm, false);
             return false;
         }
     }
