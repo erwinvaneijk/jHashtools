@@ -28,6 +28,8 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
+import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -309,17 +311,21 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
     public DirHasherResult intersect(final DirHasherResult o)
     {
         final DirHasherResult result = new DirHasherResult();
-        for (Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
-            final File key = entry.getKey();
-            final DigestResult digestForKey = entry.getValue();
-            if (o.containsKey(key)) {
-                final DigestResult otherKey = o.get(key);
-                if (digestForKey.matches(otherKey)) {
-                    result.put(key, digestForKey);
-                } else if (otherKey.matches(digestForKey)) {
-                    result.put(key, otherKey);
+        try {
+            for (Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
+                final File key = entry.getKey();
+                final DigestResult digestForKey = entry.getValue();
+                if (o.containsKey(key)) {
+                    final DigestResult otherKey = o.get(key);
+                    if (digestForKey.matches(otherKey)) {
+                        result.put(key, digestForKey);
+                    } else if (otherKey.matches(digestForKey)) {
+                        result.put(key, otherKey);
+                    }
                 }
             }
+        } catch (NoMatchingAlgorithmsError ex) {
+            return result;
         }
         return result;
     }
@@ -415,4 +421,20 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
         return this.content.entrySet().iterator();
     }
 
+    /**
+     * Get the number of entries in the set that have the same
+     * entries.
+     * 
+     * @param digest
+     * @return
+     */
+    public int count(DigestResult digest) {
+        int c = 0;
+        for (Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
+             if (entry.getValue().matches(digest)) {
+                 c += 1;
+             }
+        }
+        return c;
+    }
 }

@@ -29,10 +29,13 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
+import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
+import nl.minjus.nfi.dt.jhashtools.utils.DigestMask;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -40,6 +43,7 @@ import java.util.TreeSet;
  */
 public class DigestResult extends TreeSet<Digest>
 {
+    private int containedDigestMask = 0;
 
     public DigestResult()
     {
@@ -59,6 +63,11 @@ public class DigestResult extends TreeSet<Digest>
                 this.add((Digest) d);
             }
         }
+    }
+
+    public boolean add(Digest value) {
+        containedDigestMask = this.updateAlgorithmMask(containedDigestMask, value.getAlgorithm());
+        return super.add(value);
     }
 
     public Collection<String> getAlgorithms()
@@ -130,21 +139,29 @@ public class DigestResult extends TreeSet<Digest>
      * @param other the other side to compare to.
      *
      * @return true when this matches other.
+     *
+     * @throws NoMatchingAlgorithmsError when there are no matching algorithms between this and other.
      */
-    boolean matches(DigestResult other)
+    public boolean matches(DigestResult other)
     {
-        if ((other != null)) {
-            for (Digest d : other) {
-                if (this.contains(d)) {
-                    return true;
-                }
+        if (other != null) {
+            int matchingAlgorithms = this.containedDigestMask & other.containedDigestMask;
+            if (matchingAlgorithms == 0) {
+                throw new NoMatchingAlgorithmsError();
             }
-            for (Digest d : this) {
-                if (other.contains(d)) {
-                    return true;
-                }
+            List<String> algorithms = DigestMask.getInstance().contains((short) matchingAlgorithms);
+            boolean correct = true;         // Everything is true for the empty set of checked results.
+            for (String algorithm: algorithms) {
+                Digest d1 = this.getDigest(algorithm);
+                Digest d2 = other.getDigest(algorithm);
+                correct = correct && d1.equals(d2);
             }
+            return correct;
         }
         return false;
+    }
+
+    private static int updateAlgorithmMask(int mask, String algorithm) {
+        return mask | DigestMask.getInstance().getMask(algorithm);
     }
 }

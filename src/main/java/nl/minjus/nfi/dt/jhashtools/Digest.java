@@ -32,12 +32,13 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
+import nl.minjus.nfi.dt.jhashtools.utils.DigestMask;
 import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonValue;
 
 import java.security.MessageDigest;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * This class holds some convenience for handling the results delivered
@@ -98,6 +99,11 @@ public class Digest implements Comparable<Digest>
         this.content = StringOperations.hexToBytes(parts[1]);
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param digest
+     */
     public Digest(MessageDigest digest)
     {
         this.algorithm = digest.getAlgorithm();
@@ -245,4 +251,6 @@ public class Digest implements Comparable<Digest>
             return (this.content.length - anOther.content.length);
         }
     }
+
+    
 }

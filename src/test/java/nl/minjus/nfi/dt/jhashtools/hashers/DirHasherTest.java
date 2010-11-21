@@ -219,6 +219,7 @@ public class DirHasherTest {
             assertEquals(digests, digests.intersect(knownDigests));
             DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
             assertEquals(13, knownDigestMd5.size());
+
             DirHasherResult intersected = digests.intersect(knownDigestMd5);
             assertEquals(0, intersected.size());
 

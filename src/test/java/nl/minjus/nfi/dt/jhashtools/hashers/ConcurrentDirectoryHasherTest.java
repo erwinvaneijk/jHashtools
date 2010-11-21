@@ -28,6 +28,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 import org.junit.Before;
@@ -40,6 +41,7 @@ import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -81,6 +83,10 @@ public class ConcurrentDirectoryHasherTest {
             DirHasherResult result = digests.intersect(knownDigestSha256);
             assertEquals(knownDigestSha256, result);
             assertEquals(digests, digests.intersect(knownDigests));
+            for (Map.Entry<File, DigestResult> digest: digests) {
+                int count = digests.count(digest.getValue());
+                assertEquals(1, count);
+            }
         }
         catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
@@ -185,7 +191,8 @@ public class ConcurrentDirectoryHasherTest {
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
-            assertEquals(digests, digests.intersect(knownDigests));
+            DirHasherResult remainingDigests = digests.intersect(knownDigests);
+            assertEquals(digests, remainingDigests);
         }
         catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
@@ -200,7 +207,8 @@ public class ConcurrentDirectoryHasherTest {
             directoryHasher.addAlgorithm("md5");
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
-            assertEquals(digests, digests.intersect(knownDigests));
+            DirHasherResult remainingDigests = digests.intersect(knownDigests);
+            assertEquals(digests, remainingDigests);
         }
         catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");

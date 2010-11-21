@@ -34,6 +34,7 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
+import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -113,5 +114,13 @@ public class DigestResultTest {
         o = new DigestResult(new Digest("md5", "deadbeefdeadbeefdeadbeefdeaddead"));
         assertTrue(! dr.matches(o));
         assertTrue(! o.matches(dr));
+
+        o = new DigestResult(new Digest("sha-1", "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"));
+        try {
+            dr.matches(o);
+            fail("An exception should have been thrown");
+        } catch (NoMatchingAlgorithmsError e) {
+            // This is correct
+        }
     }
 }
