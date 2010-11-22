@@ -40,28 +40,21 @@ import java.util.Collection;
 class SerialDirectoryHasher extends AbstractDirectoryHasher
 {
 
-    private final DirHasherResult results;
+    private final DirHasherResult results = new DirHasherResult();
 
     public SerialDirectoryHasher()
     {
         super();
-        results = new DirHasherResult();
     }
 
     public SerialDirectoryHasher(String algorithm) throws NoSuchAlgorithmException
     {
-        this();
-        if (!algorithm.equals(FileHasher.NO_ALGORITHM)) {
-            this.algorithms.add(algorithm);
-        }
+        super(algorithm);
     }
 
     public SerialDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
     {
-        this();
-        for (String algorithm : algorithms) {
-            this.addAlgorithm(algorithm);
-        }
+        super(algorithms);
     }
 
     @Override

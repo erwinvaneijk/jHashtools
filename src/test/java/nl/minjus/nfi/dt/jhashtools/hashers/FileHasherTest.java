@@ -62,6 +62,7 @@ public class FileHasherTest {
     private final Map<Integer, String> expectedDigests;
 
     private File testFile;
+    private static final String DEFAULT_ALGORITHM = "sha-256";
 
     public FileHasherTest() {
         DirHasherResult result = KnownDigests.getKnownResults();
@@ -75,7 +76,7 @@ public class FileHasherTest {
                 continue;
             }
 
-            expectedDigests.put(i, entry.getValue().getHexDigest(FileHasher.DEFAULT_ALGORITHM));
+            expectedDigests.put(i, entry.getValue().getHexDigest(DEFAULT_ALGORITHM));
             i += 1;
         }
     }
@@ -95,12 +96,12 @@ public class FileHasherTest {
     @Test
     public void testGetDigest() {
         try {
-            FileHasher instance = new SerialFileHasher("sha-256");
+            FileHasher instance = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
             String expResult = expectedDigests.get(1);
             DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
-            assertNotNull(results.getDigest(FileHasher.DEFAULT_ALGORITHM));
-            String digest = results.getHexDigest(FileHasher.DEFAULT_ALGORITHM);
+            assertNotNull(results.getDigest(DEFAULT_ALGORITHM));
+            String digest = results.getHexDigest(DEFAULT_ALGORITHM);
             assertEquals("Digests are not the same", expResult, digest);
         } catch (FileNotFoundException ex) {
             fail(ex.toString());
@@ -119,12 +120,12 @@ public class FileHasherTest {
     @Test
     public void testGetDigestMultithreaded() {
         try {
-            FileHasher instance = new ConcurrentFileHasher("sha-256");
+            FileHasher instance = new ConcurrentFileHasher(DigestAlgorithmFactory.create("sha-256"));
             String expResult = expectedDigests.get(1);
             DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
-            assertNotNull(results.getDigest(FileHasher.DEFAULT_ALGORITHM));
-            String digest = results.getHexDigest(FileHasher.DEFAULT_ALGORITHM);
+            assertNotNull(results.getDigest(DEFAULT_ALGORITHM));
+            String digest = results.getHexDigest(DEFAULT_ALGORITHM);
             assertEquals("Digests are not the same", expResult, digest);
         } catch (FileNotFoundException ex) {
             fail(ex.toString());
@@ -155,7 +156,7 @@ public class FileHasherTest {
     @Test
     public void testFileHasherUnknownFile() {
         try {
-            FileHasher h = new SerialFileHasher("md5");
+            FileHasher h = new SerialFileHasher(DigestAlgorithmFactory.create("md5"));
             DigestResult d = h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
         } catch (FileNotFoundException ex) {
@@ -170,7 +171,7 @@ public class FileHasherTest {
     @Test
     public void testFileHasherUnknownFileConcurrent() {
         try {
-            FileHasher h = new ConcurrentFileHasher("md5");
+            FileHasher h = new ConcurrentFileHasher(DigestAlgorithmFactory.create("md5"));
             DigestResult d = h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
         } catch (FileNotFoundException ex) {

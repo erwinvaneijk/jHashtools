@@ -49,7 +49,7 @@ public class DirectoryVisitor implements WalkerVisitor
     private boolean verbose;
     private final FileHasher fileHasher;
 
-    public DirectoryVisitor(String algorithm) throws NoSuchAlgorithmException
+    public DirectoryVisitor(DigestAlgorithm algorithm) throws NoSuchAlgorithmException
     {
         resultMap = new DirHasherResult();
         this.verbose = false;
@@ -63,13 +63,13 @@ public class DirectoryVisitor implements WalkerVisitor
         this.fileHasher = FileHasherCreator.create(null);
     }
 
-    public DirectoryVisitor(Collection<String> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException
+    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException
     {
         this(algorithms, false);
         this.resultMap = digests;
     }
 
-    public DirectoryVisitor(Collection<String> algorithms, boolean verbose) throws NoSuchAlgorithmException
+    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, boolean verbose) throws NoSuchAlgorithmException
     {
         resultMap = new DirHasherResult();
         this.fileHasher = FileHasherCreator.createSimple(algorithms);

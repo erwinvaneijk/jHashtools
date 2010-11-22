@@ -26,7 +26,7 @@
  * or implied, of <copyright holder>.
  */
 
-package nl.minjus.nfi.dt.jhashtools.utils;
+package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

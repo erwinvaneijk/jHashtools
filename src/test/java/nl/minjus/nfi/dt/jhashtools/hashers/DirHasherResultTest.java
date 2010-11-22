@@ -228,7 +228,7 @@ public class DirHasherResultTest {
         list.add( new Digest("md4", "1111") );
         setOne.put(new File("four"), new DigestResult(list));
         List<Digest> list2 = new ArrayList<Digest>();
-        list.add( new Digest("md4", "1111") );
+        list2.add( new Digest("md4", "1111") );
         setTwo.put(new File("four"), new DigestResult(list2));
 
         DirHasherResult result = setOne.intersect(setTwo);

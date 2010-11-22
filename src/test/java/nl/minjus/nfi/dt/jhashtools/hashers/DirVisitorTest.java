@@ -85,7 +85,7 @@ public class DirVisitorTest {
     public void testVisitNonExistant() throws NoSuchAlgorithmException {
         try {
             File theFile = new File("does-not-exist");
-            DirectoryVisitor instance = new DirectoryVisitor("sha-256");
+            DirectoryVisitor instance = new DirectoryVisitor(DigestAlgorithmFactory.create("sha-256"));
             instance.visit(theFile);
             assertEquals(0, instance.getResults().size());
         } catch (Throwable t) {
@@ -99,7 +99,7 @@ public class DirVisitorTest {
     @Test
     public void testVisitNonExistantAlgorithm() {
         try {
-            DirectoryVisitor instance = new DirectoryVisitor("sha-345");
+            DirectoryVisitor instance = new DirectoryVisitor(DigestAlgorithmFactory.create("sha-345"));
             fail("We should have an NoSuchAlgorithmException");
         } catch (NoSuchAlgorithmException ex) {
             // pass

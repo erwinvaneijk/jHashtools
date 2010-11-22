@@ -32,7 +32,6 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.utils.DigestMask;
 import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonValue;

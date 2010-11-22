@@ -48,7 +48,7 @@ public class SerialFileHasherTest
     {
         String content = "foo";
         ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
-        SerialFileHasher serialFileHasher = new SerialFileHasher("sha-256");
+        SerialFileHasher serialFileHasher = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
         DigestResult result = serialFileHasher.getDigest(stream);
 
         assertEquals("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae", 

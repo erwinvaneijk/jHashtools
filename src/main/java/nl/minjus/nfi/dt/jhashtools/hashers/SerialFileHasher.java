@@ -46,12 +46,12 @@ class SerialFileHasher extends AbstractFileHasher
         super();
     }
 
-    public SerialFileHasher(String digest) throws NoSuchAlgorithmException
+    public SerialFileHasher(DigestAlgorithm digest) throws NoSuchAlgorithmException
     {
         super(digest);
     }
 
-    public SerialFileHasher(Collection<String> digests) throws NoSuchAlgorithmException
+    public SerialFileHasher(Collection<DigestAlgorithm> digests) throws NoSuchAlgorithmException
     {
         super(digests);
     }

@@ -46,23 +46,23 @@ abstract class AbstractFileHasher implements FileHasher
 {
     public static final int BLOCK_READ_SIZE = 1024 * 1024;
     private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
-    protected Collection<String> digests;
+    protected Collection<DigestAlgorithm> digests;
 
     public AbstractFileHasher()
     {
-        this.digests = new ArrayList<String>();
+        this.digests = new ArrayList<DigestAlgorithm>();
     }
 
-    public AbstractFileHasher(String digestAlgorithm) throws NoSuchAlgorithmException
+    public AbstractFileHasher(DigestAlgorithm digestAlgorithm) throws NoSuchAlgorithmException
     {
         this();
         this.addAlgorithm(digestAlgorithm);
     }
 
-    public AbstractFileHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
+    public AbstractFileHasher(Collection<DigestAlgorithm> algorithms) throws NoSuchAlgorithmException
     {
         this();
-        for (String algorithmName : algorithms) {
+        for (DigestAlgorithm algorithmName : algorithms) {
             this.addAlgorithm(algorithmName);
         }
     }
@@ -75,13 +75,9 @@ abstract class AbstractFileHasher implements FileHasher
      * @throws NoSuchAlgorithmException when the algorithm is not supported by the underlying JVM.
      */
     @Override
-    public void addAlgorithm(String algorithmName) throws NoSuchAlgorithmException
+    public void addAlgorithm(DigestAlgorithm algorithmName) throws NoSuchAlgorithmException
     {
-        if (SupportedDigestAlgorithms.isSupportedAlgorithm(algorithmName)) {
-            this.digests.add(algorithmName);
-        } else {
-            throw new NoSuchAlgorithmException("Algorithm " + algorithmName + " is not supported");
-        }
+        this.digests.add(algorithmName);
     }
 
     /**
@@ -97,11 +93,11 @@ abstract class AbstractFileHasher implements FileHasher
     @Override
     public abstract DigestResult getDigest(File file) throws FileNotFoundException, IOException;
 
-    protected Collection<MessageDigest> getMessageDigests() {
+    protected synchronized Collection<MessageDigest> getMessageDigests() {
         Collection<MessageDigest> messageDigests = new ArrayList<MessageDigest>(this.digests.size());
-        for (String algorithmName : this.digests) {
+        for (DigestAlgorithm algorithm : this.digests) {
             try {
-                messageDigests.add(MessageDigest.getInstance(algorithmName));
+                messageDigests.add(algorithm.getInstance());
             } catch (NoSuchAlgorithmException ex) {
                 ex.printStackTrace();           // this cannot happen, we've already checked them before.
             }

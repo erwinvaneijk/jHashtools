@@ -59,6 +59,7 @@ public class App
     private static final String FOOTER = "";
     private static final Logger LOG = getLogger(App.class.getName());
     private static final int DEFAULT_TERMINAL_WIDTH = 80;
+    private static final String DEFAULT_ALGORITHM = "sha-256";
 
     public static void main(String[] arguments)
     {
@@ -176,7 +177,7 @@ public class App
         } finally {
             try {
                 if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
-                    directoryHasher.addAlgorithm(FileHasher.DEFAULT_ALGORITHM);
+                    directoryHasher.addAlgorithm(DEFAULT_ALGORITHM);
                 }
             } catch (NoSuchAlgorithmException ex) {
                 LOG.log(Level.SEVERE, "Algorithm is not found", ex);

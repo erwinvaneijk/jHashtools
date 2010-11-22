@@ -53,18 +53,18 @@ public class ConcurrentFileHasher extends AbstractFileHasher
         this.exchanger = new Exchanger<ByteBuffer>();
     }
 
-    public ConcurrentFileHasher(final String digest) throws NoSuchAlgorithmException
+    public ConcurrentFileHasher(final DigestAlgorithm digest) throws NoSuchAlgorithmException
     {
         super(digest);
         this.exchanger = new Exchanger<ByteBuffer>();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
-    public ConcurrentFileHasher(final Collection<String> digests) throws NoSuchAlgorithmException
+    public ConcurrentFileHasher(final Collection<DigestAlgorithm> digests) throws NoSuchAlgorithmException
     {
         super(digests);
         this.exchanger = new Exchanger<ByteBuffer>();
-        this.executorService = Executors.newSingleThreadExecutor();
+        this.executorService = Executors.newFixedThreadPool(2);
     }
 
     /**
@@ -95,7 +95,7 @@ public class ConcurrentFileHasher extends AbstractFileHasher
     {
         try {
             Future<DigestResult> digestComputerThread =
-                            executorService.submit(new DigestComputerThread(this.getMessageDigests(), this.exchanger));
+                            executorService.submit(new DigestComputerThread(this.digests, this.exchanger));
             
             int bytesRead;
             byte[] buf = new byte[BLOCK_READ_SIZE];

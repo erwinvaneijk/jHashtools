@@ -30,7 +30,7 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
-import nl.minjus.nfi.dt.jhashtools.utils.DigestMask;
+import nl.minjus.nfi.dt.jhashtools.hashers.DigestMask;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;

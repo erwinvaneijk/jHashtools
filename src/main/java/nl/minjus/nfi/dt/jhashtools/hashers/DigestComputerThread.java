@@ -52,7 +52,7 @@ import static java.util.logging.Logger.getLogger;
 class DigestComputerThread implements Callable<DigestResult>
 {
     private static final Logger LOG = getLogger(DigestComputerThread.class.getName());
-    private Collection<MessageDigest> digests;
+    private Collection<DigestAlgorithm> digests;
     private Exchanger<ByteBuffer> exchanger;
 
     /**
@@ -61,7 +61,7 @@ class DigestComputerThread implements Callable<DigestResult>
      * @param digests the digests to use.
      * @param exchanger the exchanger to get the data from.
      */
-    public DigestComputerThread(final Collection<MessageDigest> digests, Exchanger<ByteBuffer> exchanger)
+    public DigestComputerThread(final Collection<DigestAlgorithm> digests, Exchanger<ByteBuffer> exchanger)
     {
         this.digests = digests;
         this.exchanger = exchanger;
@@ -76,6 +76,16 @@ class DigestComputerThread implements Callable<DigestResult>
      */
     public DigestResult call()
     {
+        Collection<MessageDigest> digests = new ArrayList<MessageDigest>(this.digests.size());
+        for (DigestAlgorithm alg: this.digests) {
+            try {
+                digests.add(alg.getInstance());
+            } catch (NoSuchAlgorithmException ex) {
+                // FIXME:
+                // Decide whether we should log this properly.
+                // For now, we ignore.
+            }
+        }
         try {
             byte[] buf = new byte[AbstractFileHasher.BLOCK_READ_SIZE];
             ByteBuffer buffer = ByteBuffer.wrap(buf, 0, AbstractFileHasher.BLOCK_READ_SIZE);
@@ -84,12 +94,14 @@ class DigestComputerThread implements Callable<DigestResult>
                 if (buffer == null) {
                     break;
                 }
-                for (MessageDigest digest : this.digests) {
+                int savePos = buffer.position();
+                for (MessageDigest digest : digests) {
                     digest.update(buffer);
+                    buffer.position(savePos);   // Reset the position.
                 }
             }
             final DigestResult res = new DigestResult();
-            for (MessageDigest digest : this.digests) {
+            for (MessageDigest digest : digests) {
                 res.add(new Digest(digest));
             }
             return res;

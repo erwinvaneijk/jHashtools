@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights reserved.
+ * Copyright (c) 2010 Erwin van Eijk.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -28,26 +28,39 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * FIXME:
- * Add proper documentation for this interface.
- * 
- * @author Erwin van Eijk
+ * Created by IntelliJ IDEA.
+ * User: eijk
+ * Date: Nov 22, 2010
+ * Time: 11:46:13 AM
+ * To change this template use File | Settings | File Templates.
  */
-public interface FileHasher
-{
-    void addAlgorithm(DigestAlgorithm algorithmName) throws NoSuchAlgorithmException;
+public class DigestAlgorithm {
+    private String name;
+    private short value;
 
-    DigestResult getDigest(File file) throws FileNotFoundException, IOException;
+    public DigestAlgorithm(String name, short value) {
+        this.name = name;
+        this.value = value;
+    }
 
-    DigestResult getDigest(InputStream file) throws IOException;
+    public DigestAlgorithm(String name) {
+        this.name = name;
+        this.value = DigestMask.getInstance().getMask(name);
+    }
+
+    public final String getName() {
+        return this.name;
+    }
+
+    public final short getValue() {
+        return this.value;
+    }
+
+    public synchronized MessageDigest getInstance() throws NoSuchAlgorithmException {
+        return MessageDigest.getInstance(this.name);
+    }
 }

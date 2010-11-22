@@ -39,23 +39,20 @@ import java.util.LinkedList;
 
 abstract class AbstractDirectoryHasher implements DirectoryHasher
 {
-    protected final Collection<String> algorithms;
+    protected final Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
     private boolean verbose;
 
     public AbstractDirectoryHasher()
     {
-        algorithms = new ArrayList<String>();
     }
 
     public AbstractDirectoryHasher(String algorithm) throws NoSuchAlgorithmException
     {
-        this();
         this.addAlgorithm(algorithm);
     }
 
     public AbstractDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
     {
-        this();
         for (String algorithm : algorithms) {
             this.addAlgorithm(algorithm);
         }
@@ -71,11 +68,7 @@ abstract class AbstractDirectoryHasher implements DirectoryHasher
 
     public void addAlgorithm(String algorithm) throws NoSuchAlgorithmException
     {
-        if (SupportedDigestAlgorithms.isSupportedAlgorithm(algorithm)) {
-            algorithms.add(algorithm);
-        } else {
-            throw new NoSuchAlgorithmException("Algorithm " + algorithm + " is not supported");
-        }
+        algorithms.add(DigestAlgorithmFactory.create(algorithm));
     }
 
     public abstract DirHasherResult getDigests(File startFile);
@@ -94,6 +87,10 @@ abstract class AbstractDirectoryHasher implements DirectoryHasher
 
     public final Collection<String> getAlgorithms()
     {
-        return this.algorithms;
+        Collection<String> newSet = new LinkedList<String>();
+        for (DigestAlgorithm alg: this.algorithms) {
+            newSet.add(alg.getName());
+        }
+        return newSet;
     }
 }
