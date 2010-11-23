@@ -60,6 +60,10 @@ public class DirVisitorTask implements WalkerVisitor
      */
     public final void visit(final File aFile)
     {
-        this.queue.add(aFile);
+        try {
+            this.queue.put(aFile);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }
