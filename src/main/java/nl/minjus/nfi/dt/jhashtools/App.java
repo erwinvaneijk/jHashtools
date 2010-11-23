@@ -153,7 +153,7 @@ public class App
                     (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI_THREADING;
 
             if (concurrencyMode == ConcurrencyMode.MULTI_THREADING) {
-                directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool());
+                directoryHasher = DirectoryHasherCreator.create(Executors.newFixedThreadPool(8));
             } else {
                 directoryHasher = DirectoryHasherCreator.create(null);
             }

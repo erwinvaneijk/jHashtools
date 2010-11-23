@@ -88,7 +88,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(6);
+        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(16);
 
         CompletionService<DirHasherResult> completionService =
                 new ExecutorCompletionService<DirHasherResult>(this.executorService);
@@ -98,10 +98,10 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
 
         Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
 
-        ExecutorService execService = Executors.newFixedThreadPool(2);
+        // ExecutorService execService = Executors.newFixedThreadPool(2);
         while (!(fileWalkerTask.isDone() || fileWalkerTask.isCancelled()) || (queue.size() > 0)) {
             try {
-                FileHasher fileHasher = new FileHasherCreator().create(execService, this.algorithms);
+                FileHasher fileHasher = new FileHasherCreator().create(this.executorService, this.algorithms);
                 
                 File filename = queue.poll(10, TimeUnit.MILLISECONDS);
                 if (filename != null) {
@@ -110,7 +110,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
             } catch (NoSuchAlgorithmException e) {
                 LOG.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                LOG.log(Level.SEVERE, "Execution was interrupted.", e);
             }
         }
 
