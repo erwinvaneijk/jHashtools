@@ -95,7 +95,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
         }
 
         Collection<Thread> threads = new LinkedList<Thread>();
-        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(16);
+        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(6);
         ProcessingState currentState = new ProcessingState();
 
         CompletionService<DirHasherResult> completionService =
