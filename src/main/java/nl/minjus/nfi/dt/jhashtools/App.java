@@ -41,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -151,7 +152,11 @@ public class App
             ConcurrencyMode concurrencyMode =
                     (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI_THREADING;
 
-            directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool());
+            if (concurrencyMode == ConcurrencyMode.MULTI_THREADING) {
+                directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool());
+            } else {
+                directoryHasher = DirectoryHasherCreator.create(null);
+            }
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
