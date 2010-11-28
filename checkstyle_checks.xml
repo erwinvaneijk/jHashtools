@@ -61,7 +61,7 @@
     </module>
 
     <module name="Header">
-        <property name="headerFile" value="/Users/eijk/NetBeansProjects/jHashtools/java.header"/>
+        <property name="headerFile" value="java.header"/>
         <property name="fileExtensions" value="java"/>
         <property name="id" value="header"/>
     </module>
@@ -83,7 +83,7 @@
 
         <module name="IllegalCatch"/>
         <module name="ImportControl">
-            <property name="file" value="/Users/eijk/NetBeansProjects/jHashtools/import_control.xml"/>
+            <property name="file" value="import_control.xml"/>
         </module>
         <module name="IllegalImport"/>
         <module name="IllegalInstantiation"/>
