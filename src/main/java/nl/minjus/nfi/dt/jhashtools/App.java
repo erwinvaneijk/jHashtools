@@ -151,7 +151,12 @@ public class App
             ConcurrencyMode concurrencyMode =
                     (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI_THREADING;
 
-            directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool());
+            if (concurrencyMode == ConcurrencyMode.SINGLE) {
+                directoryHasher = DirectoryHasherCreator.create(null);
+            } else {
+                directoryHasher = DirectoryHasherCreator.create(Executors.newFixedThreadPool(10));
+            }
+            
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {
