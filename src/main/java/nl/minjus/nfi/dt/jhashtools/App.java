@@ -41,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -156,7 +157,6 @@ public class App
             } else {
                 directoryHasher = DirectoryHasherCreator.create(Executors.newFixedThreadPool(10));
             }
-            
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
             if (line.hasOption("all") || line.hasOption("sha-256")) {

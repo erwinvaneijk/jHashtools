@@ -94,7 +94,8 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        BlockingQueue<File> queue = new LinkedBlockingQueue<File>(32);
+        Collection<Thread> threads = new LinkedList<Thread>();
+        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(16);
         ProcessingState currentState = new ProcessingState();
 
         CompletionService<DirHasherResult> completionService =
@@ -119,8 +120,6 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
             // first, wait for the fileWalkerTask to finish.
             if (fileWalkerTask.get() != null) {
                 LOG.log(Level.SEVERE, "It should be impossible to get a result here.");
-            } else {
-                LOG.log(Level.INFO, "Finished walking the tree");
             }
 
             for (Future<DirHasherResult> task : computeTasks) {
