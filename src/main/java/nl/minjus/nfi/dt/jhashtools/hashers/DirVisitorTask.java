@@ -29,6 +29,7 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.io.File;
+import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -41,16 +42,19 @@ public class DirVisitorTask implements WalkerVisitor
     /**
      * A BlockingQueue to put the File's into.
      */
-    private BlockingQueue<File> queue;
+    private Vector<BlockingQueue<File>> queues;
+
+    private int nextQueue;
 
     /**
      * Constructor.
      *
-     * @param aQueue the Queue to write File-instances that should be visited to.
+     * @param queues The queues to write File-instances that should be visited to.
      */
-    public DirVisitorTask(final BlockingQueue<File> aQueue)
+    public DirVisitorTask(final Vector<BlockingQueue<File>> queues)
     {
-        this.queue = aQueue;
+        this.queues = queues;
+        this.nextQueue = 0;
     }
 
     /**
@@ -61,7 +65,9 @@ public class DirVisitorTask implements WalkerVisitor
     public final void visit(final File aFile)
     {
         try {
-            this.queue.put(aFile);
+            BlockingQueue<File> currentQueue = queues.get(this.nextQueue);
+            currentQueue.put(aFile);
+            this.nextQueue = (this.nextQueue + 1) % this.queues.size();
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

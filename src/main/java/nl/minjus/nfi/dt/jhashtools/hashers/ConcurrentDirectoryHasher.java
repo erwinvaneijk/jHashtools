@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Vector;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -95,14 +96,17 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
         }
 
         Collection<Thread> threads = new LinkedList<Thread>();
-        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(16);
+        Vector<BlockingQueue<File>> queues = new Vector<BlockingQueue<File>>(MAX_THREADS);
+        for (int i=0; i<MAX_THREADS; i++) {
+            queues.add(i, new LinkedBlockingQueue<File>(32));
+        }
         ProcessingState currentState = new ProcessingState();
 
         CompletionService<DirHasherResult> completionService =
                 new ExecutorCompletionService<DirHasherResult>(this.executorService);
         // Create the task that just walks the tree and puts the File entries in the queue
         Future<DirHasherResult> fileWalkerTask =
-                completionService.submit(new FileWalkerTask(startPath, queue, currentState));
+                completionService.submit(new FileWalkerTask(startPath, queues, currentState));
 
         // Start the compute tasks that compute the digests on the data in the File's that are read from
         // the queue.
@@ -110,7 +114,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
         for (int i = 0; i < MAX_THREADS; i++) {
             try {
                 FileHasher fileHasher = new FileHasherCreator().create(this.executorService, this.algorithms);
-                computeTasks.add(completionService.submit(new FileDigestComputeTask(queue, fileHasher, currentState)));
+                computeTasks.add(completionService.submit(new FileDigestComputeTask(queues.get(i), fileHasher, currentState)));
             } catch (NoSuchAlgorithmException e) {
                 LOG.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);
             }
@@ -155,10 +159,10 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
         private DirVisitorTask visitor;
         private ProcessingState processingState;
 
-        public FileWalkerTask(final File startingPath, final BlockingQueue<File> inputQueue, final ProcessingState processingState)
+        public FileWalkerTask(final File startingPath, final Vector<BlockingQueue<File>> inputQueues, final ProcessingState processingState)
         {
             this.startingPath = startingPath;
-            this.visitor = new DirVisitorTask(inputQueue);
+            this.visitor = new DirVisitorTask(inputQueues);
             this.processingState = processingState;
         }
 
