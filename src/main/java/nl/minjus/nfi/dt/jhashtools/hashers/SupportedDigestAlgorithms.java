@@ -47,7 +47,7 @@ class SupportedDigestAlgorithms
         		return cachedValue;
         	} else {
         		MessageDigest digest = MessageDigest.getInstance(algorithm);
-        		supportedMap.put(algorithm, true);
+        		supportedMap.put(digest.getAlgorithm(), true);
         		return true;
         	}
         } catch (NoSuchAlgorithmException ex) {

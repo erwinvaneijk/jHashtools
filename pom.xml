@@ -32,7 +32,7 @@
     <groupId>nl.minjus.nfi.dt</groupId>
     <artifactId>jHashtools</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
     <name>jHashtools</name>
     <url>http://maven.apache.org</url>
     <licenses>

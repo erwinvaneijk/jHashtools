@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Vector;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -43,99 +44,126 @@ import java.util.logging.Logger;
 
 /**
  * Use multithreading to compute the digests on all the files.
- *
  * @author Erwin van Eijk
  */
-class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
+class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
+{
 
     private static final Logger LOG = Logger.getLogger(ConcurrentDirectoryHasher.class.getName());
     private ExecutorService executorService;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
 
-    static enum ProcessingStates {
+    static enum ProcessingStates
+    {
 
         UNINITIALIZED,
         BUSY,
         FINISHED
     }
 
-    public ConcurrentDirectoryHasher(ExecutorService anExecutorService) {
+    public ConcurrentDirectoryHasher(ExecutorService anExecutorService)
+    {
         super();
         this.executorService = anExecutorService;
     }
 
     public ConcurrentDirectoryHasher(ExecutorService anExecutorService, String algorithm)
-            throws NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException
+    {
         super(algorithm);
         this.executorService = anExecutorService;
     }
 
     public ConcurrentDirectoryHasher(ExecutorService anExecutorService, Collection<String> algorithms)
-            throws NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException
+    {
         super(algorithms);
         this.executorService = anExecutorService;
     }
 
-    public DirHasherResult getDigests(File startPath) {
+    public DirHasherResult getDigests(File startPath)
+    {
         DirHasherResult result = new DirHasherResult();
         this.updateDigests(result, startPath);
         return result;
     }
 
     @Override
-    public void updateDigests(DirHasherResult digests, File startPath) {
+    public void updateDigests(DirHasherResult digests, File startPath)
+    {
         if (!startPath.exists()) {
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        BlockingQueue<File> queue = new ArrayBlockingQueue<File>(16);
+        Collection<Thread> threads = new LinkedList<Thread>();
+        Vector<BlockingQueue<File>> queues = new Vector<BlockingQueue<File>>(MAX_THREADS);
+        for (int i=0; i<MAX_THREADS; i++) {
+            queues.add(i, new LinkedBlockingQueue<File>(32));
+        }
+        ProcessingState currentState = new ProcessingState();
 
         CompletionService<DirHasherResult> completionService =
                 new ExecutorCompletionService<DirHasherResult>(this.executorService);
         // Create the task that just walks the tree and puts the File entries in the queue
         Future<DirHasherResult> fileWalkerTask =
-                completionService.submit(new FileWalkerTask(startPath, queue));
+                completionService.submit(new FileWalkerTask(startPath, queues, currentState));
 
+        // Start the compute tasks that compute the digests on the data in the File's that are read from
+        // the queue.
         Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
-
-        // ExecutorService execService = Executors.newFixedThreadPool(2);
-        while (!(fileWalkerTask.isDone() || fileWalkerTask.isCancelled()) || (queue.size() > 0)) {
+        for (int i = 0; i < MAX_THREADS; i++) {
             try {
                 FileHasher fileHasher = new FileHasherCreator().create(this.executorService, this.algorithms);
-                
-                File filename = queue.poll(10, TimeUnit.MILLISECONDS);
-                if (filename != null) {
-                    computeTasks.add(completionService.submit(new FileDigestComputeTask(filename, fileHasher)));
-                }       
+                computeTasks.add(completionService.submit(new FileDigestComputeTask(queues.get(i), fileHasher, currentState)));
             } catch (NoSuchAlgorithmException e) {
                 LOG.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);
-            } catch (InterruptedException e) {
-                LOG.log(Level.SEVERE, "Execution was interrupted.", e);
             }
         }
 
-        for (Future<DirHasherResult> task: computeTasks) {
-            try {
-               DirHasherResult partial = task.get();
+        try {
+            // first, wait for the fileWalkerTask to finish.
+            if (fileWalkerTask.get() != null) {
+                LOG.log(Level.SEVERE, "It should be impossible to get a result here.");
+            }
+
+            for (Future<DirHasherResult> task : computeTasks) {
+                DirHasherResult partial = task.get();
                 if (partial != null) {
                     digests.putAll(partial);
                 }
-            }catch (InterruptedException ex) {
-                LOG.log(Level.WARNING, "Interruption has occurred.", ex);
-            } catch (ExecutionException ex) {
-                LOG.log(Level.WARNING, "Execution was interrupted.", ex);
             }
+        } catch (InterruptedException ex) {
+            LOG.log(Level.WARNING, "Interruption has occurred.", ex);
+        } catch (ExecutionException ex) {
+            LOG.log(Level.WARNING, "Execution was interrupted.", ex);
         }
     }
 
-    static class FileWalkerTask implements Callable<DirHasherResult> {
+    static class ProcessingState
+    {
+
+        public ProcessingState()
+        {
+            this.lock = new ReentrantLock();
+            this.currentState = ProcessingStates.UNINITIALIZED;
+        }
+
+        public Lock lock;
+        public ProcessingStates currentState;
+    }
+
+    static class FileWalkerTask implements Callable<DirHasherResult>
+    {
 
         private File startingPath;
         private DirVisitorTask visitor;
+        private ProcessingState processingState;
 
-        public FileWalkerTask(final File startingPath, final BlockingQueue<File> inputQueue) {
+        public FileWalkerTask(final File startingPath, final Vector<BlockingQueue<File>> inputQueues, final ProcessingState processingState)
+        {
             this.startingPath = startingPath;
-            this.visitor = new DirVisitorTask(inputQueue);
+            this.visitor = new DirVisitorTask(inputQueues);
+            this.processingState = processingState;
         }
 
         /**
@@ -145,37 +173,70 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher {
          * The general contract of the method <code>run</code> is that it may take any action whatsoever.
          *
          * @return the result of the computation.
+         *
          * @see Callable#call()
          */
-        public DirHasherResult call() {
+        public DirHasherResult call()
+        {
+            try {
+                this.processingState.lock.lock();
+                this.processingState.currentState = ProcessingStates.BUSY;
+            } finally {
+                this.processingState.lock.unlock();
+            }
             FileWalker walker = new FileWalker();
             walker.addWalkerVisitor(visitor);
             walker.walk(this.startingPath);
+            try {
+                this.processingState.lock.lock();
+                this.processingState.currentState = ProcessingStates.FINISHED;
+            } finally {
+                this.processingState.lock.unlock();
+            }
+
             return null;
         }
     }
 
-    static class FileDigestComputeTask implements Callable<DirHasherResult> {
-        private File inputFilename;
+    static class FileDigestComputeTask implements Callable<DirHasherResult>
+    {
+        private BlockingQueue<File> inputQueue;
         private FileHasher fileHasher;
         private DirHasherResult partialResult;
+        private ProcessingState processingState;
 
-        public FileDigestComputeTask(final File inputFilename, final FileHasher fileHasher) throws NoSuchAlgorithmException {
-            this.inputFilename = inputFilename;
+        public FileDigestComputeTask(final BlockingQueue<File> inputQueue, final FileHasher fileHasher, final ProcessingState processingState) throws NoSuchAlgorithmException
+        {
+            this.inputQueue = inputQueue;
             this.fileHasher = fileHasher;
             this.partialResult = new DirHasherResult();
+            this.processingState = processingState;
         }
 
         /**
          * Computes a result, or throws an exception if unable to do so.
          *
          * @return computed result
+         *
+         * @throws Exception if unable to compute a result
          */
-        public DirHasherResult call() {
+        public DirHasherResult call() throws Exception
+        {
             try {
-                this.partialResult.put(inputFilename, this.fileHasher.getDigest(inputFilename));
-            } catch (IOException ex) {
-                // pass
+                while (true) {
+                    try {
+                        File file = this.inputQueue.poll(10, TimeUnit.MICROSECONDS);
+                        if (file != null) {
+                            this.partialResult.put(file, this.fileHasher.getDigest(file));
+                        } else if (this.processingState.currentState == ProcessingStates.FINISHED) {
+                            break;
+                        }
+                    } catch (IOException ex) {
+                        // pass
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
             return this.partialResult;
         }

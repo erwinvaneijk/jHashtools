@@ -152,10 +152,10 @@ public class App
             ConcurrencyMode concurrencyMode =
                     (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI_THREADING;
 
-            if (concurrencyMode == ConcurrencyMode.MULTI_THREADING) {
-                directoryHasher = DirectoryHasherCreator.create(Executors.newFixedThreadPool(8));
-            } else {
+            if (concurrencyMode == ConcurrencyMode.SINGLE) {
                 directoryHasher = DirectoryHasherCreator.create(null);
+            } else {
+                directoryHasher = DirectoryHasherCreator.create(Executors.newFixedThreadPool(10));
             }
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
