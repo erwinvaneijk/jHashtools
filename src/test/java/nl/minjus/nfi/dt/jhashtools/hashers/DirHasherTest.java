@@ -26,10 +26,6 @@
  * or implied, of <copyright holder>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;

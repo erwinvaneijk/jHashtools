@@ -36,7 +36,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 /**
- * This class computes digests of files without using multithreading.
+ * This class computes digests of files without using multi threading.
  */
 class SerialFileHasher extends AbstractFileHasher
 {
@@ -64,11 +64,10 @@ class SerialFileHasher extends AbstractFileHasher
      *
      * @return a DigestResult containing the result of the computation.
      *
-     * @throws java.io.FileNotFoundException thrown when <c>file</c> doesn't exist.
      * @throws java.io.IOException           thrown when some IOException occurs.
      */
     @Override
-    public DigestResult getDigest(File file) throws FileNotFoundException, IOException
+    public DigestResult getDigest(File file) throws IOException
     {
         if (!file.exists()) {
             throw new FileNotFoundException(file.toString());

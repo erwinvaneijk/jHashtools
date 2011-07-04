@@ -29,6 +29,7 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.utils.OsUtils;
 import org.junit.Test;
 
 import java.io.*;
@@ -67,9 +68,15 @@ public class ConcurrentFileHasherTest
         FileHasher fileHasher = new SerialFileHasher(algorithms);
         DigestResult result = fileHasher.getDigest(stream);
 
-        assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result.getDigest("sha-1").toString());
+        if (!OsUtils.isWindows()) {
+            assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result.getDigest("sha-1").toString());
 
-        assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+        } else {
+            assertEquals("sha1 do not match", "sha-1:e229a5114d7476505210778a5a5fcc94d69e36c1", result.getDigest("sha-1").toString());
+
+            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5").toString());
+        }
     }
 
     @Test
@@ -82,11 +89,16 @@ public class ConcurrentFileHasherTest
         FileHasher fileHasher = new ConcurrentFileHasher(algorithms);
         DigestResult result = fileHasher.getDigest(stream);
 
-        assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result.getDigest("sha-1").toString());
-        
-        assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
-    }
+        if (!OsUtils.isWindows()) {
+            assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result.getDigest("sha-1").toString());
 
+            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+        } else {
+            assertEquals("sha1 do not match", "sha-1:e229a5114d7476505210778a5a5fcc94d69e36c1", result.getDigest("sha-1").toString());
+
+            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5").toString());
+        }
+    }
 
     @Test
     public void testGetDigestOfFileConcurrent() throws NoSuchAlgorithmException, IOException
@@ -97,6 +109,10 @@ public class ConcurrentFileHasherTest
         FileHasher fileHasher = new ConcurrentFileHasher(algorithms);
         DigestResult result = fileHasher.getDigest(stream);
 
-        assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+        if (!OsUtils.isWindows()) {
+            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+        } else {
+            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5").toString());
+        }
     }
 }
