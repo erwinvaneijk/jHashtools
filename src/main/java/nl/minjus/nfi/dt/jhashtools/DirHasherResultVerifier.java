@@ -59,7 +59,7 @@ public class DirHasherResultVerifier
      * Constructor.
      *
      * @param aHasher the hasher to use.
-     * @param thePersistenceStyle the persistencestyle to use.
+     * @param thePersistenceStyle the persistence style to use.
      */
     public DirHasherResultVerifier(DirectoryHasher aHasher, PersistenceStyle thePersistenceStyle)
     {
@@ -82,7 +82,7 @@ public class DirHasherResultVerifier
     /**
      * Generate the digests for all the paths in thePathsToProcess.
      *
-     * @param thePathsToProcess
+     * @param thePathsToProcess which paths should be done.
      */
     public void generateDigests(String[] thePathsToProcess)
     {
@@ -110,7 +110,7 @@ public class DirHasherResultVerifier
     }
 
     /**
-     * Actually perform the verfication phase. Write the output to <c>anOutput<c>.
+     * Actually perform the verification phase. Write the output to <c>anOutput<c>.
      *
      * @param anOutput where to write the output to.
      */

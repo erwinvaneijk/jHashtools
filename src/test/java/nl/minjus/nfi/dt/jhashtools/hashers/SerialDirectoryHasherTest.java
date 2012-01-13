@@ -43,6 +43,7 @@ import static org.junit.Assert.*;
 
 /**
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class SerialDirectoryHasherTest {
     private DirHasherResult knownDigests = null;
     private ExecutorService executorService;
