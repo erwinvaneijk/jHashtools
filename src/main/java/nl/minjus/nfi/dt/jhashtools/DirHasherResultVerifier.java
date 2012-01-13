@@ -149,6 +149,7 @@ public class DirHasherResultVerifier
                     }
                 }
 
+                differences = this.verificationDigests.missing(this.measuredDigests);
                 anOutput.println("These entries are in the "
                         + this.file.getName()
                         + " list, but not in the directory and/or files.");
