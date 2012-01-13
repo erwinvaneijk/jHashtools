@@ -38,6 +38,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
+ * An abstraction for a set of map entries.
+ *
  * @author Erwin van Eijk
  */
 public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>> {
