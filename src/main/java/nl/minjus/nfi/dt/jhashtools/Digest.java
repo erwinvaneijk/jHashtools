@@ -32,12 +32,10 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonValue;
-
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Arrays;
+
+import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 
 /**
  * This class holds some convenience for handling the results delivered
@@ -90,7 +88,6 @@ public class Digest implements Comparable<Digest>
      *
      * @param aValue the value to parse.
      */
-    @JsonCreator
     public Digest(String aValue)
     {
         final String[] parts = aValue.split(":");
@@ -164,7 +161,6 @@ public class Digest implements Comparable<Digest>
      *
      * @return a string.
      */
-    @JsonValue
     public String toString()
     {
         return this.toString(':');

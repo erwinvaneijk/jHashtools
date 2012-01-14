@@ -37,16 +37,14 @@ import java.util.List;
  *
  * @author Erwin van Eijk
  */
-class FileWalker
-{
+class FileWalker {
     private final List<WalkerVisitor> visitors;
     private int visited;
 
     /**
      * Default constructor.
      */
-    public FileWalker()
-    {
+    public FileWalker() {
         this.visitors = new LinkedList<WalkerVisitor>();
     }
 
@@ -55,8 +53,7 @@ class FileWalker
      *
      * @param aVisitor the aVisitor to add.
      */
-    public void addWalkerVisitor(WalkerVisitor aVisitor)
-    {
+    public void addWalkerVisitor(WalkerVisitor aVisitor) {
         this.visitors.add(aVisitor);
     }
 
@@ -65,18 +62,17 @@ class FileWalker
      *
      * @return a list.
      */
-    public final List<WalkerVisitor> getWalkerVisitors()
-    {
+    public final List<WalkerVisitor> getWalkerVisitors() {
         return this.visitors;
     }
 
     /**
      * Starting at startPath, find all files that are 'under' there.
+     *
      * @param aStartPath
      * @return
      */
-    public int walk(File aStartPath)
-    {
+    public int walk(File aStartPath) {
         this.visited = 0;
         this.walkTheFile(aStartPath);
         return this.visited;
@@ -87,31 +83,32 @@ class FileWalker
      *
      * @return an int.
      */
-    public int getVisited()
-    {
+    public int getVisited() {
         return this.visited;
     }
 
-    private void walkTheFile(File aPath)
-    {
-        if (!aPath.exists()) {
-            return;
-        }
-        if (aPath.isFile()) {
-            fireVisitorsWith(aPath);
-        } else if (aPath.isDirectory()) {
-            for (File child : aPath.listFiles()) {
-                if (child.isFile()) {
-                    fireVisitorsWith(child);
-                } else {
-                    walkTheFile(child);
+    private void walkTheFile(File aPath) {
+        try {
+            if (!aPath.exists()) {
+                return;
+            }
+            if (aPath.isFile()) {
+                fireVisitorsWith(aPath);
+            } else if (aPath.isDirectory()) {
+                for (File child : aPath.listFiles()) {
+                    if (child.isFile()) {
+                        fireVisitorsWith(child);
+                    } else {
+                        walkTheFile(child);
+                    }
                 }
             }
+        } catch (InterruptedException e) {
+            // pass
         }
     }
 
-    private void fireVisitorsWith(File aFile)
-    {
+    private void fireVisitorsWith(File aFile) throws InterruptedException {
         for (WalkerVisitor visitor : this.visitors) {
             visitor.visit(aFile);
         }
