@@ -35,8 +35,6 @@ public final class StringOperations
 {
 
     private static final String HEXES = "0123456789abcdef";
-    private static final char[] THE_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
-            'b', 'c', 'd', 'e', 'f', };
 
     /**
      * Create a base-16 encoding of the given raw bytes.

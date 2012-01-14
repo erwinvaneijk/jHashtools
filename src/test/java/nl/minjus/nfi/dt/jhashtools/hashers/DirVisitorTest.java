@@ -99,7 +99,7 @@ public class DirVisitorTest {
     @Test
     public void testVisitNonExistantAlgorithm() {
         try {
-            DirectoryVisitor instance = new DirectoryVisitor(DigestAlgorithmFactory.create("sha-345"));
+            new DirectoryVisitor(DigestAlgorithmFactory.create("sha-345"));
             fail("We should have an NoSuchAlgorithmException");
         } catch (NoSuchAlgorithmException ex) {
             // pass

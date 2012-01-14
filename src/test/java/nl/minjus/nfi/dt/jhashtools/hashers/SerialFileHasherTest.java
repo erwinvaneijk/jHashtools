@@ -28,15 +28,15 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.security.NoSuchAlgorithmException;
 
-import static junit.framework.Assert.*;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+
+import org.junit.Test;
 
 /**
  * @author Erwin van Eijk

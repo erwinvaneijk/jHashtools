@@ -47,6 +47,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7.1</version>
                 <configuration>
                     <excludes>
                         <exclude>**/Abstract*</exclude>
@@ -55,6 +56,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -87,7 +89,7 @@
                                     <manifestEntries>
                                         <Main-Class>nl.minjus.nfi.dt.jhashtools.App</Main-Class>
                                         <Implementation-Build>${buildNumber}</Implementation-Build>
-                                        <Implementation-Version>${version}</Implementation-Version>
+                                        <Implementation-Version>${project.version}</Implementation-Version>
                                         <Build-Number>${buildNumber}</Build-Number>
                                     </manifestEntries>
                                 </transformer>
@@ -99,6 +101,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5.1</version>
                 <configuration>
                     <instrumentation>
                         <ignores>
@@ -144,7 +147,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.4</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
@@ -172,9 +175,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
-                <version>1.0</version>
+                <version>3.3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -220,7 +223,12 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.0.1</version>
+            <version>3.3</version>
+        </dependency>
+        <dependency>
+        	<groupId>bouncycastle</groupId>
+        	<artifactId>bcprov-jdk16</artifactId>
+        	<version>140</version>
         </dependency>
     </dependencies>
     <reporting>
@@ -228,6 +236,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.8</version>
                 <configuration>
                     <configLocation>${basedir}/checkstyle_checks.xml</configLocation>
                 </configuration>
@@ -235,6 +244,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5.1</version>
                 <configuration>
                     <formats>
                         <format>html</format>

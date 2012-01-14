@@ -30,17 +30,16 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 /**
- * Created by IntelliJ IDEA.
- * User: eijk
- * Date: Nov 21, 2010
- * Time: 6:12:47 PM
- * To change this template use File | Settings | File Templates.
+ * Where all the digests are managed.
  */
 public class DigestMask {
     private static DigestMask instance;
@@ -59,12 +58,15 @@ public class DigestMask {
 
     static {
         try {
+        	Security.addProvider(new BouncyCastleProvider());
+        	
             masks.put(MessageDigest.getInstance("md5").getAlgorithm(), MD5_ALGORITHM);
             masks.put(MessageDigest.getInstance("sha-1").getAlgorithm(), SHA1_ALGORITHM_MASK);
             masks.put("sha-1", SHA1_ALGORITHM_MASK);            
             masks.put(MessageDigest.getInstance("sha-256").getAlgorithm(), SHA256_ALGORITHM_MASK);
             masks.put(MessageDigest.getInstance("sha-384").getAlgorithm(), SHA384_ALGORITHM_MASK);
             masks.put(MessageDigest.getInstance("sha-512").getAlgorithm(), SHA512_ALGORITHM_MASK);
+            masks.put(MessageDigest.getInstance("ripemd160").getAlgorithm(), RIPEMD_ALGORITHM_MASK);
             masks.put("crc", CRC_ALGORITHM);
 
             reverseMasks.put(MD5_ALGORITHM, MessageDigest.getInstance("md5").getAlgorithm());
@@ -72,6 +74,7 @@ public class DigestMask {
             reverseMasks.put(SHA256_ALGORITHM_MASK, MessageDigest.getInstance("sha-256").getAlgorithm());
             reverseMasks.put(SHA384_ALGORITHM_MASK, MessageDigest.getInstance("sha-384").getAlgorithm());
             reverseMasks.put(SHA512_ALGORITHM_MASK, MessageDigest.getInstance("sha-512").getAlgorithm());
+            reverseMasks.put(RIPEMD_ALGORITHM_MASK, MessageDigest.getInstance("ripemd160").getAlgorithm());
             reverseMasks.put(CRC_ALGORITHM, "crc");
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);

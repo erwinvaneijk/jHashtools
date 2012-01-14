@@ -49,7 +49,7 @@ import java.util.Map;
 class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
 {
     /**
-     * Deserialize a DirHasherResult.
+     * DeSerialize a DirHasherResult.
      *
      * @param aJsonParser             the JsonParser to use.
      * @param aDeserializationContext the current context.
@@ -58,7 +58,8 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
      *
      * @throws IOException when the requested IO cannot be performed.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public DirHasherResult deserialize(final JsonParser aJsonParser,
                                        final DeserializationContext aDeserializationContext)
             throws IOException

@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * This class implements a Comparator for File where each file is deemed the same of the path would point to the same

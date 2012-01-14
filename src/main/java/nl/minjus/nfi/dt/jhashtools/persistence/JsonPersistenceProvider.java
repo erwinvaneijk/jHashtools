@@ -80,7 +80,6 @@ public class JsonPersistenceProvider implements PersistenceProvider
         }
     }
 
-    @SuppressWarnings({"unchecked"})
     @Override
     public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException
     {
@@ -91,7 +90,8 @@ public class JsonPersistenceProvider implements PersistenceProvider
         }
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException
     {
         try {

@@ -28,14 +28,13 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
  * FIXME:

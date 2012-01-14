@@ -33,25 +33,26 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  *
@@ -157,7 +158,7 @@ public class FileHasherTest {
     public void testFileHasherUnknownFile() {
         try {
             FileHasher h = new SerialFileHasher(DigestAlgorithmFactory.create("md5"));
-            DigestResult d = h.getDigest(new File("Does not exist"));
+            h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
         } catch (FileNotFoundException ex) {
             // pass
@@ -172,7 +173,7 @@ public class FileHasherTest {
     public void testFileHasherUnknownFileConcurrent() {
         try {
             FileHasher h = new ConcurrentFileHasher(DigestAlgorithmFactory.create("md5"));
-            DigestResult d = h.getDigest(new File("Does not exist"));
+            h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
         } catch (FileNotFoundException ex) {
             // pass

@@ -28,14 +28,8 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
@@ -47,8 +41,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.Executors;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
+
+import org.junit.Test;
 
 public class IntegrationTest {
 

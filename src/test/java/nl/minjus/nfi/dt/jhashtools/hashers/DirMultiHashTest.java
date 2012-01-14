@@ -71,7 +71,6 @@ public class DirMultiHashTest {
     public void tearDown() {
     }
 
-    @SuppressWarnings({"MethodWithMultipleLoops"})
     @Test
     public void testGetDigests() {
         DirectoryHasher directoryHasher = new SerialDirectoryHasher();

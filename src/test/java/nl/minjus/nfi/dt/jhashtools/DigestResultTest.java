@@ -64,26 +64,23 @@ public class DigestResultTest {
     public void tearDown() {
     }
 
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Test
     public void testGetHexDigest() {
         DigestResult d = new DigestResult(new Digest("crc", "1111"));
         assertEquals("1111", d.getHexDigest("crc"));
     }
 
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     @Test
     public void testGetDigest() {
         DigestResult dr = new DigestResult();
         try {
-            Digest d = dr.getDigest("gpg");
+            dr.getDigest("gpg");
             fail("Should have thrown AlgorithmNotFound");
         } catch (AlgorithmNotFoundException ex) {
             // pass
         }
     }
 
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     @Test
     public void testEmptyDigestResult() {
         DigestResult dr = new DigestResult();

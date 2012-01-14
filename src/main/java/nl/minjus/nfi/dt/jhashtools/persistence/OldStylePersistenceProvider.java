@@ -79,7 +79,8 @@ public class OldStylePersistenceProvider implements PersistenceProvider
         throw new PersistenceException("Currently the use of TypeReference is not supported for oldstyle files");
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException
     {
         if (clazz.equals(DirHasherResult.class)) {

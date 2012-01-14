@@ -30,8 +30,6 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import org.junit.Test;
 
-import java.util.Set;
-
 /**
  * @author Erwin van Eijk
  */

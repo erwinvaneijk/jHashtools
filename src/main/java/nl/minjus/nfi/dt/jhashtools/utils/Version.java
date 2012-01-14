@@ -47,7 +47,7 @@ public class Version
      */
     public static String getVersion()
     {
-        final Class clazz = Version.class;
+        final Class<Version> clazz = Version.class;
         final String className = clazz.getSimpleName();
         final String classFileName = className + ".class";
         final String pathToClass = clazz.getResource(classFileName).toString();

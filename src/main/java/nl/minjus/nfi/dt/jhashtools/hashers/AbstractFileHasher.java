@@ -27,9 +27,6 @@
  */
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,13 +36,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+
 /**
  * @author Erwin van Eijk
  */
 abstract class AbstractFileHasher implements FileHasher
 {
     public static final int BLOCK_READ_SIZE = 1024 * 1024;
-    private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
+    @SuppressWarnings("unused")
+	private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
     protected Collection<DigestAlgorithm> digests;
 
     public AbstractFileHasher()

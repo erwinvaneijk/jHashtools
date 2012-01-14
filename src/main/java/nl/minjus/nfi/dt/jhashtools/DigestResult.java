@@ -43,7 +43,15 @@ import java.util.TreeSet;
  */
 public class DigestResult extends TreeSet<Digest>
 {
-    private int containedDigestMask = 0;
+    /**
+	 * Generated serial id.
+	 */
+	private static final long serialVersionUID = 8846362968322773564L;
+	
+	/**
+	 * The mask that indicates the digests that are supported.
+	 */
+	private int containedDigestMask = 0;
 
     public DigestResult()
     {
@@ -66,7 +74,7 @@ public class DigestResult extends TreeSet<Digest>
     }
 
     public boolean add(Digest value) {
-        containedDigestMask = this.updateAlgorithmMask(containedDigestMask, value.getAlgorithm());
+        containedDigestMask = DigestResult.updateAlgorithmMask(containedDigestMask, value.getAlgorithm());
         return super.add(value);
     }
 

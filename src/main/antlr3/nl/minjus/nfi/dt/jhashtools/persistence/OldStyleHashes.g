@@ -6,10 +6,8 @@ options {
 }
 	
 @parser::header { package nl.minjus.nfi.dt.jhashtools.persistence; 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.Digest;
-import java.util.AbstractMap;
+
 }
 
 @lexer::header {  package nl.minjus.nfi.dt.jhashtools.persistence;

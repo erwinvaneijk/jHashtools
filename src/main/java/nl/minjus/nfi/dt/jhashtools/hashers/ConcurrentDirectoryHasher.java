@@ -95,7 +95,6 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        Collection<Thread> threads = new LinkedList<Thread>();
         Vector<BlockingQueue<File>> queues = new Vector<BlockingQueue<File>>(MAX_THREADS);
         for (int i=0; i<MAX_THREADS; i++) {
             queues.add(i, new LinkedBlockingQueue<File>(32));
@@ -113,7 +112,8 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
         Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
         for (int i = 0; i < MAX_THREADS; i++) {
             try {
-                FileHasher fileHasher = new FileHasherCreator().create(this.executorService, this.algorithms);
+                new FileHasherCreator();
+				FileHasher fileHasher = FileHasherCreator.create(this.executorService, this.algorithms);
                 computeTasks.add(completionService.submit(new FileDigestComputeTask(queues.get(i), fileHasher, currentState)));
             } catch (NoSuchAlgorithmException e) {
                 LOG.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);

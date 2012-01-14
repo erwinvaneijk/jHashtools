@@ -48,7 +48,6 @@ public class KnownDigests {
      *
      * @return a DirHasherResult.
      */
-    @SuppressWarnings({"OverlyLongMethod"})
     public static DirHasherResult getKnownResults() {
         DirHasherResult knownResults = new DirHasherResult();
 

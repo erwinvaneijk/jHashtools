@@ -56,8 +56,6 @@ import static org.junit.Assert.*;
  */
 public class JsonPersisterTest {
 
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private String testDigestInJson;
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;
 
@@ -71,7 +69,6 @@ public class JsonPersisterTest {
 
     @Before
     public void setUp() {
-        this.testDigestInJson = "\"sha-1:0000111122223333444455556666777788889999aaaa\"";
         this.testDigestResultInJson = "[\"sha-1:0000111122223333444455556666777788889999aaaa\"]";
         this.testDirHasherResultInJson = "{\"constructionInfo\":{\"constructionDate\":1273412558116,\"operatingSystem\":\"Mac OS X:10.6.3\",\"versionInformation\":\"1.0-unknown\",\"username\":\"eijk\"},\"content\":{\"myfile\":[\"sha-1:0000111122223333444455556666777788889999aaaa\"]}}";
     }

@@ -36,6 +36,11 @@ package nl.minjus.nfi.dt.jhashtools.exceptions;
  * To change this template use File | Settings | File Templates.
  */
 public class NoMatchingAlgorithmsError extends RuntimeException {
-    public NoMatchingAlgorithmsError() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6496500981728230325L;
+
+	public NoMatchingAlgorithmsError() {
     }
 }

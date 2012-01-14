@@ -28,24 +28,30 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
-import nl.minjus.nfi.dt.jhashtools.hashers.FileHasher;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
-import nl.minjus.nfi.dt.jhashtools.utils.Version;
-import org.apache.commons.cli.*;
+import static java.util.logging.Logger.getLogger;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.util.logging.Logger.getLogger;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
+import nl.minjus.nfi.dt.jhashtools.utils.Version;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 
 /**
  * Entrypoint of the cli version of the tooling.
@@ -193,8 +199,8 @@ public class App
         return directoryHasher;
     }
 
-    @SuppressWarnings({"static-access", "AccessStaticViaInstance"})
-    private static CommandLine getCommandLine(final String[] theArguments)
+    @SuppressWarnings("static-access")
+	private static CommandLine getCommandLine(final String[] theArguments)
     {
         CommandLineParser parser = new PosixParser();
 

@@ -28,14 +28,12 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import java.io.File;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 abstract class AbstractDirectoryHasher implements DirectoryHasher
 {

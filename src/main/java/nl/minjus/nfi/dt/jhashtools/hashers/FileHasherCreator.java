@@ -107,7 +107,8 @@ public class FileHasherCreator
     public static DigestResult computeDigest(File file, DigestAlgorithm algorithm)
             throws IOException, NoSuchAlgorithmException
     {
-        FileHasher hasher = new FileHasherCreator().create(null, algorithm);
+        new FileHasherCreator();
+		FileHasher hasher = FileHasherCreator.create(null, algorithm);
         return hasher.getDigest(file);
     }
 
@@ -123,7 +124,8 @@ public class FileHasherCreator
     public static DigestResult computeDigest(File file, Collection<DigestAlgorithm> algorithms)
             throws IOException, NoSuchAlgorithmException
     {
-        FileHasher hasher = new FileHasherCreator().create(null, algorithms);
+        new FileHasherCreator();
+		FileHasher hasher = FileHasherCreator.create(null, algorithms);
         return hasher.getDigest(file);
     }
 
