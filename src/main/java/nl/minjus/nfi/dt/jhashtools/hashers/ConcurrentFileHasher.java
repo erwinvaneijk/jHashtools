@@ -46,12 +46,17 @@ import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
+/**
+ * Compute file hashes with multiple threads.
+ *
+ * @author Erwin van Eijk
+ */
 public class ConcurrentFileHasher extends AbstractFileHasher
 {
     private static final Logger LOG = Logger.getLogger(ConcurrentFileHasher.class.getName());
 
-    private ExecutorService executorService;
-    private Exchanger<ByteBuffer> exchanger;
+    private final ExecutorService executorService;
+    private final Exchanger<ByteBuffer> exchanger;
 
     public ConcurrentFileHasher()
     {
@@ -77,20 +82,23 @@ public class ConcurrentFileHasher extends AbstractFileHasher
     /**
      * Compute the digest(s) for the contents of the file.
      *
-     * @param file the File to compute the digests for.
+     * @param file
+     *            the File to compute the digests for.
      *
      * @return a DigestResult containing the result of the computation.
      *
-     * @throws java.io.FileNotFoundException thrown when <c>file<c> doesn't exist.
-     * @throws java.io.IOException           thrown when some IOException occurs.
+     * @throws java.io.FileNotFoundException
+     *             thrown when <c>file<c> doesn't exist.
+     * @throws java.io.IOException
+     *             thrown when some IOException occurs.
      */
-    public final DigestResult getDigest(final File file) throws IOException
-    {
+    @Override
+    public final DigestResult getDigest(final File file) throws IOException {
         if (!file.exists()) {
             throw new FileNotFoundException(String.format("File %s does not exist", file.toString()));
         }
 
-        FileInputStream stream = new FileInputStream(file);
+        final FileInputStream stream = new FileInputStream(file);
         try {
             return getDigest(stream);
         } finally {
@@ -98,12 +106,12 @@ public class ConcurrentFileHasher extends AbstractFileHasher
         }
     }
 
-    public DigestResult getDigest(InputStream stream) throws IOException
-    {
+    @Override
+    public DigestResult getDigest(final InputStream stream) throws IOException {
         try {
-            Future<DigestResult> digestComputerThread =
-                            executorService.submit(new DigestComputerThread(this.digests, this.exchanger));
-            
+            final Future<DigestResult> digestComputerThread = executorService
+                .submit(new DigestComputerThread(this.getDigests(), this.exchanger));
+
             int bytesRead;
             byte[] buf = new byte[BLOCK_READ_SIZE];
             ByteBuffer buffer = ByteBuffer.wrap(buf);
@@ -121,9 +129,9 @@ public class ConcurrentFileHasher extends AbstractFileHasher
             // Notify the digesting thread that we're finished.
             exchanger.exchange(null);
             return digestComputerThread.get();
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             LOG.log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
+        } catch (final ExecutionException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
         return null;

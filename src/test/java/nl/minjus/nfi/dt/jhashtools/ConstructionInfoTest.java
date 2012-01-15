@@ -41,12 +41,14 @@ import java.util.Calendar;
 import static org.junit.Assert.*;
 
 /**
- *
+ * 
  * @author kojak
  */
-public class ConstructionInfoTest {
+public class ConstructionInfoTest
+{
 
-    public ConstructionInfoTest() {
+    public ConstructionInfoTest()
+    {
     }
 
     @Before

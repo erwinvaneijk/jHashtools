@@ -28,11 +28,12 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import org.codehaus.jackson.type.TypeReference;
-
 import java.io.OutputStream;
 import java.io.Reader;
+
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+
+import org.codehaus.jackson.type.TypeReference;
 
 /**
  * This interface can be used to do persistence.
@@ -45,36 +46,45 @@ public interface PersistenceProvider
 {
 
     /**
-     * Persist the content of <c>obj</c> to <c>out</c>.
+     * Persist the content of <code>obj</code> to <code>out</code>.
      *
-     * @param out The stream to send the output to
-     * @param obj the object to persist.
+     * @param out
+     *            The stream to send the output to
+     * @param obj
+     *            the object to persist.
      *
-     * @throws PersistenceException thrown when a problem occurs when persisting the data.
+     * @throws PersistenceException
+     *             thrown when a problem occurs when persisting the data.
      */
-    public void persist(OutputStream out, Object obj) throws PersistenceException;
+    void persist(OutputStream out, Object obj) throws PersistenceException;
 
     /**
-     * UnPersist the content of <c>obj</c> from <c>reader</c>.
+     * UnPersist the content of <code>obj</code> from <code>reader</code>.
      *
-     * @param reader A Reader to read the content from.
-     * @param clazz  The class to finally deliver.
+     * @param reader
+     *            A Reader to read the content from.
+     * @param clazz
+     *            The class to finally deliver.
      *
      * @return an instance of clazz or null.
      *
-     * @throws PeristenceException when an error occurrs with parsing the reader.
+     * @throws PeristenceException
+     *             when an error occurrs with parsing the reader.
      */
-    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException;
+    <T> T load(Reader reader, Class<T> clazz) throws PersistenceException;
 
     /**
-     * UnPersist the content of <c>obj</c> from <c>reader</c>.
+     * UnPersist the content of <code>obj</code> from <code>reader</code>.
      *
-     * @param reader A Reader to read the content from.
-     * @param type   The type of the class to finally deliver.
+     * @param reader
+     *            A Reader to read the content from.
+     * @param type
+     *            The type of the class to finally deliver.
      *
      * @return an instance of clazz or null.
      *
-     * @throws PeristenceException when an error occurrs with parsing the reader.
+     * @throws PeristenceException
+     *             when an error occurrs with parsing the reader.
      */
-    public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException;
+    <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException;
 }

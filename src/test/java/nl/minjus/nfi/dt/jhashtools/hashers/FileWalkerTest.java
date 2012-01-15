@@ -40,12 +40,14 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 
 /**
- *
+ * 
  * @author kojak
  */
-public class FileWalkerTest {
+public class FileWalkerTest
+{
 
-    public FileWalkerTest() {
+    public FileWalkerTest()
+    {
     }
 
     @BeforeClass
@@ -88,10 +90,12 @@ public class FileWalkerTest {
         assertEquals(expResult, result);
     }
 
-    class WalkerVisitorImpl implements WalkerVisitor {
+    class WalkerVisitorImpl implements WalkerVisitor
+    {
         private int number;
 
-        public WalkerVisitorImpl() {
+        public WalkerVisitorImpl()
+        {
             this.number = 0;
         }
 

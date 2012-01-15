@@ -40,12 +40,14 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
- *
+ * 
  * @author Erwin van Eijk
  */
-public class DigestResultTest {
+public class DigestResultTest
+{
 
-    public DigestResultTest() {
+    public DigestResultTest()
+    {
     }
 
     @BeforeClass
@@ -109,8 +111,8 @@ public class DigestResultTest {
         assertTrue(o.matches(dr));
 
         o = new DigestResult(new Digest("md5", "deadbeefdeadbeefdeadbeefdeaddead"));
-        assertTrue(! dr.matches(o));
-        assertTrue(! o.matches(dr));
+        assertTrue(!dr.matches(o));
+        assertTrue(!o.matches(dr));
 
         o = new DigestResult(new Digest("sha-1", "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"));
         try {

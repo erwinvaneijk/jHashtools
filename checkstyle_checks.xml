@@ -44,10 +44,6 @@
 
     <property name="severity" value="error"/>
 
-    <module name="SuppressionFilter">
-        <property name="file" value="suppressions.xml"/>
-    </module>
-
     <module name="JavadocPackage">
         <property name="allowLegacy" value="false"/>
     </module>
@@ -58,12 +54,6 @@
 
     <module name="FileLength">
         <property name="fileExtensions" value="java"/>
-    </module>
-
-    <module name="Header">
-        <property name="headerFile" value="java.header"/>
-        <property name="fileExtensions" value="java"/>
-        <property name="id" value="header"/>
     </module>
 
     <module name="RegexpSingleline">
@@ -83,7 +73,6 @@
 
         <module name="IllegalCatch"/>
         <module name="ImportControl">
-            <property name="file" value="import_control.xml"/>
         </module>
         <module name="IllegalImport"/>
         <module name="IllegalInstantiation"/>
@@ -98,8 +87,6 @@
             <property name="excludeScope" value="private"/>
         </module>
         <module name="JavadocVariable">
-            <property name="scope" value="public"/>
-            <property name="scope" value="protected"/>
         </module>
         <module name="JavadocStyle">
             <property name="scope" value="public"/>

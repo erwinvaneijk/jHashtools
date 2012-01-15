@@ -29,18 +29,16 @@
 package nl.minjus.nfi.dt.jhashtools.exceptions;
 
 /**
- * Created by IntelliJ IDEA.
- * User: eijk
- * Date: Nov 21, 2010
- * Time: 6:04:54 PM
- * To change this template use File | Settings | File Templates.
+ * Exception to be thrown when the requested algorithm cannot be found.
  */
-public class NoMatchingAlgorithmsError extends RuntimeException {
+public class NoMatchingAlgorithmsError extends RuntimeException
+{
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6496500981728230325L;
+     * Serial version.
+     */
+    private static final long serialVersionUID = -6496500981728230325L;
 
-	public NoMatchingAlgorithmsError() {
+    public NoMatchingAlgorithmsError()
+    {
     }
 }

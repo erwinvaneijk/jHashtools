@@ -40,15 +40,27 @@ import java.util.Map;
  */
 class FileComparator implements Comparator<File>
 {
-	private static Map<File, String> filenameCache = 
-		new LinkedHashMap<File, String>(1024, 0.75f, true) {
-			// (an anonymous inner class)
-	      	private static final long serialVersionUID = 1;
-	      	@Override protected boolean removeEldestEntry (Map.Entry<File,String> eldest) {
-	      		return size() > 1024; 
-	      	}
-		};
-	
+    private static final float CACHE_FILL_PERCENTAGE = 0.75f;
+
+    private static final int DEFAULT_FILENAME_CACHE_SIZE = 1024;
+
+    /**
+     * A cache for the filenames, to save a lot of lookups.
+     */
+    private static Map<File, String> filenameCache = new LinkedHashMap<File, String>(
+        DEFAULT_FILENAME_CACHE_SIZE, CACHE_FILL_PERCENTAGE, true)
+    {
+        private static final long serialVersionUID = 1;
+
+        @Override
+        protected boolean removeEldestEntry(final Map.Entry<File, String> eldest) {
+            return size() > DEFAULT_FILENAME_CACHE_SIZE;
+        }
+    };
+
+    /**
+     * true if we ignore the case in the names that pass by.
+     */
     private boolean ignoreCase;
 
     public FileComparator()
@@ -61,22 +73,19 @@ class FileComparator implements Comparator<File>
         this.ignoreCase = isIgnoringCase;
     }
 
-    public void setIgnoreCase(boolean ignoreCase)
-    {
+    public void setIgnoreCase(boolean ignoreCase) {
         this.ignoreCase = ignoreCase;
     }
 
-    public boolean isIgnoringCase()
-    {
+    public boolean isIgnoringCase() {
         return this.ignoreCase;
     }
 
     @Override
-    public int compare(File o1, File o2)
-    {
+    public int compare(File o1, File o2) {
         try {
-            String filename1 = getCanonicalPath(o1);
-            String filename2 = getCanonicalPath(o2);
+            final String filename1 = getCanonicalPath(o1);
+            final String filename2 = getCanonicalPath(o2);
             if (this.isIgnoringCase()) {
                 return filename1.compareToIgnoreCase(filename2);
             } else {
@@ -86,15 +95,15 @@ class FileComparator implements Comparator<File>
             return o1.compareTo(o2);
         }
     }
-    
+
     private String getCanonicalPath(File file) throws IOException {
-    	String path = filenameCache.get(file);
-    	if (path == null) {
-    		path = file.getCanonicalPath();
-    		filenameCache.put(file, path);
-    		return path;
-    	} else {
-    		return path;
-    	}
+        String path = filenameCache.get(file);
+        if (path == null) {
+            path = file.getCanonicalPath();
+            filenameCache.put(file, path);
+            return path;
+        } else {
+            return path;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package nl.minjus.nfi.dt.jhashtools.utils;
 
-public final class OsUtils {
+public final class OsUtils
+{
     private static String OS = null;
 
     public static String getOsName() {
@@ -19,6 +20,6 @@ public final class OsUtils {
     }
 
     public static boolean isMac() {
-         return getOsName().toLowerCase().startsWith("mac");
+        return getOsName().toLowerCase().startsWith("mac");
     }
 }

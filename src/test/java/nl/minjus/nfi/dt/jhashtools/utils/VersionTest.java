@@ -32,14 +32,16 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class VersionTest {
+public class VersionTest
+{
 
     @Test
     public void testGetVersion() {
         String version = Version.getVersion();
         // FIXME
         // The following test is WRONG. It should NOT return 1.0-unknown,
-        // but since the versioninfo is derived from the Manifest.mf, that is only
+        // but since the versioninfo is derived from the Manifest.mf, that is
+        // only
         // present in the jar-file, which is not there (yet) when this test is
         // run. Currently I have no way of overcoming that obstacle.
         assertEquals("Version should be ", "1.0-unknown", version);

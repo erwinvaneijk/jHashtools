@@ -38,14 +38,16 @@ import java.security.NoSuchAlgorithmException;
 import static org.junit.Assert.*;
 
 /**
- *
+ * 
  * @author kojak
  */
-public class DirHasherTest {
+public class DirHasherTest
+{
 
     private DirHasherResult knownDigests;
 
-    public DirHasherTest() {
+    public DirHasherTest()
+    {
     }
 
     @BeforeClass
@@ -59,7 +61,7 @@ public class DirHasherTest {
     @Before
     public void setUp() {
         knownDigests = KnownDigests.getKnownResults();
-    }                  
+    }
 
     @After
     public void tearDown() {
@@ -74,8 +76,7 @@ public class DirHasherTest {
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -90,8 +91,7 @@ public class DirHasherTest {
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -103,11 +103,9 @@ public class DirHasherTest {
             DirHasherResult digests = new DirHasherResult();
             directoryHasher.updateDigests(digests, new File("does-not-exist-testdata"));
             fail("An IllegalArgumentException should have been thrown");
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // this is ok!
         }
     }
@@ -119,8 +117,7 @@ public class DirHasherTest {
             assertEquals("initially no verbose behaviour", false, directoryHasher.isVerbose());
             directoryHasher.setVerbose(true);
             assertTrue(directoryHasher.isVerbose());
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -135,8 +132,7 @@ public class DirHasherTest {
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             assertEquals(digests, digests.intersect(knownDigests));
             assertEquals(digests, knownDigests.intersect(digests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -149,8 +145,7 @@ public class DirHasherTest {
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(0, digests.exclude(knownDigestSha256).size());
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -164,8 +159,7 @@ public class DirHasherTest {
             DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
             assertEquals(knownDigestMd5, digests.intersect(knownDigestMd5));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -179,8 +173,7 @@ public class DirHasherTest {
             DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
             assertEquals(knownDigestSha, digests.intersect(knownDigestSha));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -200,8 +193,7 @@ public class DirHasherTest {
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             intersected = digests.intersect(knownDigestSha256);
             assertEquals(knownDigestSha256, intersected);
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -222,8 +214,7 @@ public class DirHasherTest {
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             intersected = digests.intersect(knownDigestSha256);
             assertEquals(knownDigestSha256, intersected);
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -237,8 +228,7 @@ public class DirHasherTest {
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -250,11 +240,9 @@ public class DirHasherTest {
             DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // everything is ok.
         }
     }

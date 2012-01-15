@@ -37,7 +37,8 @@ import java.io.*;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
-public class OldStylePersistenceProviderTest {
+public class OldStylePersistenceProviderTest
+{
 
     @Test
     public void testLoadFile() {
@@ -48,11 +49,15 @@ public class OldStylePersistenceProviderTest {
             DirHasherResult result = (DirHasherResult) provider.load(input, DirHasherResult.class);
             assert result != null;
             assertEquals(4, result.size());
-            assertEquals("md5:a4850cd827a34a7e54dacf6814e06f55", result.get(new File("hashtree256.py")).getDigest("md5").toString());
-            assertEquals("sha-1:23e7ace892b507b07e4dfcf1f028ee3130bc682e", result.get(new File("hashtree256.py")).getDigest("sha-1").toString());
+            assertEquals("md5:a4850cd827a34a7e54dacf6814e06f55", result.get(new File("hashtree256.py"))
+                .getDigest("md5").toString());
+            assertEquals("sha-1:23e7ace892b507b07e4dfcf1f028ee3130bc682e",
+                result.get(new File("hashtree256.py")).getDigest("sha-1").toString());
 
-            assertEquals("md5:44af6da725a24c2d8363a42069ee110f", result.get(new File("shatest.py")).getDigest("md5").toString());
-            assertEquals("sha-256:b7e94899a85df9809030e8ede16b857e90d886279dc1d3d14562142c9303dc39", result.get(new File("shatest.py")).getDigest("sha-256").toString());
+            assertEquals("md5:44af6da725a24c2d8363a42069ee110f", result.get(new File("shatest.py"))
+                .getDigest("md5").toString());
+            assertEquals("sha-256:b7e94899a85df9809030e8ede16b857e90d886279dc1d3d14562142c9303dc39", result
+                .get(new File("shatest.py")).getDigest("sha-256").toString());
 
         } catch (IOException ex) {
             fail("We got an IOException. Wrong.");

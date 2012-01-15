@@ -28,12 +28,16 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
  * This class computes digests of files without using multi threading.
@@ -46,54 +50,55 @@ class SerialFileHasher extends AbstractFileHasher
         super();
     }
 
-    public SerialFileHasher(DigestAlgorithm digest) throws NoSuchAlgorithmException
+    public SerialFileHasher(final DigestAlgorithm digest) throws NoSuchAlgorithmException
     {
         super(digest);
     }
 
-    public SerialFileHasher(Collection<DigestAlgorithm> digests) throws NoSuchAlgorithmException
+    public SerialFileHasher(final Collection<DigestAlgorithm> digests) throws NoSuchAlgorithmException
     {
         super(digests);
     }
 
-
     /**
      * Compute the digest(s) for the contents of the file.
      *
-     * @param file the File to compute the digests for.
+     * @param file
+     *            the File to compute the digests for.
      *
      * @return a DigestResult containing the result of the computation.
      *
-     * @throws java.io.IOException           thrown when some IOException occurs.
+     * @throws java.io.IOException
+     *             thrown when some IOException occurs.
      */
     @Override
-    public DigestResult getDigest(File file) throws IOException
-    {
+    public DigestResult getDigest(final File file) throws IOException {
         if (!file.exists()) {
             throw new FileNotFoundException(file.toString());
         }
-        FileInputStream inputStream = new FileInputStream(file);
+        final FileInputStream inputStream = new FileInputStream(file);
         return getDigest(inputStream);
     }
-
 
     /**
      * Compute the digest(s) for the contents of the file.
      *
-     * @param stream the stream to read.
+     * @param stream
+     *            the stream to read.
      *
      * @return the resulting digests.
      *
-     * @throws java.io.IOException when things go wrong with the IO.
+     * @throws java.io.IOException
+     *             when things go wrong with the IO.
      */
-    public DigestResult getDigest(InputStream stream) throws IOException
-    {
-        Collection<MessageDigest> digestInstances = this.getMessageDigests();
+    @Override
+    public DigestResult getDigest(final InputStream stream) throws IOException {
+        final Collection<MessageDigest> digestInstances = this.getMessageDigests();
+        final byte[] buf = new byte[BLOCK_READ_SIZE];
         int bytesRead;
-        byte[] buf = new byte[BLOCK_READ_SIZE];
         bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);
         while (bytesRead > 0) {
-            for (MessageDigest digest : digestInstances) {
+            for (final MessageDigest digest : digestInstances) {
                 digest.update(buf, 0, bytesRead);
             }
             bytesRead = stream.read(buf, 0, BLOCK_READ_SIZE);

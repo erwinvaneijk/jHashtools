@@ -42,15 +42,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- *
+ * 
  * @author Erwin van Eijk
  */
-public class DirHasherResultTest {
+public class DirHasherResultTest
+{
 
     public DirHasherResult setOne;
     public DirHasherResult setTwo;
 
-    public DirHasherResultTest() {
+    public DirHasherResultTest()
+    {
     }
 
     @BeforeClass
@@ -144,7 +146,7 @@ public class DirHasherResultTest {
         assertEquals(setOne, setTwo);
         assertEquals(setTwo, setOne);
     }
-    
+
     @Test
     public void testIntersect() {
         DirHasherResult result = setOne.intersect(setTwo);
@@ -160,7 +162,8 @@ public class DirHasherResultTest {
         setTwo.put(new File("." + File.separator + "four"), new DigestResult(new Digest("crc", "2222")));
 
         setOne.put(new File("." + File.separator + "five"), new DigestResult(new Digest("crc", "2222")));
-        setTwo.put(new File(System.getProperty("user.dir") + File.separator + "five"), new DigestResult(new Digest("crc", "2222")));
+        setTwo.put(new File(System.getProperty("user.dir") + File.separator + "five"), new DigestResult(
+            new Digest("crc", "2222")));
 
         assertEquals(setOne, setTwo);
     }
@@ -198,7 +201,7 @@ public class DirHasherResultTest {
         DirHasherResult result = setOne.intersect(setTwo);
 
         assertEquals(3, result.size());
-        assertTrue(! result.containsKey(new File("four")));
+        assertTrue(!result.containsKey(new File("four")));
         assertTrue(result.get(new File("three")).containsResult("crc"));
         assertEquals(new Digest("crc", "2222"), result.get(new File("three")).getDigest("crc"));
 
@@ -214,8 +217,8 @@ public class DirHasherResultTest {
         DirHasherResult result = setOne.intersect(setTwo);
 
         assertEquals(3, result.size());
-        assertTrue(! result.containsKey(new File("four")));
-        assertTrue(! result.containsKey(new File("five")));
+        assertTrue(!result.containsKey(new File("four")));
+        assertTrue(!result.containsKey(new File("five")));
 
         DirHasherResult result2 = setTwo.intersect(setOne);
         assertEquals(result, result2);
@@ -224,18 +227,18 @@ public class DirHasherResultTest {
     @Test
     public void testIntersectTwoMultipleHits() {
         Collection<Digest> list = new ArrayList<Digest>();
-        list.add( new Digest("crc", "eeee") );
-        list.add( new Digest("md4", "1111") );
+        list.add(new Digest("crc", "eeee"));
+        list.add(new Digest("md4", "1111"));
         setOne.put(new File("four"), new DigestResult(list));
         List<Digest> list2 = new ArrayList<Digest>();
-        list2.add( new Digest("md4", "1111") );
+        list2.add(new Digest("md4", "1111"));
         setTwo.put(new File("four"), new DigestResult(list2));
 
         DirHasherResult result = setOne.intersect(setTwo);
 
         assertEquals(3, result.size());
-        assertTrue(! result.containsKey("four"));
-        assertTrue(! result.containsKey("five"));
+        assertTrue(!result.containsKey("four"));
+        assertTrue(!result.containsKey("five"));
         assertTrue(result.get("three").containsResult("crc"));
 
         DirHasherResult result2 = setTwo.intersect(setOne);
@@ -264,7 +267,7 @@ public class DirHasherResultTest {
         assertTrue(result.containsKey("four"));
     }
 
-        @Test
+    @Test
     public void testMissing() {
         setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
         setTwo.put(new File("five"), new DigestResult(new Digest("crc", "3333")));
@@ -274,6 +277,6 @@ public class DirHasherResultTest {
 
         assertEquals(1, result.size());
         assertTrue(result.containsKey("four"));
-        assertTrue(! result.containsKey("five"));
+        assertTrue(!result.containsKey("five"));
     }
 }

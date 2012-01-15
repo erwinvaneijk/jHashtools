@@ -48,8 +48,7 @@ public class DirectoryHasherCreator
     {
     }
 
-    public static DirectoryHasher create(ExecutorService anExecutorService)
-    {
+    public static DirectoryHasher create(final ExecutorService anExecutorService) {
         if (anExecutorService == null) {
             return new SerialDirectoryHasher();
         } else {
@@ -57,8 +56,8 @@ public class DirectoryHasherCreator
         }
     }
 
-    public static DirectoryHasher create(ExecutorService anExecutorService, Collection<String> digests)
-            throws NoSuchAlgorithmException
+    public static DirectoryHasher create(final ExecutorService anExecutorService,
+        final Collection<String> digests) throws NoSuchAlgorithmException
     {
         if (anExecutorService == null) {
             return new SerialDirectoryHasher(digests);
@@ -67,10 +66,10 @@ public class DirectoryHasherCreator
         }
     }
 
-    public static DirectoryHasher create(ExecutorService anExecutorService, String digestAlgorithm)
-            throws NoSuchAlgorithmException
+    public static DirectoryHasher create(final ExecutorService anExecutorService, final String digestAlgorithm)
+        throws NoSuchAlgorithmException
     {
-        Collection<String> digestAlgorithms = new ArrayList<String>();
+        final Collection<String> digestAlgorithms = new ArrayList<String>();
         digestAlgorithms.add(digestAlgorithm);
         return create(anExecutorService, digestAlgorithms);
     }

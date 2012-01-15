@@ -28,16 +28,15 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
 /**
- * FIXME:
- * Add proper documentation for this interface.
- * 
+ * FIXME: Add proper documentation for this interface.
+ *
  * @author Erwin van Eijk
  */
 public interface DirectoryHasher

@@ -28,8 +28,13 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.TreeMap;
+
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
@@ -37,27 +42,22 @@ import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.JavaType;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.TreeMap;
-
 /**
  * @author Erwin van Eijk
  */
-class DirHasherResultSerializer
-        extends
-        JsonSerializer<DirHasherResult>
+class DirHasherResultSerializer extends JsonSerializer<DirHasherResult>
 {
     @Override
-    public void serialize(DirHasherResult dirHasherResult, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException
+    public void serialize(final DirHasherResult dirHasherResult, final JsonGenerator jsonGenerator,
+        final SerializerProvider serializerProvider) throws IOException, JsonProcessingException
     {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeFieldName("constructionInfo");
         jsonGenerator.writeObject(dirHasherResult.getConstructionInfo());
 
         jsonGenerator.writeFieldName("content");
-        JavaType mapType = TypeFactory.mapType(TreeMap.class, File.class, DigestResult.class);
-        JsonSerializer<Object> ser = serializerProvider.findValueSerializer(mapType);
+        final JavaType mapType = TypeFactory.mapType(TreeMap.class, File.class, DigestResult.class);
+        final JsonSerializer<Object> ser = serializerProvider.findValueSerializer(mapType);
         ser.serialize(dirHasherResult.getContent(), jsonGenerator, serializerProvider);
         jsonGenerator.writeEndObject();
     }

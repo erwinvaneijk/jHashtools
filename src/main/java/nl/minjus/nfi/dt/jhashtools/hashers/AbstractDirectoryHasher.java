@@ -35,60 +35,80 @@ import java.util.LinkedList;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
+/**
+ * All directory hashers need the same functionality. Use AbstractDirectoryHasher to make life easier.
+ *
+ * @author Erwin van Eijk
+ *
+ */
 abstract class AbstractDirectoryHasher implements DirectoryHasher
 {
-    protected final Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
+    private final Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
     private boolean verbose;
 
     public AbstractDirectoryHasher()
     {
     }
 
-    public AbstractDirectoryHasher(String algorithm) throws NoSuchAlgorithmException
+    public AbstractDirectoryHasher(final String algorithm) throws NoSuchAlgorithmException
     {
         this.addAlgorithm(algorithm);
     }
 
-    public AbstractDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
+    public AbstractDirectoryHasher(final Collection<String> algorithms) throws NoSuchAlgorithmException
     {
-        for (String algorithm : algorithms) {
+        for (final String algorithm : algorithms) {
             this.addAlgorithm(algorithm);
         }
     }
 
-    public void setAlgorithms(Collection<String> algorithms) throws NoSuchAlgorithmException
-    {
+    @Override
+    public void setAlgorithms(final Collection<String> algorithms) throws NoSuchAlgorithmException {
         this.algorithms.clear();
-        for (String algorithm : algorithms) {
+        for (final String algorithm : algorithms) {
             addAlgorithm(algorithm);
         }
     }
 
-    public void addAlgorithm(String algorithm) throws NoSuchAlgorithmException
-    {
+    @Override
+    public void addAlgorithm(final String algorithm) throws NoSuchAlgorithmException {
         algorithms.add(DigestAlgorithmFactory.create(algorithm));
     }
 
+    @Override
     public abstract DirHasherResult getDigests(File startFile);
 
+    @Override
     public abstract void updateDigests(DirHasherResult digests, File file);
 
-    public void setVerbose(boolean verbose)
-    {
+    @Override
+    public void setVerbose(final boolean verbose) {
         this.verbose = verbose;
     }
 
-    public boolean isVerbose()
-    {
+    @Override
+    public boolean isVerbose() {
         return this.verbose;
     }
 
-    public final Collection<String> getAlgorithms()
-    {
-        Collection<String> newSet = new LinkedList<String>();
-        for (DigestAlgorithm alg: this.algorithms) {
+    /**
+     * Get the names of the algorithms.
+     *
+     * @return the names
+     */
+    @Override
+    public final Collection<String> getAlgorithms() {
+        final Collection<String> newSet = new LinkedList<String>();
+        for (final DigestAlgorithm alg : this.algorithms) {
             newSet.add(alg.getName());
         }
         return newSet;
+    }
+
+    /**
+     * @return the algorithms
+     */
+    public Collection<DigestAlgorithm> getTheAlgorithms() {
+        return algorithms;
     }
 }

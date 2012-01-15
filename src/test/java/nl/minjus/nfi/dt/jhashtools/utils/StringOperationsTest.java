@@ -41,12 +41,14 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * 
  * @author kojak
  */
-public class StringOperationsTest {
+public class StringOperationsTest
+{
 
-    public StringOperationsTest() {
+    public StringOperationsTest()
+    {
     }
 
     @BeforeClass

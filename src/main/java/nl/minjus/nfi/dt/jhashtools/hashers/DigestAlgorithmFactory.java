@@ -33,13 +33,14 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Create new instances of DigestAlgorithm.
  */
-public class DigestAlgorithmFactory {
+public class DigestAlgorithmFactory
+{
 
-    public static final DigestAlgorithm create(String algorithmName) throws NoSuchAlgorithmException
-    {
-        if (SupportedDigestAlgorithms.isSupportedAlgorithm(algorithmName))
+    public static final DigestAlgorithm create(final String algorithmName) throws NoSuchAlgorithmException {
+        if (SupportedDigestAlgorithms.isSupportedAlgorithm(algorithmName)) {
             return new DigestAlgorithm(algorithmName, DigestMask.getInstance().getMask(algorithmName));
-        else
+        } else {
             throw new NoSuchAlgorithmException("Algorithm " + algorithmName + " is not supported");
+        }
     }
 }

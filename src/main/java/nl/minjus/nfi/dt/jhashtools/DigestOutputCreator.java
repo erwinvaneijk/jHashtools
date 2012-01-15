@@ -28,20 +28,26 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
+import static java.util.logging.Logger.getLogger;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.util.logging.Logger.getLogger;
 
 /**
  * Construct the output that can later on be used for verification.
@@ -52,21 +58,25 @@ public class DigestOutputCreator
 {
 
     private static final Logger LOG = getLogger(DigestOutputCreator.class.getCanonicalName());
-    private PrintWriter out;
-    private DirectoryHasher directoryHasher;
+    private final PrintWriter out;
+    private final DirectoryHasher directoryHasher;
     private File outputFile;
-    private DirHasherResult digests;
+    private final DirHasherResult digests;
     private PersistenceStyle persistenceStyle;
-    private boolean forceOverwrite;
+    private final boolean forceOverwrite;
 
     /**
      * Constructor.
      *
-     * @param anOutputStream the outputstream to write the final result to.
-     * @param aDirectoryHasher the directoryHasher to get the results from.
-     * @param theOverwriteOption whether or not to force overwriting.
+     * @param anOutputStream
+     *            the outputstream to write the final result to.
+     * @param aDirectoryHasher
+     *            the directoryHasher to get the results from.
+     * @param theOverwriteOption
+     *            whether or not to force overwriting.
      */
-    public DigestOutputCreator(OutputStream anOutputStream, DirectoryHasher aDirectoryHasher, boolean theOverwriteOption)
+    public DigestOutputCreator(final OutputStream anOutputStream, final DirectoryHasher aDirectoryHasher,
+        final boolean theOverwriteOption)
     {
         this.out = new PrintWriter(new OutputStreamWriter(anOutputStream, Charset.forName("utf-8")));
         this.directoryHasher = aDirectoryHasher;
@@ -75,13 +85,11 @@ public class DigestOutputCreator
         this.forceOverwrite = theOverwriteOption;
     }
 
-    public void setPersistenceStyle(PersistenceStyle thePersistenceStyle)
-    {
+    public void setPersistenceStyle(final PersistenceStyle thePersistenceStyle) {
         this.persistenceStyle = thePersistenceStyle;
     }
 
-    public void setOutputFile(String aFilename) throws FileNotFoundException
-    {
+    public void setOutputFile(final String aFilename) throws FileNotFoundException {
         final File file = new File(aFilename);
         if (!file.exists() || this.forceOverwrite) {
             this.outputFile = file;
@@ -92,11 +100,11 @@ public class DigestOutputCreator
 
     /**
      * Gnerate the digests for the algorithms starting at <c>anArrayOfPathNames<c>.
+     *
      * @param anArrayOfPathNames
      */
-    public void generate(String[] anArrayOfPathNames)
-    {
-        for (String pathname : anArrayOfPathNames) {
+    public void generate(final String[] anArrayOfPathNames) {
+        for (final String pathname : anArrayOfPathNames) {
             directoryHasher.updateDigests(digests, new File(pathname));
         }
     }
@@ -104,39 +112,37 @@ public class DigestOutputCreator
     /**
      * Finish the computation, and write the the finalizing information to <c>DigestOutputCreator#out<c>.
      */
-    public void finish()
-    {
+    public void finish() {
         final DirHasherResult result = this.persistDigestsToFile();
         this.out.printf("Generated with hashtree (java) by %s\n", System.getProperty("user.name"));
         result.prettyPrint(this.out);
     }
 
-    private DirHasherResult persistDigestsToFile()
-    {
+    private DirHasherResult persistDigestsToFile() {
         FileOutputStream file = null;
         try {
             LOG.log(Level.INFO, "Writing the results to " + outputFile.getName());
             file = new FileOutputStream(outputFile);
-            final PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
+            final PersistenceProvider persistenceProvider = PersistenceProviderCreator
+                .create(this.persistenceStyle);
             persistenceProvider.persist(file, digests);
             file.flush();
 
-            final DirectoryHasher directoryHasher = 
-                    DirectoryHasherCreator.create(null,
-                                                  digests.firstEntry().getValue().getAlgorithms());
+            final DirectoryHasher directoryHasher = DirectoryHasherCreator.create(null, digests.firstEntry()
+                .getValue().getAlgorithms());
             return directoryHasher.getDigests(outputFile);
-        } catch (PersistenceException ex) {
+        } catch (final PersistenceException ex) {
             LOG.log(Level.SEVERE, "Cannot persist content to file", ex);
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.log(Level.SEVERE, "Cannot create file", ex);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             LOG.log(Level.SEVERE, "Cannot create the algorithm", ex);
         } finally {
             try {
                 if (file != null) {
                     file.close();
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 LOG.log(Level.SEVERE, "Cannot close file", ex);
             }
         }

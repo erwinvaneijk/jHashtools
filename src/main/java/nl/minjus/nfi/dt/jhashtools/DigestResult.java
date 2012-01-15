@@ -28,15 +28,15 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
-import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
-import nl.minjus.nfi.dt.jhashtools.hashers.DigestMask;
-
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
+
+import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
+import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
+import nl.minjus.nfi.dt.jhashtools.hashers.DigestMask;
 
 /**
  * @author Erwin van Eijk
@@ -44,27 +44,29 @@ import java.util.TreeSet;
 public class DigestResult extends TreeSet<Digest>
 {
     /**
-	 * Generated serial id.
-	 */
-	private static final long serialVersionUID = 8846362968322773564L;
-	
-	/**
-	 * The mask that indicates the digests that are supported.
-	 */
-	private int containedDigestMask = 0;
+     * Generated serial id.
+     */
+    private static final long serialVersionUID = 8846362968322773564L;
+
+    /**
+     * The mask that indicates the digests that are supported.
+     */
+    private int containedDigestMask;
 
     public DigestResult()
     {
+        this.containedDigestMask = 0x0000;
     }
 
-    public DigestResult(Digest value)
+    public DigestResult(final Digest value)
     {
+        this.containedDigestMask = 0x0000;
         this.add(value);
     }
 
-    public DigestResult(Collection<? extends Object> coll)
+    public DigestResult(final Collection<? extends Object> coll)
     {
-        for (Object d : coll) {
+        for (final Object d : coll) {
             if (d instanceof MessageDigest) {
                 this.add(new Digest((MessageDigest) d));
             } else if (d instanceof Digest) {
@@ -73,23 +75,22 @@ public class DigestResult extends TreeSet<Digest>
         }
     }
 
-    public boolean add(Digest value) {
+    @Override
+    public boolean add(final Digest value) {
         containedDigestMask = DigestResult.updateAlgorithmMask(containedDigestMask, value.getAlgorithm());
         return super.add(value);
     }
 
-    public Collection<String> getAlgorithms()
-    {
-        Collection<String> coll = new ArrayList<String>();
-        for (Digest d : this) {
+    public Collection<String> getAlgorithms() {
+        final Collection<String> coll = new ArrayList<String>();
+        for (final Digest d : this) {
             coll.add(d.getAlgorithm());
         }
         return coll;
     }
 
-    public boolean containsResult(String key)
-    {
-        for (Digest e : this) {
+    public boolean containsResult(final String key) {
+        for (final Digest e : this) {
             if (e.getAlgorithm().equals(key)) {
                 return true;
             }
@@ -97,9 +98,8 @@ public class DigestResult extends TreeSet<Digest>
         return false;
     }
 
-    public Digest getDigest(String key)
-    {
-        for (Digest e : this) {
+    public Digest getDigest(final String key) {
+        for (final Digest e : this) {
             if (e.getAlgorithm().equals(key)) {
                 return e;
             }
@@ -107,27 +107,23 @@ public class DigestResult extends TreeSet<Digest>
         throw new AlgorithmNotFoundException("Algorithm " + key + " not found");
     }
 
-    public String getHexDigest(String digestName)
-    {
+    public String getHexDigest(final String digestName) {
         return this.getDigest(digestName).toHex();
     }
 
-    public void setDigest(Digest value)
-    {
+    public void setDigest(final Digest value) {
         this.add(value);
     }
 
-    public Digest digest()
-    {
+    public Digest digest() {
         return this.iterator().next();
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(final Object o) {
         if ((o != null) && (o instanceof DigestResult)) {
-            DigestResult other = (DigestResult) o;
-            for (Digest d : this) {
+            final DigestResult other = (DigestResult) o;
+            for (final Digest d : this) {
                 if (!other.contains(d)) {
                     return false;
                 }
@@ -139,29 +135,39 @@ public class DigestResult extends TreeSet<Digest>
     }
 
     /**
+     * This is to shut CheckStyle up because we implement equals.
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
      * matches returns true if the digests available on both arguments (this) and (o) are equal. If a digest algorithm
      * on one side is available, that is not available on the other it is not compared.
      * <p/>
      * When there is no match in algorithm, matches returns false.
      *
-     * @param other the other side to compare to.
+     * @param other
+     *            the other side to compare to.
      *
      * @return true when this matches other.
      *
-     * @throws NoMatchingAlgorithmsError when there are no matching algorithms between this and other.
+     * @throws NoMatchingAlgorithmsError
+     *             when there are no matching algorithms between this and other.
      */
-    public boolean matches(DigestResult other)
-    {
+    public boolean matches(final DigestResult other) {
         if (other != null) {
-            int matchingAlgorithms = this.containedDigestMask & other.containedDigestMask;
+            final int matchingAlgorithms = this.containedDigestMask & other.containedDigestMask;
             if (matchingAlgorithms == 0) {
                 throw new NoMatchingAlgorithmsError();
             }
-            List<String> algorithms = DigestMask.getInstance().contains((short) matchingAlgorithms);
-            boolean correct = true;         // Everything is true for the empty set of checked results.
-            for (String algorithm: algorithms) {
-                Digest d1 = this.getDigest(algorithm);
-                Digest d2 = other.getDigest(algorithm);
+            final List<String> algorithms = DigestMask.getInstance().contains((short) matchingAlgorithms);
+            boolean correct = true; // Everything is true for the empty set of
+                                    // checked results.
+            for (final String algorithm : algorithms) {
+                final Digest d1 = this.getDigest(algorithm);
+                final Digest d2 = other.getDigest(algorithm);
                 correct = correct && d1.equals(d2);
             }
             return correct;
@@ -169,7 +175,7 @@ public class DigestResult extends TreeSet<Digest>
         return false;
     }
 
-    private static int updateAlgorithmMask(int mask, String algorithm) {
+    private static int updateAlgorithmMask(final int mask, final String algorithm) {
         return mask | DigestMask.getInstance().getMask(algorithm);
     }
 }

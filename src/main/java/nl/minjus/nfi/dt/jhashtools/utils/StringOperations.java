@@ -34,22 +34,27 @@ package nl.minjus.nfi.dt.jhashtools.utils;
 public final class StringOperations
 {
 
+    private static final int UNSIGNED_BYTE_MAX_VALUE = 256;
+    private static final int HIGH_NIBBLE_SHIFT = 4;
+    private static final int HIGH_NIBBLE_MASK = 0xF0;
+    private static final int LOW_NIBBLE_MASK = 0x0F;
     private static final String HEXES = "0123456789abcdef";
 
     /**
      * Create a base-16 encoding of the given raw bytes.
      *
-     * @param aRawValue the value to encode.
+     * @param aRawValue
+     *            the value to encode.
      * @return a String.
      */
-    public static String hexify(final byte[] aRawValue)
-    {
+    public static String hexify(final byte[] aRawValue) {
         if (aRawValue == null) {
             return null;
         }
         final StringBuilder hex = new StringBuilder(2 * aRawValue.length);
         for (final byte b : aRawValue) {
-            hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+            hex.append(HEXES.charAt((b & HIGH_NIBBLE_MASK) >> HIGH_NIBBLE_SHIFT))
+                .append(HEXES.charAt((b & LOW_NIBBLE_MASK)));
         }
         return hex.toString();
     }
@@ -57,19 +62,19 @@ public final class StringOperations
     /**
      * Convert the hex values to real-life bytes.
      *
-     * @param hex the values to convert.
+     * @param hex
+     *            the values to convert.
      * @return a byte array.
      */
-    private static byte[] hexToBytes(char[] hex)
-    {
-        int length = hex.length / 2;
-        byte[] raw = new byte[length];
+    private static byte[] hexToBytes(final char[] hex) {
+        final int length = hex.length / 2;
+        final byte[] raw = new byte[length];
         for (int i = 0; i < length; i++) {
-            int high = Character.digit(hex[i * 2], 16);
-            int low = Character.digit(hex[i * 2 + 1], 16);
-            int value = (high << 4) | low;
-            if (value > 127) {
-                value -= 256;
+            final int high = Character.digit(hex[i * 2], 16);
+            final int low = Character.digit(hex[i * 2 + 1], 16);
+            int value = (high << HIGH_NIBBLE_SHIFT) | low;
+            if (value > Byte.MAX_VALUE) {
+                value -= UNSIGNED_BYTE_MAX_VALUE;
             }
             raw[i] = (byte) value;
         }
@@ -78,17 +83,17 @@ public final class StringOperations
 
     /**
      * Convert a base-16 encoded String into the binary version.
-     * @param aHexString the String to convert.
+     *
+     * @param aHexString
+     *            the String to convert.
      * @return the binary version.
      */
-    public static byte[] hexToBytes(String aHexString)
-    {
+    public static byte[] hexToBytes(final String aHexString) {
         return hexToBytes(aHexString.toCharArray());
     }
 
-    public static String split(String aString, int theSplitSize)
-    {
-        StringBuilder builder = new StringBuilder(aString.length() + (aString.length() / 4));
+    public static String split(final String aString, final int theSplitSize) {
+        final StringBuilder builder = new StringBuilder(aString.length() + (aString.length() / theSplitSize));
         int i = 0;
         while (i < aString.length()) {
             builder.append(aString.charAt(i));

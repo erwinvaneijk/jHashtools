@@ -28,18 +28,19 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.type.TypeReference;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Arrange the deserialization of the JSON structure for DirHasherResult.
@@ -51,18 +52,20 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
     /**
      * DeSerialize a DirHasherResult.
      *
-     * @param aJsonParser             the JsonParser to use.
-     * @param aDeserializationContext the current context.
+     * @param aJsonParser
+     *            the JsonParser to use.
+     * @param aDeserializationContext
+     *            the current context.
      *
      * @return the prepared DirHasherResult.
      *
-     * @throws IOException when the requested IO cannot be performed.
+     * @throws IOException
+     *             when the requested IO cannot be performed.
      */
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public DirHasherResult deserialize(final JsonParser aJsonParser,
-                                       final DeserializationContext aDeserializationContext)
-            throws IOException
+        final DeserializationContext aDeserializationContext) throws IOException
     {
         final DirHasherResult result = new DirHasherResult();
         while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
@@ -73,11 +76,10 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
             }
             if ("content".equals(fieldName)) {
                 aJsonParser.nextToken();
-                result.putAll(
-                        (Map<File, DigestResult>) aJsonParser.readValueAs(
-                                new TypeReference<Map<File, DigestResult>>()
-                                {
-                                }));
+                result.putAll((Map<File, DigestResult>) aJsonParser
+                    .readValueAs(new TypeReference<Map<File, DigestResult>>()
+                    {
+                    }));
             }
         }
         return result;

@@ -41,12 +41,14 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * 
  * @author eijk
  */
-public class DigestTest {
+public class DigestTest
+{
 
-    public DigestTest() {
+    public DigestTest()
+    {
     }
 
     @BeforeClass
@@ -81,7 +83,7 @@ public class DigestTest {
      */
     @Test
     public void testSetContent() {
-        byte[] value = new byte[] { (byte)0xde, (byte)0xea, (byte)0xbe, (byte)0xef };
+        byte[] value = new byte[] { (byte) 0xde, (byte) 0xea, (byte) 0xbe, (byte) 0xef };
         Digest instance = new Digest("crc", "");
         instance.setContent(value);
         assertEquals(value, instance.getContent());
@@ -92,7 +94,7 @@ public class DigestTest {
      */
     @Test
     public void testToHex() {
-        byte[] value = new byte[] { (byte)0xde, (byte)0xed, (byte)0xbe, (byte)0xef };
+        byte[] value = new byte[] { (byte) 0xde, (byte) 0xed, (byte) 0xbe, (byte) 0xef };
         Digest instance = new Digest("crc", value);
         String expResult = "deedbeef";
         String result = instance.toHex();
@@ -104,7 +106,7 @@ public class DigestTest {
      */
     @Test
     public void testToString() {
-        byte[] value = new byte[] { (byte)0xde, (byte)0xed, (byte)0xbe, (byte)0xef };
+        byte[] value = new byte[] { (byte) 0xde, (byte) 0xed, (byte) 0xbe, (byte) 0xef };
         Digest instance = new Digest("crc", value);
         String expResult = "crc:deedbeef";
         String result = instance.toString();
@@ -131,7 +133,7 @@ public class DigestTest {
         o = new Digest("md4", "deadbeefdeadbeefdeadbeefdeadbeef");
         assertEquals(false, instance.equals(o));
         assertEquals(false, o.equals(instance));
-        
+
         assertEquals(instance, instance);
     }
 
@@ -146,7 +148,7 @@ public class DigestTest {
         Digest more = new Digest("crc", "deadbef0");
         Digest longer = new Digest("crc", "deadbeefbeef");
         Digest instance = new Digest("crc", "deadbeef");
-        
+
         assertTrue(instance.compareTo(veryLess) > 0);
         assertTrue(veryLess.compareTo(instance) < 0);
         assertEquals(0, instance.compareTo(instance));

@@ -26,4 +26,7 @@
  * or implied, of <copyright holder>.
  */
 
+/**
+ * The main package where the libraries and applications live.
+ */
 package nl.minjus.nfi.dt.jhashtools;

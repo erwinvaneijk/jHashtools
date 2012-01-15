@@ -30,22 +30,22 @@ package nl.minjus.nfi.dt.jhashtools.exceptions;
 
 /**
  * This exception is used when an algorithm could not be found.
- * 
+ *
  * @author Erwin van Eijk
  */
 public class AlgorithmNotFoundException extends RuntimeException
 {
 
     /**
-	 * Generated serial id.
-	 */
-	private static final long serialVersionUID = -2549941052527371142L;
+     * Generated serial id.
+     */
+    private static final long serialVersionUID = -2549941052527371142L;
 
-	public AlgorithmNotFoundException()
+    public AlgorithmNotFoundException()
     {
     }
 
-    public AlgorithmNotFoundException(String aMessage)
+    public AlgorithmNotFoundException(final String aMessage)
     {
         super(aMessage);
     }

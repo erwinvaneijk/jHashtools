@@ -26,4 +26,8 @@
  * or implied, of <copyright holder>.
  */
 
+/**
+ * The package for all exceptions.
+ */
 package nl.minjus.nfi.dt.jhashtools.exceptions;
+

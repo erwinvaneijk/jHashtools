@@ -47,12 +47,12 @@ import java.io.Reader;
 public class JsonPersistenceProvider implements PersistenceProvider
 {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public JsonPersistenceProvider(boolean prettyPrint)
     {
-        objectMapper.getSerializationConfig().set(Feature.INDENT_OUTPUT, prettyPrint);
-        objectMapper.getSerializationConfig().set(Feature.WRITE_DATES_AS_TIMESTAMPS, !prettyPrint);
+        OBJECT_MAPPER.getSerializationConfig().set(Feature.INDENT_OUTPUT, prettyPrint);
+        OBJECT_MAPPER.getSerializationConfig().set(Feature.WRITE_DATES_AS_TIMESTAMPS, !prettyPrint);
     }
 
     public JsonPersistenceProvider()
@@ -61,41 +61,38 @@ public class JsonPersistenceProvider implements PersistenceProvider
     }
 
     static {
-        CustomSerializerFactory sf = new CustomSerializerFactory();
+        final CustomSerializerFactory sf = new CustomSerializerFactory();
         sf.addGenericMapping(DirHasherResult.class, new DirHasherResultSerializer());
-        objectMapper.setSerializerFactory(sf);
+        OBJECT_MAPPER.setSerializerFactory(sf);
 
-        CustomDeserializerFactory df = new CustomDeserializerFactory();
+        final CustomDeserializerFactory df = new CustomDeserializerFactory();
         df.addSpecificMapping(DirHasherResult.class, new DirHasherResultDeserializer());
-        objectMapper.setDeserializerProvider(new StdDeserializerProvider(df));
+        OBJECT_MAPPER.setDeserializerProvider(new StdDeserializerProvider(df));
     }
 
     @Override
-    public void persist(OutputStream out, Object obj) throws PersistenceException
-    {
+    public void persist(OutputStream out, Object obj) throws PersistenceException {
         try {
-            objectMapper.writeValue(out, obj);
+            OBJECT_MAPPER.writeValue(out, obj);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }
     }
 
     @Override
-    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException
-    {
+    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException {
         try {
-            return objectMapper.readValue(reader, clazz);
+            return OBJECT_MAPPER.readValue(reader, clazz);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }
     }
 
     @SuppressWarnings("unchecked")
-	@Override
-    public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException
-    {
+    @Override
+    public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException {
         try {
-            return (T) objectMapper.readValue(reader, type);
+            return (T) OBJECT_MAPPER.readValue(reader, type);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }

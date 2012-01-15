@@ -41,7 +41,8 @@ public interface WalkerVisitor
     /**
      * Called when a file is visited.
      *
-     * @param theFile the file that is being visited.
+     * @param theFile
+     *            the file that is being visited.
      */
     void visit(File theFile) throws InterruptedException;
 

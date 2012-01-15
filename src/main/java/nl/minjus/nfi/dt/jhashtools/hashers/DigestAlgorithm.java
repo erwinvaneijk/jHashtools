@@ -32,22 +32,22 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: eijk
- * Date: Nov 22, 2010
- * Time: 11:46:13 AM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: eijk Date: Nov 22, 2010 Time: 11:46:13 AM To change this template use File | Settings
+ * | File Templates.
  */
-public class DigestAlgorithm {
+public class DigestAlgorithm
+{
     private String name;
     private short value;
 
-    public DigestAlgorithm(String name, short value) {
+    public DigestAlgorithm(String name, short value)
+    {
         this.name = name;
         this.value = value;
     }
 
-    public DigestAlgorithm(String name) {
+    public DigestAlgorithm(String name)
+    {
         this.name = name;
         this.value = DigestMask.getInstance().getMask(name);
     }

@@ -28,19 +28,28 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.util.Calendar;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrentFileHasher;
+
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.codehaus.jackson.type.TypeReference;
-
-import java.io.*;
-import java.util.Calendar;
-import java.util.Map;
 
 /**
  * This class supports the Old Style hashes.txt files that are now generated using JSON. The old format should be
@@ -51,22 +60,25 @@ import java.util.Map;
 public class OldStylePersistenceProvider implements PersistenceProvider
 {
 
+    private static final Logger LOG = Logger.getLogger(ConcurrentFileHasher.class.getName());
+
     @Override
-    public void persist(OutputStream out, Object obj) throws PersistenceException
-    {
+    public void persist(final OutputStream out, final Object obj) throws PersistenceException {
         if (obj != null && obj instanceof DirHasherResult) {
-            DirHasherResult directoryHasherResult = (DirHasherResult) obj;
-            PrintStream stream = new PrintStream(out);
-            stream.println("Generated with: " + directoryHasherResult.getConstructionInfo().toString() + " " + Calendar.getInstance().getTime().toString());
-            for (Map.Entry<File, DigestResult> entry : directoryHasherResult) {
+            final DirHasherResult directoryHasherResult = (DirHasherResult) obj;
+            final PrintStream stream = new PrintStream(out);
+            stream.println("Generated with: " + directoryHasherResult.getConstructionInfo().toString() + " "
+                + Calendar.getInstance().getTime().toString());
+            for (final Map.Entry<File, DigestResult> entry : directoryHasherResult) {
                 stream.println(entry.getKey().toString());
-                for (Digest d : entry.getValue()) {
+                for (final Digest d : entry.getValue()) {
                     stream.println("\t" + d.prettyPrint(":\t"));
                 }
             }
         } else {
             if (obj != null) {
-                throw new PersistenceException("There is no persistence method defined for class " + obj.getClass().toString());
+                throw new PersistenceException("There is no persistence method defined for class "
+                    + obj.getClass().toString());
             } else {
                 throw new PersistenceException("There is no persistence method defined for null class");
             }
@@ -74,21 +86,21 @@ public class OldStylePersistenceProvider implements PersistenceProvider
     }
 
     @Override
-    public <T> T load(Reader reader, TypeReference<T> typeReference) throws PersistenceException
-    {
-        throw new PersistenceException("Currently the use of TypeReference is not supported for oldstyle files");
+    public <T> T load(final Reader reader, final TypeReference<T> typeReference) throws PersistenceException {
+        throw new PersistenceException(
+            "Currently the use of TypeReference is not supported for oldstyle files");
     }
 
     @SuppressWarnings("unchecked")
-	@Override
-    public <T> T load(Reader reader, Class<T> clazz) throws PersistenceException
-    {
+    @Override
+    public <T> T load(final Reader reader, final Class<T> clazz) throws PersistenceException {
         if (clazz.equals(DirHasherResult.class)) {
-            DirHasherResult directoryHasherResult = new DirHasherResult();
+            final DirHasherResult directoryHasherResult = new DirHasherResult();
             try {
-                LineNumberReader lineNumberReader = new LineNumberReader(reader);
+                final LineNumberReader lineNumberReader = new LineNumberReader(reader);
+
                 String line = lineNumberReader.readLine();
-                if (!line.startsWith("Generated with: ")) {
+                if (line == null || !line.startsWith("Generated with: ")) {
                     throw new PersistenceException("The first line is not ok.");
                 }
                 String currentFileName = "";
@@ -111,29 +123,28 @@ public class OldStylePersistenceProvider implements PersistenceProvider
                         result = new DigestResult();
                     } else {
                         try {
-                            OldStyleHashesParser parser = createParser(line);
-                            Digest theDigest = parser.digest();
+                            final OldStyleHashesParser parser = createParser(line);
+                            final Digest theDigest = parser.digest();
                             result.add(theDigest);
-                        } catch (RecognitionException ex) {
-                            // FIXME
-                            // Output a proper error message and continue.
+                        } catch (final RecognitionException ex) {
+                            LOG.log(Level.INFO, "Could not recognize [" + line + "]");
                         }
                     }
                 }
                 return (T) directoryHasherResult;
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw new PersistenceException(ex);
             }
         } else {
-            throw new PersistenceException("There is no persistence method defined for class" + clazz.toString());
+            throw new PersistenceException("There is no persistence method defined for class"
+                + clazz.toString());
         }
     }
 
-    private OldStyleHashesParser createParser(String testString) throws IOException
-    {
-        CharStream stream = new ANTLRStringStream(testString);
-        OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
+    private OldStyleHashesParser createParser(final String testString) throws IOException {
+        final CharStream stream = new ANTLRStringStream(testString);
+        final OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
         return new OldStyleHashesParser(tokens);
     }
 }

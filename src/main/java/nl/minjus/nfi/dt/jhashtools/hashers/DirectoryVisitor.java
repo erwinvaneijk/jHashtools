@@ -63,49 +63,48 @@ public class DirectoryVisitor implements WalkerVisitor
         this.fileHasher = FileHasherCreator.create(null);
     }
 
-    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, DirHasherResult digests) throws NoSuchAlgorithmException
+    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, DirHasherResult digests)
+        throws NoSuchAlgorithmException
     {
         this(algorithms, false);
         this.resultMap = digests;
     }
 
-    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, boolean verbose) throws NoSuchAlgorithmException
+    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, boolean verbose)
+        throws NoSuchAlgorithmException
     {
         resultMap = new DirHasherResult();
         this.fileHasher = FileHasherCreator.createSimple(algorithms);
         this.verbose = verbose;
     }
 
-    public void visit(File theFile)
-    {
+    public void visit(File theFile) {
         try {
-            DigestResult res = this.fileHasher.getDigest(theFile);
+            final DigestResult res = this.fileHasher.getDigest(theFile);
             resultMap.put(theFile, res);
         } catch (FileNotFoundException ex) {
-            // ignore
+            this.logger.log(Level.SEVERE, "File not found: " + theFile.getPath());
         } catch (IOException ex) {
             this.logger.log(Level.SEVERE, "Got IOException while processing " + theFile.toString());
         }
     }
 
-    public final DirHasherResult getResults()
-    {
+    public final DirHasherResult getResults() {
         return this.resultMap;
     }
 
     /**
      * @return get the verbosity
      */
-    public boolean isVerbose()
-    {
+    public boolean isVerbose() {
         return verbose;
     }
 
     /**
-     * @param verbose set the verbosity of this visitor.
+     * @param verbose
+     *            set the verbosity of this visitor.
      */
-    public void setVerbose(boolean verbose)
-    {
+    public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 }

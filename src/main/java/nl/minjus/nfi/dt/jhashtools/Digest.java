@@ -38,9 +38,8 @@ import java.util.Arrays;
 import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 
 /**
- * This class holds some convenience for handling the results delivered
- * by MessageDigest#digest.
- * 
+ * This class holds some convenience for handling the results delivered by MessageDigest#digest.
+ *
  * @author Erwin van Eijk
  */
 public class Digest implements Comparable<Digest>
@@ -62,10 +61,12 @@ public class Digest implements Comparable<Digest>
     /**
      * Constructor.
      *
-     * @param anAlgorithm the Algorithm to store.
-     * @param aValue the Digest aValue.
+     * @param anAlgorithm
+     *            the Algorithm to store.
+     * @param aValue
+     *            the Digest aValue.
      */
-    public Digest(String anAlgorithm, byte[] aValue)
+    public Digest(final String anAlgorithm, final byte[] aValue)
     {
         this.content = aValue;
         this.algorithm = anAlgorithm;
@@ -74,10 +75,12 @@ public class Digest implements Comparable<Digest>
     /**
      * Constructor.
      *
-     * @param anAlgorithm the Algorithm to use.
-     * @param aHexValue the Digest value, as hexadecimal characters.
+     * @param anAlgorithm
+     *            the Algorithm to use.
+     * @param aHexValue
+     *            the Digest value, as hexadecimal characters.
      */
-    public Digest(String anAlgorithm, String aHexValue)
+    public Digest(final String anAlgorithm, final String aHexValue)
     {
         this.algorithm = anAlgorithm;
         this.content = StringOperations.hexToBytes(aHexValue);
@@ -86,9 +89,10 @@ public class Digest implements Comparable<Digest>
     /**
      * Constructor. This is a special case where the expected format is like 'digestname:value'.
      *
-     * @param aValue the value to parse.
+     * @param aValue
+     *            the value to parse.
      */
-    public Digest(String aValue)
+    public Digest(final String aValue)
     {
         final String[] parts = aValue.split(":");
         this.algorithm = parts[0];
@@ -97,10 +101,10 @@ public class Digest implements Comparable<Digest>
 
     /**
      * Constructor.
-     * 
+     *
      * @param digest
      */
-    public Digest(MessageDigest digest)
+    public Digest(final MessageDigest digest)
     {
         this.algorithm = digest.getAlgorithm();
         this.content = digest.digest();
@@ -109,10 +113,10 @@ public class Digest implements Comparable<Digest>
     /**
      * Setter for the algorithm value.
      *
-     * @param anAlgorithm the algorithm to set.
+     * @param anAlgorithm
+     *            the algorithm to set.
      */
-    public void setAlgorithm(final String anAlgorithm)
-    {
+    public void setAlgorithm(final String anAlgorithm) {
         this.algorithm = anAlgorithm;
     }
 
@@ -121,18 +125,17 @@ public class Digest implements Comparable<Digest>
      *
      * @return the algorithm
      */
-    public String getAlgorithm()
-    {
+    public String getAlgorithm() {
         return this.algorithm;
     }
 
     /**
      * Set the digest value.
      *
-     * @param aValue the value to use.
+     * @param aValue
+     *            the value to use.
      */
-    public void setContent(byte[] aValue)
-    {
+    public void setContent(final byte[] aValue) {
         this.content = aValue;
     }
 
@@ -141,8 +144,7 @@ public class Digest implements Comparable<Digest>
      *
      * @return the value of the digest.
      */
-    public byte[] getContent()
-    {
+    public byte[] getContent() {
         return this.content;
     }
 
@@ -151,8 +153,7 @@ public class Digest implements Comparable<Digest>
      *
      * @return a hexadecimal representation of the digest value.
      */
-    public String toHex()
-    {
+    public String toHex() {
         return StringOperations.hexify(content);
     }
 
@@ -161,53 +162,55 @@ public class Digest implements Comparable<Digest>
      *
      * @return a string.
      */
-    public String toString()
-    {
+    @Override
+    public String toString() {
         return this.toString(':');
     }
 
     /**
      * Output the algorithm and value as one whole, separated by joinChar.
      *
-     * @param aJoinChar the character to join algorithm and value.
+     * @param aJoinChar
+     *            the character to join algorithm and value.
      * @return a string.
      */
-    public String toString(char aJoinChar)
-    {
+    public String toString(final char aJoinChar) {
         return this.algorithm + aJoinChar + StringOperations.hexify(content);
     }
 
     /**
      * Get a pretty representation of the algorithm and the value of the digest.
      *
-     * @param theJoinChar the character to join algorithms and value.
+     * @param theJoinChar
+     *            the character to join algorithms and value.
      * @return a string.
      */
-    public String prettyPrint(char theJoinChar)
-    {
-        return this.algorithm + theJoinChar + StringOperations.split(StringOperations.hexify(content), HEX_GROUP_SIZE);
+    public String prettyPrint(final char theJoinChar) {
+        return this.algorithm + theJoinChar
+            + StringOperations.split(StringOperations.hexify(content), HEX_GROUP_SIZE);
     }
 
     /**
      * Get a pretty representation of the algorithm and the value of the digest.
      *
-     * @param theJoinChar the character to join algorithms and value.
+     * @param theJoinChar
+     *            the character to join algorithms and value.
      * @return a string.
      */
-    public String prettyPrint(String theJoinChar)
-    {
-        return this.algorithm + theJoinChar + StringOperations.split(StringOperations.hexify(content), HEX_GROUP_SIZE);
+    public String prettyPrint(final String theJoinChar) {
+        return this.algorithm + theJoinChar
+            + StringOperations.split(StringOperations.hexify(content), HEX_GROUP_SIZE);
     }
 
     /**
      * Implement equals.
      *
-     * @param theOther the other value to compare to.
+     * @param theOther
+     *            the other value to compare to.
      * @return true if theOther and this have the same algorithm and the same value.
      */
     @Override
-    public boolean equals(Object theOther)
-    {
+    public boolean equals(final Object theOther) {
         if (this == theOther) {
             return true;
         }
@@ -221,14 +224,22 @@ public class Digest implements Comparable<Digest>
     }
 
     /**
+     * Needed when you implement equals.
+     */
+    @Override
+    public int hashCode() {
+        return this.algorithm.hashCode() + Arrays.hashCode(this.content);
+    }
+
+    /**
      * Compare this to the other.
      *
-     * @param anOther the compare to.
+     * @param anOther
+     *            the compare to.
      * @return an int.
      */
     @Override
-    public int compareTo(Digest anOther)
-    {
+    public int compareTo(final Digest anOther) {
         if (!this.algorithm.equals(anOther.algorithm)) {
             return this.algorithm.compareTo(anOther.algorithm);
         }
@@ -247,5 +258,4 @@ public class Digest implements Comparable<Digest>
         }
     }
 
-    
 }

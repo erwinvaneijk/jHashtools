@@ -28,6 +28,14 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.util.Calendar;
+import java.util.Map;
+
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
@@ -35,13 +43,9 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 
-import java.io.*;
-import java.util.Calendar;
-import java.util.Map;
-
 /**
- * Perform the verfication pass on the measurements and the results that were computed in another pass,
- * which are stored in some file.
+ * Perform the verfication pass on the measurements and the results that were computed in another pass, which are stored
+ * in some file.
  *
  * @author Erwin van Eijk
  */
@@ -58,10 +62,12 @@ public class DirHasherResultVerifier
     /**
      * Constructor.
      *
-     * @param aHasher the hasher to use.
-     * @param thePersistenceStyle the persistence style to use.
+     * @param aHasher
+     *            the hasher to use.
+     * @param thePersistenceStyle
+     *            the persistence style to use.
      */
-    public DirHasherResultVerifier(DirectoryHasher aHasher, PersistenceStyle thePersistenceStyle)
+    public DirHasherResultVerifier(final DirectoryHasher aHasher, final PersistenceStyle thePersistenceStyle)
     {
         this.persistenceStyle = thePersistenceStyle;
         this.measuredDigests = new DirHasherResult();
@@ -69,24 +75,22 @@ public class DirHasherResultVerifier
         this.ignoreCase = false;
     }
 
-    public void setIgnoreCase(boolean ignoreCase)
-    {
+    public void setIgnoreCase(final boolean ignoreCase) {
         this.ignoreCase = ignoreCase;
     }
 
-    public boolean isIgnoringCase()
-    {
+    public boolean isIgnoringCase() {
         return this.ignoreCase;
     }
 
     /**
      * Generate the digests for all the paths in thePathsToProcess.
      *
-     * @param thePathsToProcess which paths should be done.
+     * @param thePathsToProcess
+     *            which paths should be done.
      */
-    public void generateDigests(String[] thePathsToProcess)
-    {
-        for (String pathName : thePathsToProcess) {
+    public void generateDigests(final String[] thePathsToProcess) {
+        for (final String pathName : thePathsToProcess) {
             this.directoryHasher.updateDigests(measuredDigests, new File(pathName));
         }
     }
@@ -94,17 +98,22 @@ public class DirHasherResultVerifier
     /**
      * Load the precomputed digests from <c>aFilename<c>.
      *
-     * @param aFilename the file to read.
-     * @throws FileNotFoundException when the file is not found.
-     * @throws PersistenceException when the file could not be properly read.
+     * @param aFilename
+     *            the file to read.
+     * @throws FileNotFoundException
+     *             when the file is not found.
+     * @throws PersistenceException
+     *             when the file could not be properly read.
      */
-    public void loadDigestsFromFile(String aFilename) throws FileNotFoundException, PersistenceException
+    public void loadDigestsFromFile(final String aFilename) throws FileNotFoundException,
+        PersistenceException
     {
         Reader reader;
         this.file = new File(aFilename);
         reader = new FileReader(this.file);
 
-        final PersistenceProvider persistenceProvider = PersistenceProviderCreator.create(this.persistenceStyle);
+        final PersistenceProvider persistenceProvider = PersistenceProviderCreator
+            .create(this.persistenceStyle);
 
         this.verificationDigests = persistenceProvider.load(reader, DirHasherResult.class);
     }
@@ -112,10 +121,10 @@ public class DirHasherResultVerifier
     /**
      * Actually perform the verification phase. Write the output to <c>anOutput<c>.
      *
-     * @param anOutput where to write the output to.
+     * @param anOutput
+     *            where to write the output to.
      */
-    public void verify(PrintWriter anOutput)
-    {
+    public void verify(final PrintWriter anOutput) {
         if (this.isIgnoringCase()) {
             final DirHasherResult ignoredCaseMeasurements = new DirHasherResult(this.isIgnoringCase());
             ignoredCaseMeasurements.putAll(this.measuredDigests);
@@ -132,30 +141,31 @@ public class DirHasherResultVerifier
             anOutput.println("*** PASSED VERIFICATION ***");
         } else {
             if (differences.size() == 1
-                    && FileOperations.isSameFile(differences.iterator().next().getKey(), this.file))
+                && FileOperations.isSameFile(differences.iterator().next().getKey(), this.file))
             {
                 anOutput.println("*** PASSED VERIFICATION ***");
                 anOutput.println("Printing info on " + this.file.getName());
                 differences.prettyPrint(anOutput);
             } else {
                 anOutput.println("There are differences.");
-                // First calculate the files measured, but missing in the verification.
+                // First calculate the files measured, but missing in the
+                // verification.
                 differences = this.measuredDigests.missing(this.verificationDigests);
-                anOutput.println("These entries are seen, but missing in the " + this.file.getName() + " list");
-                for (Map.Entry<File, DigestResult> entry : differences) {
+                anOutput.println("These entries are seen, but missing in the " + this.file.getName()
+                    + " list");
+                for (final Map.Entry<File, DigestResult> entry : differences) {
                     anOutput.println(entry.getKey().toString());
-                    for (Digest d : entry.getValue()) {
+                    for (final Digest d : entry.getValue()) {
                         anOutput.printf("\t%s\n", d.toString('\t'));
                     }
                 }
 
                 differences = this.verificationDigests.missing(this.measuredDigests);
-                anOutput.println("These entries are in the "
-                        + this.file.getName()
-                        + " list, but not in the directory and/or files.");
-                for (Map.Entry<File, DigestResult> entry : differences) {
+                anOutput.println("These entries are in the " + this.file.getName()
+                    + " list, but not in the directory and/or files.");
+                for (final Map.Entry<File, DigestResult> entry : differences) {
                     anOutput.println(entry.getKey().toString());
-                    for (Digest d : entry.getValue()) {
+                    for (final Digest d : entry.getValue()) {
                         anOutput.printf("\t%s\n", d.toString('\t'));
                     }
                 }

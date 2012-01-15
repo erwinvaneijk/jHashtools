@@ -54,26 +54,28 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 /**
- * Entrypoint of the cli version of the tooling.
+ * Entry point of the cli version of the tooling.
+ *
  * @author Erwin van Eijk
  */
 public class App
 {
 
+    private static final int FIXED_THREAD_POOL_SIZE = 10;
+    private static final int EXIT_PERSISTENCE_ERROR = 2;
     private static final String USAGE = "[options] dir [dir...]";
-    private static final String HEADER =
-            "hashtree - Creating a list of digests for files and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
+    private static final String HEADER = "hashtree - Creating a list of digests for files "
+        + "and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
     private static final String FOOTER = "";
     private static final Logger LOG = getLogger(App.class.getName());
     private static final int DEFAULT_TERMINAL_WIDTH = 80;
     private static final String DEFAULT_ALGORITHM = "sha-256";
 
-    public static void main(String[] arguments)
-    {
-        CommandLine line = App.getCommandLine(arguments);
-        String[] filesToProcess = line.getArgs();
+    public static void main(final String[] arguments) {
+        final CommandLine line = App.getCommandLine(arguments);
+        final String[] filesToProcess = line.getArgs();
 
-        DirectoryHasher directoryHasher = createDirectoryHasher(line);
+        final DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
         LOG.log(Level.INFO, "Version: " + Version.getVersion());
 
@@ -82,25 +84,25 @@ public class App
             System.exit(1);
         }
 
-        PersistenceStyle persistenceStyle = getPersistenceStyle(line);
+        final PersistenceStyle persistenceStyle = getPersistenceStyle(line);
         if (line.hasOption("i")) {
-            String filename = line.getOptionValue("i");
+            final String filename = line.getOptionValue("i");
             processFileAndVerify(directoryHasher, persistenceStyle, line, filename, filesToProcess);
         } else if (line.hasOption("o")) {
-            String outputFilename = line.getOptionValue("output");
-            boolean forceOverwrite = line.hasOption("force");
+            final String outputFilename = line.getOptionValue("output");
+            final boolean forceOverwrite = line.hasOption("force");
 
-            processFilesAndWrite(directoryHasher, outputFilename, persistenceStyle, forceOverwrite, filesToProcess);
+            processFilesAndWrite(directoryHasher, outputFilename, persistenceStyle, forceOverwrite,
+                filesToProcess);
         } else {
-        	LOG.log(Level.WARNING, "You need either -i or -o");
-        	System.exit(2);
+            LOG.log(Level.WARNING, "You need either -i or -o");
+            System.exit(2);
         }
 
         System.exit(0);
     }
 
-    private static PersistenceStyle getPersistenceStyle(CommandLine line)
-    {
+    private static PersistenceStyle getPersistenceStyle(final CommandLine line) {
         PersistenceStyle persistenceStyle;
         if (line.hasOption("style")) {
             persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
@@ -110,87 +112,58 @@ public class App
         return persistenceStyle;
     }
 
-    private static void processFilesAndWrite(DirectoryHasher directoryHasher,
-                                             String outputFile,
-                                             PersistenceStyle style,
-                                             boolean forceOverwrite,
-                                             String[] filesToProcess)
+    private static void processFilesAndWrite(final DirectoryHasher directoryHasher, final String outputFile,
+        final PersistenceStyle style, final boolean forceOverwrite, final String[] filesToProcess)
     {
         try {
-            DigestOutputCreator outputCreator =
-                    new DigestOutputCreator(System.err, directoryHasher, forceOverwrite);
+            final DigestOutputCreator outputCreator = new DigestOutputCreator(System.err, directoryHasher,
+                forceOverwrite);
 
             outputCreator.setOutputFile(outputFile);
             outputCreator.setPersistenceStyle(style);
             outputCreator.generate(filesToProcess);
             outputCreator.finish();
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             System.err.println("File " + outputFile + " exists or not forced to be overwritten. Stop.");
             System.exit(-1);
         }
     }
 
-    private static void processFileAndVerify(DirectoryHasher directoryHasher,
-                                             PersistenceStyle persistenceStyle,
-                                             CommandLine line,
-                                             String filename,
-                                             String[] filesToProcess)
+    private static void processFileAndVerify(final DirectoryHasher directoryHasher,
+        final PersistenceStyle persistenceStyle, final CommandLine line, final String filename,
+        final String[] filesToProcess)
     {
         try {
-            DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher, persistenceStyle);
+            final DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher,
+                persistenceStyle);
             verifier.setIgnoreCase(line.hasOption("ignorecase"));
             verifier.loadDigestsFromFile(filename);
             verifier.generateDigests(filesToProcess);
             verifier.verify(new PrintWriter(System.out, true));
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             LOG.log(Level.SEVERE, "A file could not be found.", ex);
             System.exit(-1);
-        } catch (PersistenceException ex) {
+        } catch (final PersistenceException ex) {
             LOG.log(Level.SEVERE, "Could not parse the file.", ex);
-            System.exit(-2);
+            System.exit(-EXIT_PERSISTENCE_ERROR);
         }
     }
 
-    private static DirectoryHasher createDirectoryHasher(CommandLine line)
-    {
+    private static DirectoryHasher createDirectoryHasher(final CommandLine line) {
         DirectoryHasher directoryHasher = null;
         try {
-            ConcurrencyMode concurrencyMode =
-                    (line.hasOption("single")) ? ConcurrencyMode.SINGLE : ConcurrencyMode.MULTI_THREADING;
-
-            if (concurrencyMode == ConcurrencyMode.SINGLE) {
-                directoryHasher = DirectoryHasherCreator.create(null);
-            } else {
-                directoryHasher = DirectoryHasherCreator.create(Executors.newFixedThreadPool(10));
-            }
+            directoryHasher = getThreadingModel(line);
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
-            if (line.hasOption("all") || line.hasOption("sha-256")) {
-                directoryHasher.addAlgorithm("sha-256");
-            }
-            if (line.hasOption("all") || line.hasOption("sha-1")) {
-                directoryHasher.addAlgorithm("sha-1");
-            }
-            if (line.hasOption("all") || line.hasOption("sha-384")) {
-                directoryHasher.addAlgorithm("sha-384");
-            }
-            if (line.hasOption("all") || line.hasOption("sha-512")) {
-                directoryHasher.addAlgorithm("sha-512");
-            }
-            if (line.hasOption("all") || line.hasOption("md5")) {
-                directoryHasher.addAlgorithm("md5");
-            }
-            if (line.hasOption("all") || line.hasOption("md2")) {
-                directoryHasher.addAlgorithm("md2");
-            }
-        } catch (NoSuchAlgorithmException ex) {
+            setRequestedAlgorithms(line, directoryHasher);
+        } catch (final NoSuchAlgorithmException ex) {
             LOG.log(Level.SEVERE, "Algorithm not found", ex);
         } finally {
             try {
                 if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
                     directoryHasher.addAlgorithm(DEFAULT_ALGORITHM);
                 }
-            } catch (NoSuchAlgorithmException ex) {
+            } catch (final NoSuchAlgorithmException ex) {
                 LOG.log(Level.SEVERE, "Algorithm is not found", ex);
                 System.exit(1);
             }
@@ -199,12 +172,48 @@ public class App
         return directoryHasher;
     }
 
-    @SuppressWarnings("static-access")
-	private static CommandLine getCommandLine(final String[] theArguments)
+    private static void setRequestedAlgorithms(final CommandLine line, final DirectoryHasher directoryHasher)
+        throws NoSuchAlgorithmException
     {
-        CommandLineParser parser = new PosixParser();
+        if (line.hasOption("all") || line.hasOption("sha-256")) {
+            directoryHasher.addAlgorithm("sha-256");
+        }
+        if (line.hasOption("all") || line.hasOption("sha-1")) {
+            directoryHasher.addAlgorithm("sha-1");
+        }
+        if (line.hasOption("all") || line.hasOption("sha-384")) {
+            directoryHasher.addAlgorithm("sha-384");
+        }
+        if (line.hasOption("all") || line.hasOption("sha-512")) {
+            directoryHasher.addAlgorithm("sha-512");
+        }
+        if (line.hasOption("all") || line.hasOption("md5")) {
+            directoryHasher.addAlgorithm("md5");
+        }
+        if (line.hasOption("all") || line.hasOption("md2")) {
+            directoryHasher.addAlgorithm("md2");
+        }
+    }
 
-        Options options = new Options();
+    private static DirectoryHasher getThreadingModel(final CommandLine line) {
+        DirectoryHasher directoryHasher;
+        final ConcurrencyMode concurrencyMode = (line.hasOption("single")) ? ConcurrencyMode.SINGLE
+            : ConcurrencyMode.MULTI_THREADING;
+
+        if (concurrencyMode == ConcurrencyMode.SINGLE) {
+            directoryHasher = DirectoryHasherCreator.create(null);
+        } else {
+            directoryHasher = DirectoryHasherCreator.create(Executors
+                .newFixedThreadPool(FIXED_THREAD_POOL_SIZE));
+        }
+        return directoryHasher;
+    }
+
+    @SuppressWarnings("static-access")
+    private static CommandLine getCommandLine(final String[] theArguments) {
+        final CommandLineParser parser = new PosixParser();
+
+        final Options options = new Options();
 
         options.addOption("h", "help", false, "Get help on the supported commandline options");
         options.addOption("1", "sha-1", false, "Output a sha-1 digest");
@@ -218,16 +227,15 @@ public class App
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
         options.addOption(null, "single", false, "Only use single threaded execution path");
-        final Option outputOption =
-                OptionBuilder
-                        .withLongOpt("output")
-                        .withDescription("The file the output is written to")
-                        .hasArg()
-                        .withArgName("outputfile")
-                        .create("o");
+        final Option outputOption = OptionBuilder.withLongOpt("output")
+            .withDescription("The file the output is written to").hasArg().withArgName("outputfile")
+            .create("o");
         options.addOption(outputOption);
-        options.addOption(OptionBuilder.withLongOpt("input").withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile").create("i"));
-        options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use").hasArg().withArgName("style").create("s"));
+        options.addOption(OptionBuilder.withLongOpt("input")
+            .withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile")
+            .create("i"));
+        options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use")
+            .hasArg().withArgName("style").create("s"));
         options.addOption(null, "single", false, "Only use single threaded execution path");
         CommandLine line;
         try {
@@ -238,11 +246,11 @@ public class App
                 formatter.printHelp(USAGE, HEADER, options, FOOTER);
                 System.exit(0);
             }
-        } catch (ParseException ex) {
+        } catch (final ParseException ex) {
             LOG.log(Level.SEVERE, "Failed at parsing the commandline options.", ex);
             final HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp("hashtree [options] dir [dir...]", options);
-            System.exit(-2);
+            System.exit(EXIT_PERSISTENCE_ERROR);
             return null;
         }
         return line;

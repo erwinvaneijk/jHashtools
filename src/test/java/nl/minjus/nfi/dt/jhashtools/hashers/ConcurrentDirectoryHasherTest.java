@@ -52,20 +52,22 @@ import org.junit.runners.Parameterized;
 /**
  */
 @RunWith(Parameterized.class)
-public class ConcurrentDirectoryHasherTest {
+public class ConcurrentDirectoryHasherTest
+{
     private DirHasherResult knownDigests = null;
     private ExecutorService executorService;
 
     @Parameterized.Parameters
     public static Collection<Object[]> executors() {
         return Arrays.asList(new Object[][] {
-            // Do NOT use Executors.newSingleThreadExecutor. That will deadlock.
-            {Executors.newCachedThreadPool()},
-            {Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())},
-        });
+            // Do NOT use Executors.newSingleThreadExecutor. That will
+            // deadlock.
+            { Executors.newCachedThreadPool() },
+            { Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()) }, });
     }
 
-    public ConcurrentDirectoryHasherTest(ExecutorService anExecutorService) {
+    public ConcurrentDirectoryHasherTest(ExecutorService anExecutorService)
+    {
         super();
         this.executorService = anExecutorService;
     }
@@ -85,12 +87,11 @@ public class ConcurrentDirectoryHasherTest {
             DirHasherResult result = digests.intersect(knownDigestSha256);
             assertEquals(knownDigestSha256, result);
             assertEquals(digests, digests.intersect(knownDigests));
-            for (Map.Entry<File, DigestResult> digest: digests) {
+            for (Map.Entry<File, DigestResult> digest : digests) {
                 int count = digests.count(digest.getValue());
                 assertEquals(1, count);
             }
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -105,8 +106,7 @@ public class ConcurrentDirectoryHasherTest {
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -118,8 +118,7 @@ public class ConcurrentDirectoryHasherTest {
             assertEquals("initially no verbose behaviour", false, directoryHasher.isVerbose());
             directoryHasher.setVerbose(true);
             assertTrue(directoryHasher.isVerbose());
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -134,8 +133,7 @@ public class ConcurrentDirectoryHasherTest {
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             assertEquals(digests, digests.intersect(knownDigests));
             assertEquals(digests, knownDigests.intersect(digests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -148,8 +146,7 @@ public class ConcurrentDirectoryHasherTest {
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             assertEquals(0, digests.exclude(knownDigestSha256).size());
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -163,8 +160,7 @@ public class ConcurrentDirectoryHasherTest {
             DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
             assertEquals(knownDigestMd5, digests.intersect(knownDigestMd5));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -178,8 +174,7 @@ public class ConcurrentDirectoryHasherTest {
             DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
             assertEquals(knownDigestSha, digests.intersect(knownDigestSha));
             assertEquals(digests, digests.intersect(knownDigests));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -195,8 +190,7 @@ public class ConcurrentDirectoryHasherTest {
             assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
             DirHasherResult remainingDigests = digests.intersect(knownDigests);
             assertEquals(digests, remainingDigests);
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -211,8 +205,7 @@ public class ConcurrentDirectoryHasherTest {
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult remainingDigests = digests.intersect(knownDigests);
             assertEquals(digests, remainingDigests);
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -224,11 +217,9 @@ public class ConcurrentDirectoryHasherTest {
             DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher(this.executorService, "sha-256");
             DirHasherResult digests = directoryHasher.getDigests(new File("does-not-exist"));
             fail("We should not get here. An exception should have been thrown");
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // everything is ok.
         }
     }

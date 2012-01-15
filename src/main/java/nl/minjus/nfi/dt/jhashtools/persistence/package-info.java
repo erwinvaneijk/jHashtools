@@ -26,4 +26,8 @@
  * or implied, of <copyright holder>.
  */
 
+/**
+ * This package contains all the persistence layers.
+ */
 package nl.minjus.nfi.dt.jhashtools.persistence;
+

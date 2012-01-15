@@ -38,11 +38,11 @@ public class PersistenceProviderCreator
     /**
      * Create a new PersistenceProvider for <c>thePersistenceStyle<c>.
      *
-     * @param thePersistenceStyle the style to create persistency for.
+     * @param thePersistenceStyle
+     *            the style to create persistency for.
      * @return a provider.
      */
-    public static PersistenceProvider create(PersistenceStyle thePersistenceStyle)
-    {
+    public static PersistenceProvider create(final PersistenceStyle thePersistenceStyle) {
         PersistenceProvider persistenceProvider = null;
         switch (thePersistenceStyle) {
             case JSON:
@@ -54,7 +54,8 @@ public class PersistenceProviderCreator
             case XML:
                 throw new RuntimeException("XML is not yet supported.");
             default:
-                throw new UnsupportedOperationException("We know nothing of persistenceStyle " + thePersistenceStyle);    
+                throw new UnsupportedOperationException("We know nothing of persistenceStyle "
+                    + thePersistenceStyle);
         }
         return persistenceProvider;
     }

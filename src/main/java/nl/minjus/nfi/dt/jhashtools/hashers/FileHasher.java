@@ -37,9 +37,8 @@ import java.security.NoSuchAlgorithmException;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
- * FIXME:
- * Add proper documentation for this interface.
- * 
+ * FIXME: Add proper documentation for this interface.
+ *
  * @author Erwin van Eijk
  */
 public interface FileHasher

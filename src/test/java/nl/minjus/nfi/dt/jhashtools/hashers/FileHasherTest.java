@@ -55,21 +55,23 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
+ * 
  * @author Erwin van Eijk
  */
-public class FileHasherTest {
+public class FileHasherTest
+{
 
     private final Map<Integer, String> expectedDigests;
 
     private File testFile;
     private static final String DEFAULT_ALGORITHM = "sha-256";
 
-    public FileHasherTest() {
+    public FileHasherTest()
+    {
         DirHasherResult result = KnownDigests.getKnownResults();
         expectedDigests = new TreeMap<Integer, String>();
         int i = 1;
-        for (Map.Entry<File, DigestResult> entry: result) {
+        for (Map.Entry<File, DigestResult> entry : result) {
             if (entry.getKey().toString().contains("oldformat")) {
                 continue;
             }
@@ -113,7 +115,6 @@ public class FileHasherTest {
             fail(ex.toString());
         }
     }
-
 
     /**
      * Test of getDigest method, of class AbstractFileHasher.

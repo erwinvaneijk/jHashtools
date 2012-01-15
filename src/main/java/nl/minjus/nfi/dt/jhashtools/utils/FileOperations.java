@@ -33,6 +33,7 @@ import java.io.IOException;
 
 /**
  * Utility class for operations on files.
+ *
  * @author Erwin van Eijk
  */
 public class FileOperations
@@ -40,19 +41,20 @@ public class FileOperations
     /**
      * Determine whether or not aFirstFile and aSecondFile really are the same file.
      *
-     * @param aFirstFile the first file to compare
-     * @param aSecondFile the second file to compare
+     * @param aFirstFile
+     *            the first file to compare
+     * @param aSecondFile
+     *            the second file to compare
      * @return true if they access the same file.
      */
-    public static boolean isSameFile(final File aFirstFile, final File aSecondFile)
-    {
+    public static boolean isSameFile(final File aFirstFile, final File aSecondFile) {
         try {
             if (aFirstFile.exists() && aSecondFile.exists()) {
                 if (aFirstFile.getCanonicalFile().equals(aSecondFile.getCanonicalFile())) {
                     return true;
                 }
             }
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             return false;
         }
         return false;
@@ -61,12 +63,13 @@ public class FileOperations
     /**
      * Determine whether or not aFirstFile and aSecondFile really are the same file.
      *
-     * @param aFirstFile the first file to compare
-     * @param aSecondFile the second file to compare to.
+     * @param aFirstFile
+     *            the first file to compare
+     * @param aSecondFile
+     *            the second file to compare to.
      * @return true of they point to the same file.
      */
-    public static boolean isSameFile(final String aFirstFile, final String aSecondFile)
-    {
+    public static boolean isSameFile(final String aFirstFile, final String aSecondFile) {
         final File firstFile = new File(aFirstFile);
         final File secondFile = new File(aSecondFile);
         return FileOperations.isSameFile(firstFile, secondFile);

@@ -38,20 +38,20 @@ import java.util.Map;
  */
 class SupportedDigestAlgorithms
 {
-	private static Map<String, Boolean> supportedMap = new HashMap<String, Boolean>();
-	
-	public static boolean isSupportedAlgorithm(String algorithm) {
+    private static Map<String, Boolean> supportedMap = new HashMap<String, Boolean>();
+
+    public static boolean isSupportedAlgorithm(final String algorithm) {
         try {
-        	Boolean cachedValue = supportedMap.get(algorithm);
-        	if (cachedValue != null) {
-        		return cachedValue;
-        	} else {
-        		MessageDigest digest = MessageDigest.getInstance(algorithm);
-        		supportedMap.put(digest.getAlgorithm(), true);
-        		return true;
-        	}
-        } catch (NoSuchAlgorithmException ex) {
-        	supportedMap.put(algorithm, false);
+            final Boolean cachedValue = supportedMap.get(algorithm);
+            if (cachedValue != null) {
+                return cachedValue;
+            } else {
+                final MessageDigest digest = MessageDigest.getInstance(algorithm);
+                supportedMap.put(digest.getAlgorithm(), true);
+                return true;
+            }
+        } catch (final NoSuchAlgorithmException ex) {
+            supportedMap.put(algorithm, false);
             return false;
         }
     }

@@ -46,21 +46,18 @@ import static junit.framework.Assert.assertEquals;
 public class ConcurrentFileHasherTest
 {
     @Test
-    public void testGetDigest() throws NoSuchAlgorithmException, IOException
-    {
+    public void testGetDigest() throws NoSuchAlgorithmException, IOException {
         String content = "foo";
         ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
         FileHasher serialFileHasher = new ConcurrentFileHasher(DigestAlgorithmFactory.create("sha-256"));
         DigestResult result = serialFileHasher.getDigest(stream);
 
-        assertEquals("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
-                     result.getDigest("sha-256").toString());
+        assertEquals("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae", result
+            .getDigest("sha-256").toString());
     }
 
-
     @Test
-    public void testGetDigestOfFileSerially() throws NoSuchAlgorithmException, IOException
-    {
+    public void testGetDigestOfFileSerially() throws NoSuchAlgorithmException, IOException {
         InputStream stream = new FileInputStream(new File("testdata/include-sha1-sha256-sha512.txt"));
         Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
         algorithms.add(DigestAlgorithmFactory.create("sha-1"));
@@ -69,19 +66,22 @@ public class ConcurrentFileHasherTest
         DigestResult result = fileHasher.getDigest(stream);
 
         if (!OsUtils.isWindows()) {
-            assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result.getDigest("sha-1").toString());
+            assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result
+                .getDigest("sha-1").toString());
 
-            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5")
+                .toString());
         } else {
-            assertEquals("sha1 do not match", "sha-1:e229a5114d7476505210778a5a5fcc94d69e36c1", result.getDigest("sha-1").toString());
+            assertEquals("sha1 do not match", "sha-1:e229a5114d7476505210778a5a5fcc94d69e36c1", result
+                .getDigest("sha-1").toString());
 
-            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5")
+                .toString());
         }
     }
 
     @Test
-    public void testGetTwoDigestsOfFileConcurrent() throws NoSuchAlgorithmException, IOException
-    {
+    public void testGetTwoDigestsOfFileConcurrent() throws NoSuchAlgorithmException, IOException {
         InputStream stream = new FileInputStream(new File("testdata/include-sha1-sha256-sha512.txt"));
         Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
         algorithms.add(DigestAlgorithmFactory.create("sha-1"));
@@ -90,19 +90,22 @@ public class ConcurrentFileHasherTest
         DigestResult result = fileHasher.getDigest(stream);
 
         if (!OsUtils.isWindows()) {
-            assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result.getDigest("sha-1").toString());
+            assertEquals("sha1 do not match", "sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f", result
+                .getDigest("sha-1").toString());
 
-            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5")
+                .toString());
         } else {
-            assertEquals("sha1 do not match", "sha-1:e229a5114d7476505210778a5a5fcc94d69e36c1", result.getDigest("sha-1").toString());
+            assertEquals("sha1 do not match", "sha-1:e229a5114d7476505210778a5a5fcc94d69e36c1", result
+                .getDigest("sha-1").toString());
 
-            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5")
+                .toString());
         }
     }
 
     @Test
-    public void testGetDigestOfFileConcurrent() throws NoSuchAlgorithmException, IOException
-    {
+    public void testGetDigestOfFileConcurrent() throws NoSuchAlgorithmException, IOException {
         InputStream stream = new FileInputStream(new File("testdata/include-sha1-sha256-sha512.txt"));
         Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
         algorithms.add(DigestAlgorithmFactory.create("md5"));
@@ -110,9 +113,11 @@ public class ConcurrentFileHasherTest
         DigestResult result = fileHasher.getDigest(stream);
 
         if (!OsUtils.isWindows()) {
-            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:bed8e0d55ab120d38325af63da19125f", result.getDigest("md5")
+                .toString());
         } else {
-            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5").toString());
+            assertEquals("md5 do not match", "md5:504c08283bc87e86a6ed327838c10f48", result.getDigest("md5")
+                .toString());
         }
     }
 }

@@ -26,4 +26,8 @@
  * or implied, of <copyright holder>.
  */
 
+/**
+ * The various hashers live here.
+ */
 package nl.minjus.nfi.dt.jhashtools.hashers;
+

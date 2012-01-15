@@ -41,12 +41,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 /**
  * Where all the digests are managed.
  */
-public class DigestMask {
-    private static DigestMask instance;
-    private static final Object lock = new Object();
+public class DigestMask
+{
+    private static final int MAXIMUM_SUPPORTED_VALUE = 0x0080;
+    private static final Object LOCK = new Object();
 
-    private static final Map<String, Short> masks = new HashMap<String, Short>();
-    private static final Map<Short, String> reverseMasks = new HashMap<Short, String>();
+    private static final Map<String, Short> MASKS = new HashMap<String, Short>();
+    private static final Map<Short, String> REVERSE_MASKS = new HashMap<Short, String>();
     private static final short MD5_ALGORITHM = 0x0001;
     private static final short SHA1_ALGORITHM_MASK = 0x0002;
     private static final short SHA256_ALGORITHM_MASK = 0x0004;
@@ -54,59 +55,64 @@ public class DigestMask {
     private static final short SHA512_ALGORITHM_MASK = 0x0010;
     private static final short RIPEMD_ALGORITHM_MASK = 0x0020;
     private static final short CRC_ALGORITHM = 0x0040;
-    private static short maxValue = 0x0080;
+    private static short maxValue = MAXIMUM_SUPPORTED_VALUE;
 
     static {
         try {
-        	Security.addProvider(new BouncyCastleProvider());
-        	
-            masks.put(MessageDigest.getInstance("md5").getAlgorithm(), MD5_ALGORITHM);
-            masks.put(MessageDigest.getInstance("sha-1").getAlgorithm(), SHA1_ALGORITHM_MASK);
-            masks.put("sha-1", SHA1_ALGORITHM_MASK);            
-            masks.put(MessageDigest.getInstance("sha-256").getAlgorithm(), SHA256_ALGORITHM_MASK);
-            masks.put(MessageDigest.getInstance("sha-384").getAlgorithm(), SHA384_ALGORITHM_MASK);
-            masks.put(MessageDigest.getInstance("sha-512").getAlgorithm(), SHA512_ALGORITHM_MASK);
-            masks.put(MessageDigest.getInstance("ripemd160").getAlgorithm(), RIPEMD_ALGORITHM_MASK);
-            masks.put("crc", CRC_ALGORITHM);
+            Security.addProvider(new BouncyCastleProvider());
 
-            reverseMasks.put(MD5_ALGORITHM, MessageDigest.getInstance("md5").getAlgorithm());
-            reverseMasks.put(SHA1_ALGORITHM_MASK, MessageDigest.getInstance("sha-1").getAlgorithm());
-            reverseMasks.put(SHA256_ALGORITHM_MASK, MessageDigest.getInstance("sha-256").getAlgorithm());
-            reverseMasks.put(SHA384_ALGORITHM_MASK, MessageDigest.getInstance("sha-384").getAlgorithm());
-            reverseMasks.put(SHA512_ALGORITHM_MASK, MessageDigest.getInstance("sha-512").getAlgorithm());
-            reverseMasks.put(RIPEMD_ALGORITHM_MASK, MessageDigest.getInstance("ripemd160").getAlgorithm());
-            reverseMasks.put(CRC_ALGORITHM, "crc");
-        } catch (NoSuchAlgorithmException ex) {
+            MASKS.put(MessageDigest.getInstance("md5").getAlgorithm(), MD5_ALGORITHM);
+            MASKS.put(MessageDigest.getInstance("sha-1").getAlgorithm(), SHA1_ALGORITHM_MASK);
+            MASKS.put("sha-1", SHA1_ALGORITHM_MASK);
+            MASKS.put(MessageDigest.getInstance("sha-256").getAlgorithm(), SHA256_ALGORITHM_MASK);
+            MASKS.put(MessageDigest.getInstance("sha-384").getAlgorithm(), SHA384_ALGORITHM_MASK);
+            MASKS.put(MessageDigest.getInstance("sha-512").getAlgorithm(), SHA512_ALGORITHM_MASK);
+            MASKS.put(MessageDigest.getInstance("ripemd160").getAlgorithm(), RIPEMD_ALGORITHM_MASK);
+            MASKS.put("crc", CRC_ALGORITHM);
+
+            REVERSE_MASKS.put(MD5_ALGORITHM, MessageDigest.getInstance("md5").getAlgorithm());
+            REVERSE_MASKS.put(SHA1_ALGORITHM_MASK, MessageDigest.getInstance("sha-1").getAlgorithm());
+            REVERSE_MASKS.put(SHA256_ALGORITHM_MASK, MessageDigest.getInstance("sha-256").getAlgorithm());
+            REVERSE_MASKS.put(SHA384_ALGORITHM_MASK, MessageDigest.getInstance("sha-384").getAlgorithm());
+            REVERSE_MASKS.put(SHA512_ALGORITHM_MASK, MessageDigest.getInstance("sha-512").getAlgorithm());
+            REVERSE_MASKS.put(RIPEMD_ALGORITHM_MASK, MessageDigest.getInstance("ripemd160").getAlgorithm());
+            REVERSE_MASKS.put(CRC_ALGORITHM, "crc");
+        } catch (final NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static final DigestMask getInstance() {
-        if (instance == null) {
-            synchronized (lock) {
-                if (instance == null) {
-                    instance = new DigestMask();
-                }
-            }
-        }
-        return instance;
+    /**
+     * Pattern to not use the double check idiom for singeltons. This
+     * is the threadsafe alternative.
+     *
+     * @author Erwin van Eijk
+     *
+     */
+    private static class SingletonHolder
+    {
+        static final DigestMask INSTANCE = new DigestMask();
     }
 
-    public final Short getMask(String algorithm) {
+    public static final DigestMask getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    public final Short getMask(final String algorithm) {
         if (algorithm == null) {
             return 0;
         }
 
-        Short result = masks.get(algorithm);
+        Short result = MASKS.get(algorithm);
         if (result == null) {
-            result = masks.get(algorithm.toLowerCase());
+            result = MASKS.get(algorithm.toLowerCase());
             if (result == null) {
-                synchronized (lock) {
-                    result = masks.get(algorithm.toLowerCase());
+                synchronized (LOCK) {
+                    result = MASKS.get(algorithm.toLowerCase());
                     if (result == null) {
-                        masks.put(algorithm.toUpperCase(), maxValue);
-                        reverseMasks.put(maxValue, algorithm);
-                        Short returnValue = maxValue;
+                        MASKS.put(algorithm.toUpperCase(), maxValue);
+                        REVERSE_MASKS.put(maxValue, algorithm);
+                        final short returnValue = maxValue;
                         maxValue = (short) (maxValue << 1);
                         return returnValue;
                     }
@@ -116,15 +122,15 @@ public class DigestMask {
         return result;
     }
 
-    public final List<String> contains(short mask) {
-        List<String> result = new LinkedList<String>();
+    public final List<String> contains(final short mask) {
+        final List<String> result = new LinkedList<String>();
         int i = 1;
         if (mask == 0) {
             return result;
         }
         while (i < maxValue) {
             if ((mask & i) != 0x0000) {
-                result.add(reverseMasks.get((short) i));
+                result.add(REVERSE_MASKS.get((short) i));
             }
             i = i << 1;
         }

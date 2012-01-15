@@ -28,94 +28,110 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
 /**
  * Use multithreading to compute the digests on all the files.
+ *
  * @author Erwin van Eijk
  */
 class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
 {
 
+    private static final int DEFAULT_QUEUE_SIZE = 32;
     private static final Logger LOG = Logger.getLogger(ConcurrentDirectoryHasher.class.getName());
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
 
+    /**
+     * Valid states during processing.
+     *
+     * @author Erwin van Eijk
+     *
+     */
     static enum ProcessingStates
     {
-
-        UNINITIALIZED,
-        BUSY,
-        FINISHED
+        UNINITIALIZED, BUSY, FINISHED
     }
 
-    public ConcurrentDirectoryHasher(ExecutorService anExecutorService)
+    public ConcurrentDirectoryHasher(final ExecutorService anExecutorService)
     {
         super();
         this.executorService = anExecutorService;
     }
 
-    public ConcurrentDirectoryHasher(ExecutorService anExecutorService, String algorithm)
-            throws NoSuchAlgorithmException
+    public ConcurrentDirectoryHasher(final ExecutorService anExecutorService, final String algorithm)
+        throws NoSuchAlgorithmException
     {
         super(algorithm);
         this.executorService = anExecutorService;
     }
 
-    public ConcurrentDirectoryHasher(ExecutorService anExecutorService, Collection<String> algorithms)
-            throws NoSuchAlgorithmException
+    public ConcurrentDirectoryHasher(final ExecutorService anExecutorService, final Collection<String> algorithms)
+        throws NoSuchAlgorithmException
     {
         super(algorithms);
         this.executorService = anExecutorService;
     }
 
-    public DirHasherResult getDigests(File startPath)
-    {
-        DirHasherResult result = new DirHasherResult();
+    @Override
+    public DirHasherResult getDigests(final File startPath) {
+        final DirHasherResult result = new DirHasherResult();
         this.updateDigests(result, startPath);
         return result;
     }
 
     @Override
-    public void updateDigests(DirHasherResult digests, File startPath)
-    {
+    public void updateDigests(final DirHasherResult digests, final File startPath) {
         if (!startPath.exists()) {
             throw new IllegalArgumentException("Path " + startPath + " does not exist");
         }
 
-        Vector<BlockingQueue<File>> queues = new Vector<BlockingQueue<File>>(MAX_THREADS);
-        for (int i=0; i<MAX_THREADS; i++) {
-            queues.add(i, new LinkedBlockingQueue<File>(32));
+        final Vector<BlockingQueue<File>> queues = new Vector<BlockingQueue<File>>(MAX_THREADS);
+        for (int i = 0; i < MAX_THREADS; i++) {
+            queues.add(i, new LinkedBlockingQueue<File>(DEFAULT_QUEUE_SIZE));
         }
-        ProcessingState currentState = new ProcessingState();
+        final ProcessingState currentState = new ProcessingState();
 
-        CompletionService<DirHasherResult> completionService =
-                new ExecutorCompletionService<DirHasherResult>(this.executorService);
-        // Create the task that just walks the tree and puts the File entries in the queue
-        Future<DirHasherResult> fileWalkerTask =
-                completionService.submit(new FileWalkerTask(startPath, queues, currentState));
+        final CompletionService<DirHasherResult> completionService = new ExecutorCompletionService<DirHasherResult>(
+            this.executorService);
+        // Create the task that just walks the tree and puts the File entries in
+        // the queue
+        final Future<DirHasherResult> fileWalkerTask = completionService.submit(new FileWalkerTask(startPath,
+            queues, currentState));
 
-        // Start the compute tasks that compute the digests on the data in the File's that are read from
+        // Start the compute tasks that compute the digests on the data in the
+        // File's that are read from
         // the queue.
-        Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
+        final Collection<Future<DirHasherResult>> computeTasks = new LinkedList<Future<DirHasherResult>>();
         for (int i = 0; i < MAX_THREADS; i++) {
             try {
                 new FileHasherCreator();
-				FileHasher fileHasher = FileHasherCreator.create(this.executorService, this.algorithms);
-                computeTasks.add(completionService.submit(new FileDigestComputeTask(queues.get(i), fileHasher, currentState)));
-            } catch (NoSuchAlgorithmException e) {
+                final FileHasher fileHasher = FileHasherCreator.create(this.executorService,
+                    this.getTheAlgorithms());
+                computeTasks.add(completionService.submit(new FileDigestComputeTask(queues.get(i),
+                    fileHasher, currentState)));
+            } catch (final NoSuchAlgorithmException e) {
                 LOG.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);
             }
         }
@@ -126,21 +142,30 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
                 LOG.log(Level.SEVERE, "It should be impossible to get a result here.");
             }
 
-            for (Future<DirHasherResult> task : computeTasks) {
-                DirHasherResult partial = task.get();
+            for (final Future<DirHasherResult> task : computeTasks) {
+                final DirHasherResult partial = task.get();
                 if (partial != null) {
                     digests.putAll(partial);
                 }
             }
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             LOG.log(Level.WARNING, "Interruption has occurred.", ex);
-        } catch (ExecutionException ex) {
+        } catch (final ExecutionException ex) {
             LOG.log(Level.WARNING, "Execution was interrupted.", ex);
         }
     }
 
-    static class ProcessingState
+    /**
+     * For keeping the current state of processing in one place.
+     *
+     * @author Erwin van Eijk
+     *
+     */
+    private static class ProcessingState
     {
+        private final Lock lock;
+
+        private ProcessingStates currentState;
 
         public ProcessingState()
         {
@@ -148,18 +173,36 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
             this.currentState = ProcessingStates.UNINITIALIZED;
         }
 
-        public Lock lock;
-        public ProcessingStates currentState;
+        @SuppressWarnings("unused")
+        public Lock getLock() {
+            return lock;
+        }
+
+        public ProcessingStates getCurrentState() {
+            return currentState;
+        }
+
+        @SuppressWarnings("unused")
+        public void setCurrentState(final ProcessingStates newState) {
+            this.currentState = newState;
+        }
     }
 
+    /**
+     * The task for going around the filesystem.
+     *
+     * @author Erwin van Eijk
+     *
+     */
     static class FileWalkerTask implements Callable<DirHasherResult>
     {
 
-        private File startingPath;
-        private DirVisitorTask visitor;
-        private ProcessingState processingState;
+        private final File startingPath;
+        private final DirVisitorTask visitor;
+        private final ProcessingState processingState;
 
-        public FileWalkerTask(final File startingPath, final Vector<BlockingQueue<File>> inputQueues, final ProcessingState processingState)
+        public FileWalkerTask(final File startingPath, final Vector<BlockingQueue<File>> inputQueues,
+            final ProcessingState processingState)
         {
             this.startingPath = startingPath;
             this.visitor = new DirVisitorTask(inputQueues);
@@ -176,15 +219,15 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
          *
          * @see Callable#call()
          */
-        public DirHasherResult call()
-        {
+        @Override
+        public DirHasherResult call() {
             try {
                 this.processingState.lock.lock();
                 this.processingState.currentState = ProcessingStates.BUSY;
             } finally {
                 this.processingState.lock.unlock();
             }
-            FileWalker walker = new FileWalker();
+            final FileWalker walker = new FileWalker();
             walker.addWalkerVisitor(visitor);
             walker.walk(this.startingPath);
             try {
@@ -198,14 +241,21 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
         }
     }
 
-    static class FileDigestComputeTask implements Callable<DirHasherResult>
+    /**
+     * The task for computing the digests.
+     *
+     * @author Erwin van Eijk
+     *
+     */
+    private static class FileDigestComputeTask implements Callable<DirHasherResult>
     {
-        private BlockingQueue<File> inputQueue;
-        private FileHasher fileHasher;
-        private DirHasherResult partialResult;
-        private ProcessingState processingState;
+        private final BlockingQueue<File> inputQueue;
+        private final FileHasher fileHasher;
+        private final DirHasherResult partialResult;
+        private final ProcessingState processingState;
 
-        public FileDigestComputeTask(final BlockingQueue<File> inputQueue, final FileHasher fileHasher, final ProcessingState processingState) throws NoSuchAlgorithmException
+        public FileDigestComputeTask(final BlockingQueue<File> inputQueue, final FileHasher fileHasher,
+            final ProcessingState processingState) throws NoSuchAlgorithmException
         {
             this.inputQueue = inputQueue;
             this.fileHasher = fileHasher;
@@ -218,24 +268,26 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
          *
          * @return computed result
          *
-         * @throws Exception if unable to compute a result
+         * @throws Exception
+         *             if unable to compute a result
          */
-        public DirHasherResult call() throws Exception
-        {
+        @Override
+        public DirHasherResult call() {
             try {
                 while (true) {
+                    final File file = this.inputQueue.poll(10, TimeUnit.MICROSECONDS);
                     try {
-                        File file = this.inputQueue.poll(10, TimeUnit.MICROSECONDS);
                         if (file != null) {
                             this.partialResult.put(file, this.fileHasher.getDigest(file));
-                        } else if (this.processingState.currentState == ProcessingStates.FINISHED) {
+                        } else if (this.processingState.getCurrentState() == ProcessingStates.FINISHED) {
                             break;
                         }
-                    } catch (IOException ex) {
+                    } catch (final IOException ex) {
+                        LOG.log(Level.INFO, "Could not process file: " + file.getPath());
                         // pass
                     }
                 }
-            } catch (Exception ex) {
+            } catch (final InterruptedException ex) {
                 ex.printStackTrace();
             }
             return this.partialResult;

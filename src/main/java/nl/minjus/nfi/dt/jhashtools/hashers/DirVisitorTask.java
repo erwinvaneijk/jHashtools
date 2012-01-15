@@ -42,14 +42,15 @@ public class DirVisitorTask implements WalkerVisitor
     /**
      * A BlockingQueue to put the File's into.
      */
-    private Vector<BlockingQueue<File>> queues;
+    private final Vector<BlockingQueue<File>> queues;
 
     private int nextQueue;
 
     /**
      * Constructor.
      *
-     * @param queues The queues to write File-instances that should be visited to.
+     * @param queues
+     *            The queues to write File-instances that should be visited to.
      */
     public DirVisitorTask(final Vector<BlockingQueue<File>> queues)
     {
@@ -60,16 +61,18 @@ public class DirVisitorTask implements WalkerVisitor
     /**
      * Called when a file is visited.
      *
-     * @param aFile the file that is being visited.
+     * @param aFile
+     *            the file that is being visited.
      */
-    public final void visit(final File aFile)
-    {
+    @Override
+    public final void visit(final File aFile) {
         try {
-            BlockingQueue<File> currentQueue = queues.get(this.nextQueue);
+            final BlockingQueue<File> currentQueue = queues.get(this.nextQueue);
             currentQueue.put(aFile);
             this.nextQueue = (this.nextQueue + 1) % this.queues.size();
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (final InterruptedException e) {
+            e.printStackTrace(); // To change body of catch statement use File |
+                                 // Settings | File Templates.
         }
     }
 }

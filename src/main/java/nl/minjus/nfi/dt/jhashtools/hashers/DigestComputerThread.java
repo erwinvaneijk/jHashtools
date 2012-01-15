@@ -28,8 +28,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import static java.util.logging.Logger.getLogger;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -41,27 +40,30 @@ import java.util.concurrent.Exchanger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.util.logging.Logger.getLogger;
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
- * This callable can be use to create a thread that is able to compute digests in
- * a separate thread.
+ * This callable can be use to create a thread that is able to compute digests in a separate thread.
  *
  * @author Erwin van Eijk
  */
 class DigestComputerThread implements Callable<DigestResult>
 {
     private static final Logger LOG = getLogger(DigestComputerThread.class.getName());
-    private Collection<DigestAlgorithm> digests;
-    private Exchanger<ByteBuffer> exchanger;
+    private final Collection<DigestAlgorithm> digests;
+    private final Exchanger<ByteBuffer> exchanger;
 
     /**
      * Constructor.
      *
-     * @param digests the digests to use.
-     * @param exchanger the exchanger to get the data from.
+     * @param digests
+     *            the digests to use.
+     * @param exchanger
+     *            the exchanger to get the data from.
      */
-    public DigestComputerThread(final Collection<DigestAlgorithm> digests, Exchanger<ByteBuffer> exchanger)
+    public DigestComputerThread(final Collection<DigestAlgorithm> digests,
+        final Exchanger<ByteBuffer> exchanger)
     {
         this.digests = digests;
         this.exchanger = exchanger;
@@ -74,38 +76,39 @@ class DigestComputerThread implements Callable<DigestResult>
      *
      * @return a DigestResult instance.
      */
-    public DigestResult call()
-    {
-        Collection<MessageDigest> digests = new ArrayList<MessageDigest>(this.digests.size());
-        for (DigestAlgorithm alg: this.digests) {
+    @Override
+    public DigestResult call() {
+        final Collection<MessageDigest> digests = new ArrayList<MessageDigest>(this.digests.size());
+        for (final DigestAlgorithm alg : this.digests) {
             try {
                 digests.add(alg.getInstance());
-            } catch (NoSuchAlgorithmException ex) {
+            } catch (final NoSuchAlgorithmException ex) {
                 // FIXME:
                 // Decide whether we should log this properly.
                 // For now, we ignore.
+                LOG.log(Level.SEVERE, "Algorithm not supported: " + alg.getName());
             }
         }
         try {
-            byte[] buf = new byte[AbstractFileHasher.BLOCK_READ_SIZE];
+            final byte[] buf = new byte[AbstractFileHasher.BLOCK_READ_SIZE];
             ByteBuffer buffer = ByteBuffer.wrap(buf, 0, AbstractFileHasher.BLOCK_READ_SIZE);
             while (true) {
                 buffer = this.exchanger.exchange(buffer);
                 if (buffer == null) {
                     break;
                 }
-                int savePos = buffer.position();
-                for (MessageDigest digest : digests) {
+                final int savePos = buffer.position();
+                for (final MessageDigest digest : digests) {
                     digest.update(buffer);
-                    buffer.position(savePos);   // Reset the position.
+                    buffer.position(savePos); // Reset the position.
                 }
             }
             final DigestResult res = new DigestResult();
-            for (MessageDigest digest : digests) {
+            for (final MessageDigest digest : digests) {
                 res.add(new Digest(digest));
             }
             return res;
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             LOG.log(Level.SEVERE, "Execution was aborted.", ex);
             return null;
         }

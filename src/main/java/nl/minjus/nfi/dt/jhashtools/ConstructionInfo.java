@@ -28,10 +28,10 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.utils.Version;
-
 import java.util.Calendar;
 import java.util.Date;
+
+import nl.minjus.nfi.dt.jhashtools.utils.Version;
 
 /**
  * ConstructionInfo holds the information on when the app was run.
@@ -63,66 +63,63 @@ public class ConstructionInfo
     /**
      * @return the username
      */
-    public String getUsername()
-    {
+    public String getUsername() {
         return username;
     }
 
     /**
-     * @param theUsername the username to set
+     * Set the username.
+     *
+     * @param theUsername
+     *            the username to set
      */
-    public void setUsername(String theUsername)
-    {
+    public void setUsername(final String theUsername) {
         this.username = theUsername;
     }
 
     /**
      * @return the versionInformation
      */
-    public String getVersionInformation()
-    {
+    public String getVersionInformation() {
         return versionInformation;
     }
 
     /**
-     * @param theVersionInformation the versionInformation to set
+     * @param theVersionInformation
+     *            the versionInformation to set
      */
-    public void setVersionInformation(String theVersionInformation)
-    {
+    public void setVersionInformation(final String theVersionInformation) {
         this.versionInformation = theVersionInformation;
     }
 
     /**
      * @return the constructionDate
      */
-    public Date getConstructionDate()
-    {
+    public Date getConstructionDate() {
         return this.constructionDate;
     }
 
     /**
-     * @param theConstructionDate the constructionDate to set
+     * @param theConstructionDate
+     *            the constructionDate to set
      */
-    public void setConstructionDate(Date theConstructionDate)
-    {
+    public void setConstructionDate(final Date theConstructionDate) {
         this.constructionDate = theConstructionDate;
     }
 
     /**
      * @return the operatingSystem
      */
-    public String getOperatingSystem()
-    {
+    public String getOperatingSystem() {
         return operatingSystem;
     }
 
     /**
-     * @param theOperatingSystem the operatingSystem to set
+     * @param theOperatingSystem
+     *            the operatingSystem to set
      */
-    public void setOperatingSystem(String theOperatingSystem)
-    {
+    public void setOperatingSystem(final String theOperatingSystem) {
         this.operatingSystem = theOperatingSystem;
     }
-
 
 }

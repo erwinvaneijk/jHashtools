@@ -30,6 +30,7 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 /**
  * The definition of the various supported persistence styles.
+ *
  * @author Erwin van Eijk
  */
 public enum PersistenceStyle
@@ -50,11 +51,11 @@ public enum PersistenceStyle
     /**
      * Convert the description into the suitable enum member.
      *
-     * @param aDescription the description to convert.
+     * @param aDescription
+     *            the description to convert.
      * @return a PersistenceStyle
      */
-    public static PersistenceStyle convert(String aDescription)
-    {
+    public static PersistenceStyle convert(final String aDescription) {
         if ("xml".equals(aDescription)) {
             return XML;
         } else if ("json".equals(aDescription)) {

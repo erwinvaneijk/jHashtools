@@ -28,17 +28,20 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * @author Erwin van Eijk
  */
 class SerialDirectoryHasher extends AbstractDirectoryHasher
 {
+    private static final Logger LOG = Logger.getLogger(ConcurrentFileHasher.class.getName());
 
     private final DirHasherResult results = new DirHasherResult();
 
@@ -47,39 +50,37 @@ class SerialDirectoryHasher extends AbstractDirectoryHasher
         super();
     }
 
-    public SerialDirectoryHasher(String algorithm) throws NoSuchAlgorithmException
+    public SerialDirectoryHasher(final String algorithm) throws NoSuchAlgorithmException
     {
         super(algorithm);
     }
 
-    public SerialDirectoryHasher(Collection<String> algorithms) throws NoSuchAlgorithmException
+    public SerialDirectoryHasher(final Collection<String> algorithms) throws NoSuchAlgorithmException
     {
         super(algorithms);
     }
 
     @Override
-    public DirHasherResult getDigests(final File startFile)
-    {
+    public DirHasherResult getDigests(final File startFile) {
         this.results.clear();
         updateDigests(this.results, startFile);
         return this.results;
     }
 
     @Override
-    public void updateDigests(DirHasherResult digests, final File file)
-    {
+    public void updateDigests(final DirHasherResult digests, final File file) {
         if (!file.exists()) {
             throw new IllegalArgumentException(String.format("File %s does not exist", file.toString()));
         }
 
         try {
-            FileWalker walker = new FileWalker();
-            DirectoryVisitor visitor = new DirectoryVisitor(algorithms, digests);
+            final FileWalker walker = new FileWalker();
+            final DirectoryVisitor visitor = new DirectoryVisitor(getTheAlgorithms(), digests);
             visitor.setVerbose(this.isVerbose());
             walker.addWalkerVisitor(visitor);
             walker.walk(file);
-        } catch (NoSuchAlgorithmException ex) {
-            // this cannot happen. FLW.
+        } catch (final NoSuchAlgorithmException ex) {
+            LOG.log(Level.SEVERE, "This is not possible: Algorithm not found", ex);
         }
     }
 }

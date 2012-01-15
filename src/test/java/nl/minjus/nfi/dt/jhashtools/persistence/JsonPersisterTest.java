@@ -54,7 +54,8 @@ import static org.junit.Assert.*;
 /**
  * @author eijk
  */
-public class JsonPersisterTest {
+public class JsonPersisterTest
+{
 
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;
@@ -77,15 +78,18 @@ public class JsonPersisterTest {
     public void tearDown() {
     }
 
-    static class LargeArrayClass {
+    static class LargeArrayClass
+    {
 
         List<Long> set;
 
-        public LargeArrayClass() {
+        public LargeArrayClass()
+        {
             this(0);
         }
-        
-        public LargeArrayClass(int n) {
+
+        public LargeArrayClass(int n)
+        {
             this.set = new ArrayList<Long>(n);
             for (long i = 0; i < n; i++) {
                 set.add((int) i, i);
@@ -101,10 +105,13 @@ public class JsonPersisterTest {
         }
     }
 
-    static class LargeArraySerializer extends JsonSerializer<LargeArrayClass> {
+    static class LargeArraySerializer extends JsonSerializer<LargeArrayClass>
+    {
 
         @Override
-        public void serialize(LargeArrayClass largeArrayClass, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+        public void serialize(LargeArrayClass largeArrayClass, JsonGenerator jsonGenerator,
+            SerializerProvider serializerProvider) throws IOException, JsonProcessingException
+        {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeArrayFieldStart("set");
             for (Long l : largeArrayClass.set) {
@@ -114,10 +121,13 @@ public class JsonPersisterTest {
         }
     }
 
-    static class LargeArrayDeserializer extends JsonDeserializer<LargeArrayClass> {
+    static class LargeArrayDeserializer extends JsonDeserializer<LargeArrayClass>
+    {
 
         @Override
-        public LargeArrayClass deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+        public LargeArrayClass deserialize(JsonParser jp, DeserializationContext deserializationContext)
+            throws IOException, JsonProcessingException
+        {
             LargeArrayClass instance = new LargeArrayClass(10);
             jp.nextToken();
             while (jp.nextToken() != JsonToken.END_OBJECT) {
@@ -136,14 +146,16 @@ public class JsonPersisterTest {
 
     @JsonSerialize(using = LargeArraySerializer.class)
     @JsonDeserialize(using = LargeArrayDeserializer.class)
-    class LargeArrayClassMixIn {
+    class LargeArrayClassMixIn
+    {
     }
 
     @Test
     public void testLargeArray() throws Exception {
         StringWriter out = new StringWriter();
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.getSerializationConfig().addMixInAnnotations(LargeArrayClass.class, LargeArrayClassMixIn.class);
+        objectMapper.getSerializationConfig().addMixInAnnotations(LargeArrayClass.class,
+            LargeArrayClassMixIn.class);
 
         LargeArrayClass a = new LargeArrayClass(10);
         objectMapper.writeValue(out, a);
@@ -153,7 +165,6 @@ public class JsonPersisterTest {
         assertEquals(a.getSet().size(), b.getSet().size());
         assertEquals(a.getSet(), b.getSet());
     }
-
 
     @Test
     public void testSmallSets() {
@@ -167,7 +178,9 @@ public class JsonPersisterTest {
             provider.persist(out, mySet);
 
             Reader input = new StringReader(out.toString());
-            TypeReference<Set<Integer>> setType = new TypeReference<Set<Integer>>() {};
+            TypeReference<Set<Integer>> setType = new TypeReference<Set<Integer>>()
+            {
+            };
             Set<Integer> otherSet = provider.load(input, setType);
             assertEquals(mySet.size(), otherSet.size());
             Iterator<Integer> it1 = mySet.iterator();
@@ -197,7 +210,9 @@ public class JsonPersisterTest {
             provider.persist(out, mySet);
 
             Reader reader = new StringReader(out.toString());
-            TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>() {};
+            TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>()
+            {
+            };
             Set<Integer> otherSet = provider.load(reader, setType);
             assertEquals(mySet.size(), otherSet.size());
             Iterator<Integer> it1 = mySet.iterator();
@@ -235,8 +250,9 @@ public class JsonPersisterTest {
 
     /**
      * Test of load method, of class JsonPersistenceProvider.
-     *
-     * @throws PersistenceException when problems occur with the persistence.
+     * 
+     * @throws PersistenceException
+     *             when problems occur with the persistence.
      */
     @Test
     public void testLoad() throws PersistenceException {

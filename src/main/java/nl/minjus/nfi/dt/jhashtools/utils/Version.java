@@ -35,6 +35,7 @@ import java.util.jar.Manifest;
 
 /**
  * Use this class to get version information from the jar's manifest.
+ *
  * @author Erwin van Eijk
  */
 public class Version
@@ -45,8 +46,7 @@ public class Version
      *
      * @return a string with the version.
      */
-    public static String getVersion()
-    {
+    public static String getVersion() {
         final Class<Version> clazz = Version.class;
         final String className = clazz.getSimpleName();
         final String classFileName = className + ".class";
@@ -57,8 +57,9 @@ public class Version
         try {
             final Manifest manifest = new Manifest(new URL(pathToManifest).openStream());
             final Attributes attributes = manifest.getMainAttributes();
-            return attributes.getValue("Implementation-Version") + "-" + attributes.getValue("Implementation-Build");
-        } catch (IOException ex) {
+            return attributes.getValue("Implementation-Version") + "-"
+                + attributes.getValue("Implementation-Build");
+        } catch (final IOException ex) {
             return "1.0-unknown";
         }
     }

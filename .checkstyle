@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="true">
+  <local-check-config name="jHashtools" location="internal_config__1326571285652.xml" type="internal" description=""/>
+  <fileset name="all-sources" enabled="true" check-config-name="jHashtools" local="true">
+    <file-match-pattern match-pattern="src/main/.+\.java" include-pattern="true"/>
+  </fileset>
+  <filter name="NonSrcDirs" enabled="true"/>
+</fileset-config>

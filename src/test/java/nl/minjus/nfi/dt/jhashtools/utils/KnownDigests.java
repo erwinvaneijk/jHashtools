@@ -38,14 +38,15 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * Utility class.
- *
+ * 
  * @author Erwin van Eijk
  */
-public class KnownDigests {
+public class KnownDigests
+{
 
     /**
      * Get a list of all the known digests in the test folder.
-     *
+     * 
      * @return a DirHasherResult.
      */
     public static DirHasherResult getKnownResults() {
@@ -124,7 +125,6 @@ public class KnownDigests {
             dr.add(new Digest("sha-256", "220408cd9b16d0b025fb0c822a70b340b02f1344e59b19ddff8deef0cc6e7031"));
             knownResults.put("testdata/include-md5-sha1.txt", dr);
 
-
             dr = new DigestResult();
             dr.add(new Digest("md5", "bed8e0d55ab120d38325af63da19125f "));
             dr.add(new Digest("sha-1", "2b3a601a1ee759eec30ddcde458d459aa26ba78f"));
@@ -142,7 +142,6 @@ public class KnownDigests {
             dr.add(new Digest("sha-1", "b67be08991d5d0a826bf01bc9110b3bdbe33c474"));
             dr.add(new Digest("sha-256", "483dec6fb91c1a6142928d28c1f166b62e38c04c2a659022ec1e63f016078867"));
             knownResults.put("testdata/include-md5-sha1.txt", dr);
-
 
             dr = new DigestResult();
             dr.add(new Digest("md5", "504c08283bc87e86a6ed327838c10f48"));

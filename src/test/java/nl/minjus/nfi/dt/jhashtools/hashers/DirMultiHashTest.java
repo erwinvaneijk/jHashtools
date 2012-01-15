@@ -47,11 +47,13 @@ import static org.junit.Assert.*;
 /**
  * @author kojak
  */
-public class DirMultiHashTest {
+public class DirMultiHashTest
+{
 
     private final DirHasherResult knownDigests;
 
-    public DirMultiHashTest() {
+    public DirMultiHashTest()
+    {
         this.knownDigests = KnownDigests.getKnownResults();
     }
 

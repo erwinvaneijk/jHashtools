@@ -41,12 +41,14 @@ import java.security.NoSuchAlgorithmException;
 import static org.junit.Assert.*;
 
 /**
- *
+ * 
  * @author eijk
  */
-public class DirVisitorTest {
+public class DirVisitorTest
+{
 
-    public DirVisitorTest() {
+    public DirVisitorTest()
+    {
     }
 
     @BeforeClass
@@ -67,13 +69,14 @@ public class DirVisitorTest {
 
     /**
      * Test of visit method, of class DirectoryVisitor.
+     * 
      * @throws java.security.NoSuchAlgorithmException
      */
     @Test
     public void testVisit() throws NoSuchAlgorithmException {
         File theFile = new File("testdata/testfile1.bin");
         DirectoryVisitor instance = new DirectoryVisitor();
-        assertTrue( ! instance.isVerbose());
+        assertTrue(!instance.isVerbose());
         instance.visit(theFile);
         assertEquals(1, instance.getResults().size());
     }
@@ -108,6 +111,7 @@ public class DirVisitorTest {
 
     /**
      * Test of setVerbose method, of class DirectoryVisitor.
+     * 
      * @throws java.security.NoSuchAlgorithmException
      */
     @Test

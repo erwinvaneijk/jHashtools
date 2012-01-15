@@ -39,30 +39,34 @@ import java.util.logging.Logger;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
+ * The AbstractFileHasher is needed to avoid duplication of code.
+ *
  * @author Erwin van Eijk
  */
 abstract class AbstractFileHasher implements FileHasher
 {
     public static final int BLOCK_READ_SIZE = 1024 * 1024;
+
     @SuppressWarnings("unused")
-	private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
-    protected Collection<DigestAlgorithm> digests;
+    private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
+
+    private final Collection<DigestAlgorithm> digests;
 
     public AbstractFileHasher()
     {
         this.digests = new ArrayList<DigestAlgorithm>();
     }
 
-    public AbstractFileHasher(DigestAlgorithm digestAlgorithm) throws NoSuchAlgorithmException
+    public AbstractFileHasher(final DigestAlgorithm digestAlgorithm) throws NoSuchAlgorithmException
     {
         this();
         this.addAlgorithm(digestAlgorithm);
     }
 
-    public AbstractFileHasher(Collection<DigestAlgorithm> algorithms) throws NoSuchAlgorithmException
+    public AbstractFileHasher(final Collection<DigestAlgorithm> algorithms) throws NoSuchAlgorithmException
     {
         this();
-        for (DigestAlgorithm algorithmName : algorithms) {
+        for (final DigestAlgorithm algorithmName : algorithms) {
             this.addAlgorithm(algorithmName);
         }
     }
@@ -70,36 +74,50 @@ abstract class AbstractFileHasher implements FileHasher
     /**
      * Add an algorithm to the set of supported algorithms.
      *
-     * @param algorithmName the algorithm to add.
+     * @param algorithmName
+     *            the algorithm to add.
      *
-     * @throws NoSuchAlgorithmException when the algorithm is not supported by the underlying JVM.
+     * @throws NoSuchAlgorithmException
+     *             when the algorithm is not supported by the underlying JVM.
      */
     @Override
-    public void addAlgorithm(DigestAlgorithm algorithmName) throws NoSuchAlgorithmException
-    {
+    public void addAlgorithm(final DigestAlgorithm algorithmName) throws NoSuchAlgorithmException {
         this.digests.add(algorithmName);
     }
 
     /**
      * Compute the digest(s) for the contents of the file.
      *
-     * @param file the File to compute the digests for.
+     * @param file
+     *            the File to compute the digests for.
      *
      * @return a DigestResult containing the result of the computation.
      *
-     * @throws FileNotFoundException thrown when <c>file</c> doesn't exist.
-     * @throws IOException           thrown when some IOException occurs.
+     * @throws FileNotFoundException
+     *             thrown when <c>file</c> doesn't exist.
+     * @throws IOException
+     *             thrown when some IOException occurs.
      */
     @Override
     public abstract DigestResult getDigest(File file) throws FileNotFoundException, IOException;
 
+    /**
+     * Get all the supported digests.
+     *
+     * @return the digests
+     */
+    public Collection<DigestAlgorithm> getDigests() {
+        return this.digests;
+    }
+
     protected synchronized Collection<MessageDigest> getMessageDigests() {
-        Collection<MessageDigest> messageDigests = new ArrayList<MessageDigest>(this.digests.size());
-        for (DigestAlgorithm algorithm : this.digests) {
+        final Collection<MessageDigest> messageDigests = new ArrayList<MessageDigest>(this.digests.size());
+        for (final DigestAlgorithm algorithm : this.digests) {
             try {
                 messageDigests.add(algorithm.getInstance());
-            } catch (NoSuchAlgorithmException ex) {
-                ex.printStackTrace();           // this cannot happen, we've already checked them before.
+            } catch (final NoSuchAlgorithmException ex) {
+                ex.printStackTrace(); // this cannot happen, we've already
+                                      // checked them before.
             }
         }
         return messageDigests;

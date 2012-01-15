@@ -50,7 +50,8 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 
 import org.junit.Test;
 
-public class IntegrationTest {
+public class IntegrationTest
+{
 
     @Test
     public void testIncludeFiles() throws IOException, PersistenceException {
@@ -88,15 +89,17 @@ public class IntegrationTest {
         assertEquals(0, diff.size());
     }
 
-    //@Test(timeout=120000)
+    // @Test(timeout=120000)
     public void testLargeTree() {
         try {
             Collection<String> digestAlgorithms = new ArrayList<String>();
             digestAlgorithms.add("sha-256");
             digestAlgorithms.add("md5");
             digestAlgorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(), digestAlgorithms);
-            DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(),
+                digestAlgorithms);
+            DirHasherResult digests = directoryHasher
+                .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
             Reader reader = new FileReader("boost-hashes.txt");
@@ -113,15 +116,17 @@ public class IntegrationTest {
         }
     }
 
-    //@Test(timeout=120000)
+    // @Test(timeout=120000)
     public void testLargeTreeConcurrent() {
         try {
             Collection<String> algorithms = new LinkedList<String>();
             algorithms.add("sha-256");
             algorithms.add("md5");
             algorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(), algorithms);
-            DirHasherResult digests = directoryHasher.getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(),
+                algorithms);
+            DirHasherResult digests = directoryHasher
+                .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
             Reader reader = new FileReader("boost-hashes.txt");

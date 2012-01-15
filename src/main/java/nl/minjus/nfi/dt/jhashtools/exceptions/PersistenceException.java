@@ -33,13 +33,9 @@ package nl.minjus.nfi.dt.jhashtools.exceptions;
  */
 public class PersistenceException extends Exception
 {
+    private static final long serialVersionUID = -6297583039886844370L;
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6297583039886844370L;
-
-	public PersistenceException(Throwable t)
+    public PersistenceException(Throwable t)
     {
         super(t);
     }

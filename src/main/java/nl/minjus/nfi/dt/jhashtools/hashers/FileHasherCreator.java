@@ -28,8 +28,6 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -37,9 +35,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+
 /**
  * A Creator class for creating new FileHasher instances.
- * 
+ *
  * @author Erwin van Eijk
  */
 public class FileHasherCreator
@@ -47,11 +47,11 @@ public class FileHasherCreator
     /**
      * Create a new FileHasher instance that is using the given ExecutorService.
      *
-     * @param anExecutorService the ExecutorService to use.
+     * @param anExecutorService
+     *            the ExecutorService to use.
      * @return a FileHasher instance.
      */
-    public static FileHasher create(ExecutorService anExecutorService)
-    {
+    public static FileHasher create(final ExecutorService anExecutorService) {
         FileHasher hasher;
         if (anExecutorService == null) {
             hasher = new SerialFileHasher();
@@ -64,12 +64,16 @@ public class FileHasherCreator
     /**
      * Create a new FileHasher instance that is using the given ExecutorService.
      *
-     * @param anExecutorService the ExecutorService to use.
-     * @param digests the names of the digests that should be supported.
+     * @param anExecutorService
+     *            the ExecutorService to use.
+     * @param digests
+     *            the names of the digests that should be supported.
      * @return a FileHasher instance.
-     * @throws NoSuchAlgorithmException when a name of an unknown digest is passed.
+     * @throws NoSuchAlgorithmException
+     *             when a name of an unknown digest is passed.
      */
-    public static FileHasher create(ExecutorService anExecutorService, Collection<DigestAlgorithm> digests) throws NoSuchAlgorithmException
+    public static FileHasher create(final ExecutorService anExecutorService, final Collection<DigestAlgorithm> digests)
+        throws NoSuchAlgorithmException
     {
         FileHasher hasher;
         if (anExecutorService == null) {
@@ -83,14 +87,18 @@ public class FileHasherCreator
     /**
      * Create a new FileHasher instance that is using the given ExecutorService.
      *
-     * @param anExecutorService the ExecutorService to use.
-     * @param digest the name of the digests that should be supported.
+     * @param anExecutorService
+     *            the ExecutorService to use.
+     * @param digest
+     *            the name of the digests that should be supported.
      * @return a FileHasher instance.
-     * @throws NoSuchAlgorithmException when a name of an unknown digest is passed.
+     * @throws NoSuchAlgorithmException
+     *             when a name of an unknown digest is passed.
      */
-    public static FileHasher create(ExecutorService anExecutorService, DigestAlgorithm digest) throws NoSuchAlgorithmException
+    public static FileHasher create(final ExecutorService anExecutorService, final DigestAlgorithm digest)
+        throws NoSuchAlgorithmException
     {
-        Collection<DigestAlgorithm> digests = new ArrayList<DigestAlgorithm>();
+        final Collection<DigestAlgorithm> digests = new ArrayList<DigestAlgorithm>();
         digests.add(digest);
         return create(anExecutorService, digests);
     }
@@ -98,59 +106,69 @@ public class FileHasherCreator
     /**
      * Compute the digest on a given file with a given algorithm.
      *
-     * @param file the File to process.
-     * @param algorithm the algorithm to use.
+     * @param file
+     *            the File to process.
+     * @param algorithm
+     *            the algorithm to use.
      * @return the result.
-     * @throws IOException when some IO could not be performed.
-     * @throws NoSuchAlgorithmException when the name of an unknown digest algorithm is passed.
+     * @throws IOException
+     *             when some IO could not be performed.
+     * @throws NoSuchAlgorithmException
+     *             when the name of an unknown digest algorithm is passed.
      */
-    public static DigestResult computeDigest(File file, DigestAlgorithm algorithm)
-            throws IOException, NoSuchAlgorithmException
+    public static DigestResult computeDigest(final File file, final DigestAlgorithm algorithm) throws IOException,
+        NoSuchAlgorithmException
     {
-        new FileHasherCreator();
-		FileHasher hasher = FileHasherCreator.create(null, algorithm);
+        final FileHasher hasher = FileHasherCreator.create(null, algorithm);
         return hasher.getDigest(file);
     }
 
     /**
      * Compute the digest on a given file with a given algorithm.
      *
-     * @param file the File to process.
-     * @param algorithms the algorithm to use.
+     * @param file
+     *            the File to process.
+     * @param algorithms
+     *            the algorithm to use.
      * @return the result.
-     * @throws IOException when some IO could not be performed.
-     * @throws NoSuchAlgorithmException when the name of an unknown digest algorithm is passed.
+     * @throws IOException
+     *             when some IO could not be performed.
+     * @throws NoSuchAlgorithmException
+     *             when the name of an unknown digest algorithm is passed.
      */
-    public static DigestResult computeDigest(File file, Collection<DigestAlgorithm> algorithms)
-            throws IOException, NoSuchAlgorithmException
+    public static DigestResult computeDigest(final File file, final Collection<DigestAlgorithm> algorithms)
+        throws IOException, NoSuchAlgorithmException
     {
-        new FileHasherCreator();
-		FileHasher hasher = FileHasherCreator.create(null, algorithms);
+        final FileHasher hasher = FileHasherCreator.create(null, algorithms);
         return hasher.getDigest(file);
     }
 
     /**
      * Compute the digest on a given file with the default algorithm.
      *
-     * @param file the File to process.
+     * @param file
+     *            the File to process.
      * @return the result.
-     * @throws IOException when some IO could not be performed.
-     * @throws NoSuchAlgorithmException when the name of an unknown digest algorithm is passed.
+     * @throws IOException
+     *             when some IO could not be performed.
+     * @throws NoSuchAlgorithmException
+     *             when the name of an unknown digest algorithm is passed.
      */
-    public static DigestResult computeDigest(File file)
-            throws IOException, NoSuchAlgorithmException
-    {
+    public static DigestResult computeDigest(final File file) throws IOException, NoSuchAlgorithmException {
         return computeDigest(file, DigestAlgorithmFactory.create("sha-256"));
     }
 
     /**
      * Create a new FileHasher instance, which is 100% guaranteed single threaded.
      *
-     * @param algorithms the algorithm to use.
+     * @param algorithms
+     *            the algorithm to use.
      * @return the result.
-     * @throws NoSuchAlgorithmException when the name of an unknown digest algorithm is passed.
+     * @throws NoSuchAlgorithmException
+     *             when the name of an unknown digest algorithm is passed.
      */
-    public static FileHasher createSimple(Collection<DigestAlgorithm> algorithms) throws NoSuchAlgorithmException
+    public static FileHasher createSimple(final Collection<DigestAlgorithm> algorithms)
+        throws NoSuchAlgorithmException
     {
         return new SerialFileHasher(algorithms);
     }

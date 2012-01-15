@@ -28,32 +28,42 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import nl.minjus.nfi.dt.jhashtools.DigestOutputCreator;
 
 /**
  * This class offers a 'walker' that will go through a directory and offer the resulting files to one or more visitors.
  *
  * @author Erwin van Eijk
  */
-class FileWalker {
+class FileWalker
+{
+    private static final Logger LOG = getLogger(DigestOutputCreator.class.getCanonicalName());
     private final List<WalkerVisitor> visitors;
     private int visited;
 
     /**
      * Default constructor.
      */
-    public FileWalker() {
+    public FileWalker()
+    {
         this.visitors = new LinkedList<WalkerVisitor>();
     }
 
     /**
      * Add a aVisitor to the list of visitors to signal when a file is found.
      *
-     * @param aVisitor the aVisitor to add.
+     * @param aVisitor
+     *            the aVisitor to add.
      */
-    public void addWalkerVisitor(WalkerVisitor aVisitor) {
+    public void addWalkerVisitor(final WalkerVisitor aVisitor) {
         this.visitors.add(aVisitor);
     }
 
@@ -72,7 +82,7 @@ class FileWalker {
      * @param aStartPath
      * @return
      */
-    public int walk(File aStartPath) {
+    public int walk(final File aStartPath) {
         this.visited = 0;
         this.walkTheFile(aStartPath);
         return this.visited;
@@ -87,7 +97,7 @@ class FileWalker {
         return this.visited;
     }
 
-    private void walkTheFile(File aPath) {
+    private void walkTheFile(final File aPath) {
         try {
             if (!aPath.exists()) {
                 return;
@@ -95,7 +105,7 @@ class FileWalker {
             if (aPath.isFile()) {
                 fireVisitorsWith(aPath);
             } else if (aPath.isDirectory()) {
-                for (File child : aPath.listFiles()) {
+                for (final File child : aPath.listFiles()) {
                     if (child.isFile()) {
                         fireVisitorsWith(child);
                     } else {
@@ -103,13 +113,13 @@ class FileWalker {
                     }
                 }
             }
-        } catch (InterruptedException e) {
-            // pass
+        } catch (final InterruptedException e) {
+            LOG.log(Level.INFO, "Execution interrupted");
         }
     }
 
-    private void fireVisitorsWith(File aFile) throws InterruptedException {
-        for (WalkerVisitor visitor : this.visitors) {
+    private void fireVisitorsWith(final File aFile) throws InterruptedException {
+        for (final WalkerVisitor visitor : this.visitors) {
             visitor.visit(aFile);
         }
         visited += 1;
