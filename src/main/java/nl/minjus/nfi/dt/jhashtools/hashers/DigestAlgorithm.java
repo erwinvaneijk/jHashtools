@@ -32,34 +32,52 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by IntelliJ IDEA. User: eijk Date: Nov 22, 2010 Time: 11:46:13 AM To change this template use File | Settings
- * | File Templates.
+ * A holder for the name of the algorithm and the method to actually create
+ * a corresponding digest value.
  */
 public class DigestAlgorithm
 {
-    private String name;
-    private short value;
+    private final String name;
+    private final short value;
 
-    public DigestAlgorithm(String name, short value)
+    public DigestAlgorithm(final String name, final short value)
     {
         this.name = name;
         this.value = value;
     }
 
-    public DigestAlgorithm(String name)
+    public DigestAlgorithm(final String name)
     {
         this.name = name;
         this.value = DigestMask.getInstance().getMask(name);
     }
 
+    /**
+     * Get the name of the algorithm.
+     *
+     * @return the name
+     */
     public final String getName() {
         return this.name;
     }
 
+    /**
+     * Get the shorthand value for the algorithm.
+     *
+     * @return the value
+     */
     public final short getValue() {
         return this.value;
     }
 
+    /**
+     * Get the real algorithm for this named algorithm.
+     *
+     * @return the algorithm
+     *          the algorithm that can be used to compute digest values.
+     * @throws NoSuchAlgorithmException
+     *          when the named algorithm does not exist.
+     */
     public synchronized MessageDigest getInstance() throws NoSuchAlgorithmException {
         return MessageDigest.getInstance(this.name);
     }

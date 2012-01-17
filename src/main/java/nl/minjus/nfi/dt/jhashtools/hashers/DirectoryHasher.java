@@ -35,7 +35,9 @@ import java.util.Collection;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
- * FIXME: Add proper documentation for this interface.
+ * This interface should be implemented by clients that advocate the
+ * means to walk around a file system and can compute digests on the files
+ * in the file system.
  *
  * @author Erwin van Eijk
  */
@@ -51,6 +53,16 @@ public interface DirectoryHasher
 
     boolean isVerbose();
 
+    /**
+     * Get all the digests for all configured algorithms from all the files that
+     * are reachable from <code>startFile</code>.
+     *
+     * @param startFile
+     *          Where to start looking for new files. Search is short if startFile
+     *          points to an ordinary file, instead of a directory.
+     * @return a DirHasherResult
+     *          This will contain all the digests for all the files.
+     */
     DirHasherResult getDigests(File startFile);
 
     void updateDigests(DirHasherResult digests, File file);

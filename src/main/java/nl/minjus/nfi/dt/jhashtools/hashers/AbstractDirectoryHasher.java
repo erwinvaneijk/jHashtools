@@ -41,7 +41,7 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
  * @author Erwin van Eijk
  *
  */
-abstract class AbstractDirectoryHasher implements DirectoryHasher
+public abstract class AbstractDirectoryHasher implements DirectoryHasher
 {
     private final Collection<DigestAlgorithm> algorithms = new LinkedList<DigestAlgorithm>();
     private boolean verbose;

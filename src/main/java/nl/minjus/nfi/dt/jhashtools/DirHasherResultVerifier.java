@@ -44,8 +44,8 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 
 /**
- * Perform the verfication pass on the measurements and the results that were computed in another pass, which are stored
- * in some file.
+ * Perform the verification pass on the measurements and the results that
+ * were computed in another pass, which are stored in some file.
  *
  * @author Erwin van Eijk
  */
@@ -96,7 +96,7 @@ public class DirHasherResultVerifier
     }
 
     /**
-     * Load the precomputed digests from <c>aFilename<c>.
+     * Load the precomputed digests from <code>aFilename</code>.
      *
      * @param aFilename
      *            the file to read.
