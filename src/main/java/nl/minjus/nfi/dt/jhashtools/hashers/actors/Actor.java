@@ -11,7 +11,6 @@ import kilim.Task;
  */
 public abstract class Actor extends Task
 {
-
     private final Mailbox<Message> inbox;
     private final Mailbox<Message> outbox;
 

@@ -105,7 +105,11 @@ public class DigestOutputCreator
      */
     public void generate(final String[] anArrayOfPathNames) {
         for (final String pathname : anArrayOfPathNames) {
-            directoryHasher.updateDigests(digests, new File(pathname));
+        	try {
+        		directoryHasher.updateDigests(digests, new File(pathname));
+        	} catch (Throwable t) {
+        		LOG.log(Level.FINEST, "We don't care", t);
+        	}
         }
     }
 
