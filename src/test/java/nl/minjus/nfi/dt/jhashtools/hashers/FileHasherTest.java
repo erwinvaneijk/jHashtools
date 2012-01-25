@@ -55,7 +55,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Erwin van Eijk
  */
 public class FileHasherTest
@@ -68,10 +68,10 @@ public class FileHasherTest
 
     public FileHasherTest()
     {
-        DirHasherResult result = KnownDigests.getKnownResults();
+        final DirHasherResult result = KnownDigests.getKnownResults();
         expectedDigests = new TreeMap<Integer, String>();
         int i = 1;
-        for (Map.Entry<File, DigestResult> entry : result) {
+        for (final Map.Entry<File, DigestResult> entry : result) {
             if (entry.getKey().toString().contains("oldformat")) {
                 continue;
             }
@@ -99,19 +99,19 @@ public class FileHasherTest
     @Test
     public void testGetDigest() {
         try {
-            FileHasher instance = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
-            String expResult = expectedDigests.get(1);
-            DigestResult results = instance.getDigest(this.testFile);
+            final FileHasher instance = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
+            final String expResult = expectedDigests.get(1);
+            final DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
             assertNotNull(results.getDigest(DEFAULT_ALGORITHM));
-            String digest = results.getHexDigest(DEFAULT_ALGORITHM);
+            final String digest = results.getHexDigest(DEFAULT_ALGORITHM);
             assertEquals("Digests are not the same", expResult, digest);
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             fail(ex.toString());
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             Logger.getLogger(FileHasherTest.class.getName()).log(Level.SEVERE, null, ex);
             fail(ex.toString());
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());
         }
     }
@@ -122,19 +122,19 @@ public class FileHasherTest
     @Test
     public void testGetDigestMultithreaded() {
         try {
-            FileHasher instance = new ConcurrentFileHasher(DigestAlgorithmFactory.create("sha-256"));
-            String expResult = expectedDigests.get(1);
-            DigestResult results = instance.getDigest(this.testFile);
+            final FileHasher instance = new ConcurrentFileHasher(DigestAlgorithmFactory.create("sha-256"));
+            final String expResult = expectedDigests.get(1);
+            final DigestResult results = instance.getDigest(this.testFile);
             assertEquals(1, results.size());
             assertNotNull(results.getDigest(DEFAULT_ALGORITHM));
-            String digest = results.getHexDigest(DEFAULT_ALGORITHM);
+            final String digest = results.getHexDigest(DEFAULT_ALGORITHM);
             assertEquals("Digests are not the same", expResult, digest);
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             fail(ex.toString());
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             Logger.getLogger(FileHasherTest.class.getName()).log(Level.SEVERE, null, ex);
             fail(ex.toString());
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());
         }
     }
@@ -142,15 +142,15 @@ public class FileHasherTest
     @Test
     public void testComputeDigest() {
         try {
-            String expResult = expectedDigests.get(1);
-            DigestResult results = FileHasherCreator.computeDigest(this.testFile);
-            String result = results.digest().toHex();
+            final String expResult = expectedDigests.get(1);
+            final DigestResult results = FileHasherCreator.computeDigest(this.testFile);
+            final String result = results.digest().toHex();
             assertEquals(expResult, result);
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             fail(ex.toString());
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             fail(ex.toString());
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());
         }
     }
@@ -158,14 +158,14 @@ public class FileHasherTest
     @Test
     public void testFileHasherUnknownFile() {
         try {
-            FileHasher h = new SerialFileHasher(DigestAlgorithmFactory.create("md5"));
+            final FileHasher h = new SerialFileHasher(DigestAlgorithmFactory.create("md5"));
             h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             // pass
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             fail("Should not get IOException");
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());
         }
     }
@@ -173,14 +173,14 @@ public class FileHasherTest
     @Test
     public void testFileHasherUnknownFileConcurrent() {
         try {
-            FileHasher h = new ConcurrentFileHasher(DigestAlgorithmFactory.create("md5"));
+            final FileHasher h = new ConcurrentFileHasher(DigestAlgorithmFactory.create("md5"));
             h.getDigest(new File("Does not exist"));
             fail("Should have thrown FileNotFoundException");
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             // pass
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             fail("Should not get IOException");
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());
         }
     }

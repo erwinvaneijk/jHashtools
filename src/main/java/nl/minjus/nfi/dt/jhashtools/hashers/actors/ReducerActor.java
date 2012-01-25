@@ -14,6 +14,7 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
  */
 public class ReducerActor extends Actor
 {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(ReducerActor.class.getName());
 
     private final DirHasherResult dirHasherResult;

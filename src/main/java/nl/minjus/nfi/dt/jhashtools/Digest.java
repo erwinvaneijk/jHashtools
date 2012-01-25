@@ -37,6 +37,9 @@ import java.util.Arrays;
 
 import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonValue;
+
 /**
  * This class holds some convenience for handling the results delivered by MessageDigest#digest.
  *
@@ -92,6 +95,7 @@ public class Digest implements Comparable<Digest>
      * @param aValue
      *            the value to parse.
      */
+    @JsonCreator
     public Digest(final String aValue)
     {
         final String[] parts = aValue.split(":");
@@ -163,6 +167,7 @@ public class Digest implements Comparable<Digest>
      * @return a string.
      */
     @Override
+    @JsonValue
     public String toString() {
         return this.toString(':');
     }

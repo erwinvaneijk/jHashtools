@@ -84,7 +84,7 @@ public class DigestMask
 
     /**
      * Pattern to not use the double check idiom for singeltons. This
-     * is the threadsafe alternative.
+     * is the thread safe alternative.
      *
      * @author Erwin van Eijk
      *

@@ -20,6 +20,7 @@ import nl.minjus.nfi.dt.jhashtools.hashers.FileHasherCreator;
  */
 public class HasherActor extends Actor
 {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(HasherActor.class.getName());
 
     private final FileHasher fileHasher;
