@@ -257,6 +257,18 @@
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.2.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-integration</artifactId>
+			<version>1.2.1</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- we use jackson to serialize from and to JSON -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>

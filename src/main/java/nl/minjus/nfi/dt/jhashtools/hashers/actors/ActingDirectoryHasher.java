@@ -2,12 +2,10 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import kilim.ExitMsg;
 import kilim.Mailbox;
-import kilim.Pausable;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.AbstractDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
@@ -20,12 +18,12 @@ import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
  */
 public class ActingDirectoryHasher extends AbstractDirectoryHasher implements DirectoryHasher
 {
-    private static final Logger LOG = Logger.getLogger(ActingDirectoryHasher.class.getName());
+    static final Logger LOG = Logger.getLogger(ActingDirectoryHasher.class.getName());
 
     private static final int HASHER_ACTOR_POOL_SIZE = 8;
     private static final int REDUCER_ACTOR_POOL_SIZE = 1;
 
-    private final Mailbox<Message> fileMailbox;
+    final Mailbox<Message> fileMailbox;
     private final Mailbox<Message> reducerMailbox;
     private final Mailbox<ExitMsg> exitMailbox;
 
@@ -53,42 +51,6 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
         fileMailbox = new Mailbox<Message>();
         reducerMailbox = new Mailbox<Message>();
         exitMailbox = new Mailbox<ExitMsg>();
-    }
-
-    /**
-     * This actor is needed to start things up. Therefore it does not implement <code>act</code>, but it deals with
-     * execute directly.
-     *
-     * @author Erwin van Eijk
-     *
-     */
-    private class StartupActor extends Actor
-    {
-
-        private final File file;
-
-        public StartupActor(final File file, final int numThreads, final Mailbox<Message> inbox,
-            final Mailbox<Message> outbox)
-        {
-            super(numThreads, inbox, outbox);
-            this.file = file;
-        }
-
-        @Override
-        public void execute() throws Pausable {
-            final FileNameGenerator generator = new FileNameGenerator(this.file);
-            for (final File message : generator) {
-                final FileMessage msg = new FileMessage(message);
-                fileMailbox.put(msg);
-            }
-            fileMailbox.put(new StopMessage());
-        }
-
-        @Override
-        public Message act(final Message message) {
-            LOG.log(Level.SEVERE, "We should not get here");
-            return message;
-        }
     }
 
     @Override

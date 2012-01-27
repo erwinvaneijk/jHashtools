@@ -37,6 +37,14 @@ public abstract class Actor extends Task
         }
     }
 
+    protected Mailbox<Message> getOutbox() {
+    	return this.outbox;
+    }
+    
+    protected Mailbox<Message> getInbox() {
+    	return this.inbox;
+    }
+    
     /**
      * Implement this message to get some work done on request.
      *
