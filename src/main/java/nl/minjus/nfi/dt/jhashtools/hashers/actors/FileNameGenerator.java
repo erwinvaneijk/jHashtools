@@ -2,39 +2,39 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
 
-import kilim.Generator;
-import kilim.Pausable;
+import org.jetlang.channels.Channel;
+import org.jetlang.fibers.Fiber;
 
 /**
  * Generate <code>File</code> objects to use for further processing.
  *
  * @author Erwin van Eijk
  */
-public class FileNameGenerator extends Generator<File>
+public class FileNameGenerator extends Actor
 {
-
-    private final File startPath;
-
-    public FileNameGenerator(final File startPath)
+    public FileNameGenerator(final Channel<Message> inbox, final Channel<Message> outbox, Fiber fiber)
     {
-        this.startPath = startPath;
+        super(inbox, outbox, fiber);
     }
 
     @Override
-    public void execute() throws Pausable {
-        walkTheFile(this.startPath);
+    public Message act(final Message message) {
+    	FileMessage fileMessage = (FileMessage) message;
+    	File startPath = fileMessage.getFile();
+        walkTheFile(startPath);
+        return new StopMessage();
     }
 
-    private void walkTheFile(final File aPath) throws Pausable {
+    private void walkTheFile(final File aPath) {
         if (!aPath.exists()) {
             return;
         }
         if (aPath.isFile()) {
-            yield(aPath);
+            yield(new FileMessage(aPath));
         } else if (aPath.isDirectory()) {
             for (final File child : aPath.listFiles()) {
                 if (child.isFile()) {
-                    yield(child);
+                    yield(new FileMessage(child));
                 } else {
                     walkTheFile(child);
                 }

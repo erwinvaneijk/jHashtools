@@ -34,7 +34,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
@@ -49,7 +48,6 @@ import org.junit.Test;
 public class ActorDirectoryHasherTest
 {
     private DirHasherResult knownDigests = null;
-    private ExecutorService executorService;
 
     public ActorDirectoryHasherTest()
     {

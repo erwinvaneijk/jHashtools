@@ -2,8 +2,10 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.util.logging.Logger;
 
-import kilim.Mailbox;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
+import org.jetlang.channels.Channel;
+import org.jetlang.fibers.Fiber;
 
 /**
  * An actor that can reduce all the computed digests into one
@@ -19,9 +21,9 @@ public class ReducerActor extends Actor
 
     private final DirHasherResult dirHasherResult;
 
-    public ReducerActor(final DirHasherResult dirHasherResult, final int numThreads, final Mailbox<Message> inbox)
+    public ReducerActor(final DirHasherResult dirHasherResult, final Channel<Message> inbox, Fiber fiber)
     {
-        super(numThreads, inbox, null);
+        super(inbox, null, fiber);
         this.dirHasherResult = dirHasherResult;
     }
 

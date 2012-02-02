@@ -3,8 +3,8 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 import java.io.File;
 import java.util.logging.Level;
 
-import kilim.Mailbox;
-import kilim.Pausable;
+import org.jetlang.channels.Channel;
+import org.jetlang.fibers.Fiber;
 
 /**
  * This actor is needed to start things up. Therefore it does not implement <code>act</code>, but it deals with
@@ -17,24 +17,14 @@ class StartupActor extends Actor
 {
 	private final File file;
 
-    public StartupActor(final File file, final int numThreads, final Mailbox<Message> inbox,
-        final Mailbox<Message> outbox)
+    public StartupActor(final File file, final int numThreads, final Channel<Message> inbox,
+        final Channel<Message> outbox, Fiber fiber)
     {
-        super(numThreads, inbox, outbox);
+        super(inbox, outbox, fiber);
         if (!file.exists()) {
         	throw new IllegalArgumentException("File " + file.getName() + " does not exist.");
         }
         this.file = file;
-    }
-
-    @Override
-    public void execute() throws Pausable {
-        final FileNameGenerator generator = new FileNameGenerator(this.file);
-        for (final File message : generator) {
-            final FileMessage msg = new FileMessage(message);
-            getOutbox().put(msg);
-        }
-        getOutbox().put(new StopMessage());
     }
 
     @Override

@@ -2,10 +2,16 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import kilim.ExitMsg;
-import kilim.Mailbox;
+import org.jetlang.channels.Channel;
+import org.jetlang.core.Disposable;
+import org.jetlang.fibers.Fiber;
+import org.jetlang.fibers.PoolFiberFactory;
+
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.AbstractDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
@@ -20,21 +26,22 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
 {
     static final Logger LOG = Logger.getLogger(ActingDirectoryHasher.class.getName());
 
-    private static final int HASHER_ACTOR_POOL_SIZE = 8;
-    private static final int REDUCER_ACTOR_POOL_SIZE = 1;
+	private static final int NUM_HASHERS = 1;
 
-    final Mailbox<Message> fileMailbox;
-    private final Mailbox<Message> reducerMailbox;
-    private final Mailbox<ExitMsg> exitMailbox;
+	private static final int NUM_REDUCERS = 1;
 
+	private static final int NUM_FILE_FEEDERS = 1;
+	
+    private final PoolFiberFactory fiberFactory;
+
+	private final ExecutorService executorService = Executors.newCachedThreadPool();
+    
     /**
      * Constructor.
      */
     public ActingDirectoryHasher()
     {
-        fileMailbox = new Mailbox<Message>();
-        reducerMailbox = new Mailbox<Message>();
-        exitMailbox = new Mailbox<ExitMsg>();
+    	fiberFactory = new PoolFiberFactory(executorService);
     }
 
     /**
@@ -48,9 +55,7 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
     public ActingDirectoryHasher(final String algorithm) throws NoSuchAlgorithmException
     {
         super(algorithm);
-        fileMailbox = new Mailbox<Message>();
-        reducerMailbox = new Mailbox<Message>();
-        exitMailbox = new Mailbox<ExitMsg>();
+        fiberFactory = new PoolFiberFactory(executorService);
     }
 
     @Override
@@ -63,17 +68,41 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
     @Override
     public void updateDigests(final DirHasherResult digests, final File file) {
 
-        final StartupActor startupActor = new StartupActor(file, 1, null, fileMailbox);
-        final HasherActor hasherActor = new HasherActor(this.getTheAlgorithms(), HASHER_ACTOR_POOL_SIZE,
-            fileMailbox, reducerMailbox);
-        final ReducerActor reducerActor = new ReducerActor(digests, REDUCER_ACTOR_POOL_SIZE, reducerMailbox);
-        startupActor.start();
-        startupActor.informOnExit(exitMailbox);
-        hasherActor.start();
-        hasherActor.informOnExit(exitMailbox);
-        reducerActor.start();
-        reducerActor.informOnExit(exitMailbox);
+    	final CountDownLatch onstop = new CountDownLatch(NUM_HASHERS + NUM_REDUCERS + NUM_FILE_FEEDERS);
+        Disposable dispose = new Disposable() {
+          public void dispose() {
+            onstop.countDown();
+          }
+        };
 
-        exitMailbox.getb();
+        Fiber fileFeederFiber = fiberFactory.create();
+        fileFeederFiber.add(dispose);
+        FileNameGenerator generator = new FileNameGenerator(Channels.pathChannel, Channels.filenameChannel, fileFeederFiber);
+        generator.start();
+        
+        for (int i=0;i<NUM_HASHERS;i++) {
+        	Fiber hasherFiber = fiberFactory.create();
+        	hasherFiber.add(dispose);
+        	HasherActor hasherActor = new HasherActor(getTheAlgorithms(), Channels.filenameChannel, Channels.digestChannel, hasherFiber);
+        	hasherActor.start();
+        }
+        
+        Fiber reducerFiber = fiberFactory.create();
+        reducerFiber.add(dispose);
+        ReducerActor reducerActor = new ReducerActor(digests, Channels.digestChannel, reducerFiber);
+        
+        reducerActor.start();   
+
+        /*
+         * Now provision the generator, so it starts doing stuff.
+         */
+        Channels.pathChannel.publish(new FileMessage(file));
+        
+        try { 
+            onstop.await(); 
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          executorService.shutdown();
     }
 }
