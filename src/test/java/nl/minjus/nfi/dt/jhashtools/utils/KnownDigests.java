@@ -38,7 +38,7 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * Utility class.
- * 
+ *
  * @author Erwin van Eijk
  */
 public class KnownDigests
@@ -46,11 +46,11 @@ public class KnownDigests
 
     /**
      * Get a list of all the known digests in the test folder.
-     * 
+     *
      * @return a DirHasherResult.
      */
     public static DirHasherResult getKnownResults() {
-        DirHasherResult knownResults = new DirHasherResult();
+        final DirHasherResult knownResults = new DirHasherResult();
 
         DigestResult dr = new DigestResult();
         dr.add(new Digest("sha-256", "589f2fc47ebe5744c2c349a8529dde37218eac8782e4b54bbbabd46bcbdd62ae"));
@@ -112,44 +112,23 @@ public class KnownDigests
         dr.add(new Digest("md5", "29e4c85820ae4535741b2f3b6a3aeb3e"));
         knownResults.put("testdata/testfile10.bin", dr);
 
-        if (!OsUtils.isWindows()) {
-            dr = new DigestResult();
-            dr.add(new Digest("sha-256", "aeb2027f7ee48ae11db86203a93a05a2539af4a6cd46268941e2c8f4c4dfb35a"));
-            dr.add(new Digest("sha-1", "5985b3d0f4a8126803c9ddf7811dde4e38a86af4"));
-            dr.add(new Digest("md5", "af5d3dfecc364ff1bc1177d24ada7137"));
-            knownResults.put("testdata/oldformat.txt", dr);
+        dr = new DigestResult();
+        dr.add(new Digest("sha-256", "aeb2027f7ee48ae11db86203a93a05a2539af4a6cd46268941e2c8f4c4dfb35a"));
+        dr.add(new Digest("sha-1", "5985b3d0f4a8126803c9ddf7811dde4e38a86af4"));
+        dr.add(new Digest("md5", "af5d3dfecc364ff1bc1177d24ada7137"));
+        knownResults.put("testdata/oldformat.txt", dr);
 
-            dr = new DigestResult();
-            dr.add(new Digest("md5", "0efcde993ca6f8bcd71671dfe927788c"));
-            dr.add(new Digest("sha-1", "b4497e1822a51079df54b54e2e38a8262d752851"));
-            dr.add(new Digest("sha-256", "220408cd9b16d0b025fb0c822a70b340b02f1344e59b19ddff8deef0cc6e7031"));
-            knownResults.put("testdata/include-md5-sha1.txt", dr);
+        dr = new DigestResult();
+        dr.add(new Digest("md5", "0efcde993ca6f8bcd71671dfe927788c"));
+        dr.add(new Digest("sha-1", "b4497e1822a51079df54b54e2e38a8262d752851"));
+        dr.add(new Digest("sha-256", "220408cd9b16d0b025fb0c822a70b340b02f1344e59b19ddff8deef0cc6e7031"));
+        knownResults.put("testdata/include-md5-sha1.txt", dr);
 
-            dr = new DigestResult();
-            dr.add(new Digest("md5", "bed8e0d55ab120d38325af63da19125f "));
-            dr.add(new Digest("sha-1", "2b3a601a1ee759eec30ddcde458d459aa26ba78f"));
-            dr.add(new Digest("sha-256", "8072761bd9f0147042bed6f2328f62c964707baa2cfb5cc449bd376b55ff525e"));
-            knownResults.put("testdata/include-sha1-sha256-sha512.txt", dr);
-        } else {
-            dr = new DigestResult();
-            dr.add(new Digest("sha-256", "750cf3af02b00f2d6aad9802f4f7be981973fc53e1e117459b267a0983a3ba2d"));
-            dr.add(new Digest("sha-1", "f4868bbac9c2c218a24a3b5eb430c223e0c741da"));
-            dr.add(new Digest("md5", "cbbcd8f0812799b12ebb5f645a7bdb85"));
-            knownResults.put("testdata/oldformat.txt", dr);
-
-            dr = new DigestResult();
-            dr.add(new Digest("md5", "78dbebeea000b5e6735308a1db4994d9"));
-            dr.add(new Digest("sha-1", "b67be08991d5d0a826bf01bc9110b3bdbe33c474"));
-            dr.add(new Digest("sha-256", "483dec6fb91c1a6142928d28c1f166b62e38c04c2a659022ec1e63f016078867"));
-            knownResults.put("testdata/include-md5-sha1.txt", dr);
-
-            dr = new DigestResult();
-            dr.add(new Digest("md5", "504c08283bc87e86a6ed327838c10f48"));
-            dr.add(new Digest("sha-1", "e229a5114d7476505210778a5a5fcc94d69e36c1"));
-            dr.add(new Digest("sha-256", "d19924db3a6f293a2449f9df4e056d5165fb98d0432c69e8f5ee740ffa92a5d2"));
-            knownResults.put("testdata/include-sha1-sha256-sha512.txt", dr);
-
-        }
+        dr = new DigestResult();
+        dr.add(new Digest("md5", "bed8e0d55ab120d38325af63da19125f "));
+        dr.add(new Digest("sha-1", "2b3a601a1ee759eec30ddcde458d459aa26ba78f"));
+        dr.add(new Digest("sha-256", "8072761bd9f0147042bed6f2328f62c964707baa2cfb5cc449bd376b55ff525e"));
+        knownResults.put("testdata/include-sha1-sha256-sha512.txt", dr);
         return knownResults;
     }
 }

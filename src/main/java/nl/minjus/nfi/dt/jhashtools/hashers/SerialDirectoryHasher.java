@@ -31,17 +31,18 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Erwin van Eijk
  */
 class SerialDirectoryHasher extends AbstractDirectoryHasher
 {
-    private static final Logger LOG = Logger.getLogger(ConcurrentFileHasher.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentFileHasher.class);
 
     private final DirHasherResult results = new DirHasherResult();
 
@@ -80,7 +81,7 @@ class SerialDirectoryHasher extends AbstractDirectoryHasher
             walker.addWalkerVisitor(visitor);
             walker.walk(file);
         } catch (final NoSuchAlgorithmException ex) {
-            LOG.log(Level.SEVERE, "This is not possible: Algorithm not found", ex);
+            LOG.error("This is not possible: Algorithm not found", ex);
         }
     }
 }

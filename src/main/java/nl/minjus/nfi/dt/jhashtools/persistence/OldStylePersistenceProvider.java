@@ -36,8 +36,6 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
@@ -50,6 +48,8 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.codehaus.jackson.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class supports the Old Style hashes.txt files that are now generated using JSON. The old format should be
@@ -60,7 +60,7 @@ import org.codehaus.jackson.type.TypeReference;
 public class OldStylePersistenceProvider implements PersistenceProvider
 {
 
-    private static final Logger LOG = Logger.getLogger(ConcurrentFileHasher.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentFileHasher.class);
 
     @Override
     public void persist(final OutputStream out, final Object obj) throws PersistenceException {
@@ -127,7 +127,7 @@ public class OldStylePersistenceProvider implements PersistenceProvider
                             final Digest theDigest = parser.digest();
                             result.add(theDigest);
                         } catch (final RecognitionException ex) {
-                            LOG.log(Level.INFO, "Could not recognize [" + line + "]");
+                            LOG.info("Could not recognize [" + line + "]");
                         }
                     }
                 }

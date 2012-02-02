@@ -26,7 +26,7 @@
 	<groupId>nl.minjus.nfi.dt</groupId>
 	<artifactId>jHashtools</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1.5</version>
+	<version>1.2</version>
 	<name>jHashtools</name>
 	<url>http://maven.apache.org</url>
 	<licenses>
@@ -285,6 +285,11 @@
             <artifactId>jetlang</artifactId>
             <version>0.2.7</version>
         </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.4</version>
+		</dependency>
 	</dependencies>
 	<reporting>
 		<plugins>

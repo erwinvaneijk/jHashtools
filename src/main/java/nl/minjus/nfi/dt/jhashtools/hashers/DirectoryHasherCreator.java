@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
+import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
+
 /**
  * This utility class knows how to create new instances of DirectoryHasher's.
  *
@@ -62,7 +64,7 @@ public class DirectoryHasherCreator
         if (anExecutorService == null) {
             return new SerialDirectoryHasher(digests);
         } else {
-            return new ConcurrentDirectoryHasher(anExecutorService, digests);
+            return new ActingDirectoryHasher(digests);
         }
     }
 

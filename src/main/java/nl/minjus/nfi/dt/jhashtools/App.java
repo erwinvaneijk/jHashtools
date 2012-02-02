@@ -28,14 +28,10 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import static java.util.logging.Logger.getLogger;
-
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
@@ -52,6 +48,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Entry point of the cli version of the tooling.
@@ -67,7 +65,7 @@ public class App
     private static final String HEADER = "hashtree - Creating a list of digests for files "
         + "and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
     private static final String FOOTER = "";
-    private static final Logger LOG = getLogger(App.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(App.class);
     private static final int DEFAULT_TERMINAL_WIDTH = 80;
     private static final String DEFAULT_ALGORITHM = "sha-256";
 
@@ -77,10 +75,10 @@ public class App
 
         final DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
-        LOG.log(Level.INFO, "Version: " + Version.getVersion());
+        LOG.info("Version: " + Version.getVersion());
 
         if (line.hasOption("i") && line.hasOption("o")) {
-            LOG.log(Level.WARNING, "Make up your mind. Cannot do -i and -o at the same time.");
+            LOG.warn("Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
         }
 
@@ -95,7 +93,7 @@ public class App
             processFilesAndWrite(directoryHasher, outputFilename, persistenceStyle, forceOverwrite,
                 filesToProcess);
         } else {
-            LOG.log(Level.WARNING, "You need either -i or -o");
+            LOG.warn("You need either -i or -o");
             System.exit(2);
         }
 
@@ -141,10 +139,10 @@ public class App
             verifier.generateDigests(filesToProcess);
             verifier.verify(new PrintWriter(System.out, true));
         } catch (final FileNotFoundException ex) {
-            LOG.log(Level.SEVERE, "A file could not be found.", ex);
+            LOG.error("A file could not be found.", ex);
             System.exit(-1);
         } catch (final PersistenceException ex) {
-            LOG.log(Level.SEVERE, "Could not parse the file.", ex);
+            LOG.error("Could not parse the file.", ex);
             System.exit(-EXIT_PERSISTENCE_ERROR);
         }
     }
@@ -157,14 +155,14 @@ public class App
 
             setRequestedAlgorithms(line, directoryHasher);
         } catch (final NoSuchAlgorithmException ex) {
-            LOG.log(Level.SEVERE, "Algorithm not found", ex);
+            LOG.error("Algorithm not found", ex);
         } finally {
             try {
                 if ((directoryHasher != null) && (directoryHasher.getAlgorithms().size() == 0)) {
                     directoryHasher.addAlgorithm(DEFAULT_ALGORITHM);
                 }
             } catch (final NoSuchAlgorithmException ex) {
-                LOG.log(Level.SEVERE, "Algorithm is not found", ex);
+                LOG.error("Algorithm is not found", ex);
                 System.exit(1);
             }
         }
@@ -247,7 +245,7 @@ public class App
                 System.exit(0);
             }
         } catch (final ParseException ex) {
-            LOG.log(Level.SEVERE, "Failed at parsing the commandline options.", ex);
+            LOG.error("Failed at parsing the commandline options.", ex);
             final HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp("hashtree [options] dir [dir...]", options);
             System.exit(EXIT_PERSISTENCE_ERROR);

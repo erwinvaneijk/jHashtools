@@ -28,28 +28,29 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Visit all the files in a directory tree.
  */
 public class DirectoryVisitor implements WalkerVisitor
 {
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private DirHasherResult resultMap;
     private boolean verbose;
     private final FileHasher fileHasher;
 
-    public DirectoryVisitor(DigestAlgorithm algorithm) throws NoSuchAlgorithmException
+    public DirectoryVisitor(final DigestAlgorithm algorithm) throws NoSuchAlgorithmException
     {
         resultMap = new DirHasherResult();
         this.verbose = false;
@@ -63,14 +64,14 @@ public class DirectoryVisitor implements WalkerVisitor
         this.fileHasher = FileHasherCreator.create(null);
     }
 
-    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, DirHasherResult digests)
+    public DirectoryVisitor(final Collection<DigestAlgorithm> algorithms, final DirHasherResult digests)
         throws NoSuchAlgorithmException
     {
         this(algorithms, false);
         this.resultMap = digests;
     }
 
-    public DirectoryVisitor(Collection<DigestAlgorithm> algorithms, boolean verbose)
+    public DirectoryVisitor(final Collection<DigestAlgorithm> algorithms, final boolean verbose)
         throws NoSuchAlgorithmException
     {
         resultMap = new DirHasherResult();
@@ -78,14 +79,15 @@ public class DirectoryVisitor implements WalkerVisitor
         this.verbose = verbose;
     }
 
-    public void visit(File theFile) {
+    @Override
+    public void visit(final File theFile) {
         try {
             final DigestResult res = this.fileHasher.getDigest(theFile);
             resultMap.put(theFile, res);
-        } catch (FileNotFoundException ex) {
-            this.logger.log(Level.SEVERE, "File not found: " + theFile.getPath());
-        } catch (IOException ex) {
-            this.logger.log(Level.SEVERE, "Got IOException while processing " + theFile.toString());
+        } catch (final FileNotFoundException ex) {
+            this.logger.error("File not found: " + theFile.getPath());
+        } catch (final IOException ex) {
+            this.logger.error("Got IOException while processing " + theFile.toString());
         }
     }
 
@@ -104,7 +106,7 @@ public class DirectoryVisitor implements WalkerVisitor
      * @param verbose
      *            set the verbosity of this visitor.
      */
-    public void setVerbose(boolean verbose) {
+    public void setVerbose(final boolean verbose) {
         this.verbose = verbose;
     }
 }

@@ -41,10 +41,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Compute file hashes with multiple threads.
@@ -53,7 +54,7 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
  */
 public class ConcurrentFileHasher extends AbstractFileHasher
 {
-    private static final Logger LOG = Logger.getLogger(ConcurrentFileHasher.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentFileHasher.class.getName());
 
     private final ExecutorService executorService;
     private final Exchanger<ByteBuffer> exchanger;
@@ -130,9 +131,9 @@ public class ConcurrentFileHasher extends AbstractFileHasher
             exchanger.exchange(null);
             return digestComputerThread.get();
         } catch (final InterruptedException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            LOG.error("", ex);
         } catch (final ExecutionException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            LOG.error("", ex);
         }
         return null;
     }

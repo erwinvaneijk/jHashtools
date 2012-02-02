@@ -28,15 +28,14 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static java.util.logging.Logger.getLogger;
-
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DigestOutputCreator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class offers a 'walker' that will go through a directory and offer the resulting files to one or more visitors.
@@ -45,7 +44,7 @@ import nl.minjus.nfi.dt.jhashtools.DigestOutputCreator;
  */
 class FileWalker
 {
-    private static final Logger LOG = getLogger(DigestOutputCreator.class.getCanonicalName());
+    private static final Logger LOG = LoggerFactory.getLogger(DigestOutputCreator.class);
     private final List<WalkerVisitor> visitors;
     private int visited;
 
@@ -114,7 +113,7 @@ class FileWalker
                 }
             }
         } catch (final InterruptedException e) {
-            LOG.log(Level.INFO, "Execution interrupted");
+            LOG.info("Execution interrupted");
         }
     }
 

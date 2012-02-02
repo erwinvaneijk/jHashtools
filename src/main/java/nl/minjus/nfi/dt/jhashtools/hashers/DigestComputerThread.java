@@ -28,8 +28,6 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static java.util.logging.Logger.getLogger;
-
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,11 +35,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Exchanger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This callable can be use to create a thread that is able to compute digests in a separate thread.
@@ -50,7 +49,7 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
  */
 class DigestComputerThread implements Callable<DigestResult>
 {
-    private static final Logger LOG = getLogger(DigestComputerThread.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(DigestComputerThread.class);
     private final Collection<DigestAlgorithm> digests;
     private final Exchanger<ByteBuffer> exchanger;
 
@@ -86,7 +85,7 @@ class DigestComputerThread implements Callable<DigestResult>
                 // FIXME:
                 // Decide whether we should log this properly.
                 // For now, we ignore.
-                LOG.log(Level.SEVERE, "Algorithm not supported: " + alg.getName());
+                LOG.error("Algorithm not supported: " + alg.getName());
             }
         }
         try {
@@ -109,7 +108,7 @@ class DigestComputerThread implements Callable<DigestResult>
             }
             return res;
         } catch (final InterruptedException ex) {
-            LOG.log(Level.SEVERE, "Execution was aborted.", ex);
+            LOG.error("Execution was aborted.", ex);
             return null;
         }
     }

@@ -43,8 +43,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
@@ -53,6 +51,7 @@ import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -109,7 +108,7 @@ public class FileHasherTest
         } catch (final FileNotFoundException ex) {
             fail(ex.toString());
         } catch (final IOException ex) {
-            Logger.getLogger(FileHasherTest.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(FileHasherTest.class).error(null, ex);
             fail(ex.toString());
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());
@@ -132,7 +131,7 @@ public class FileHasherTest
         } catch (final FileNotFoundException ex) {
             fail(ex.toString());
         } catch (final IOException ex) {
-            Logger.getLogger(FileHasherTest.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(FileHasherTest.class).error(null, ex);
             fail(ex.toString());
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString());

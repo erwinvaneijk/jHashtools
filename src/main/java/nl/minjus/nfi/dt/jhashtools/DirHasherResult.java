@@ -28,18 +28,17 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import static java.util.logging.Logger.getLogger;
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstraction for a set of map entries.
@@ -48,7 +47,7 @@ import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
  */
 public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
 {
-    private static final Logger LOG = getLogger(DigestOutputCreator.class.getCanonicalName());
+    private static final Logger LOG = LoggerFactory.getLogger(DigestOutputCreator.class);
 
     private ConstructionInfo constructionInfo;
 
@@ -319,7 +318,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
                         result.put(key, otherKey);
                     }
                 } catch (final NoMatchingAlgorithmsError ex) {
-                    LOG.log(Level.SEVERE, "Algorithm not supported: " + otherKey.toString());
+                    LOG.error("Algorithm not supported: " + otherKey.toString());
                 }
             }
         }

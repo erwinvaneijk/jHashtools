@@ -45,10 +45,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Use multithreading to compute the digests on all the files.
@@ -59,7 +60,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
 {
 
     private static final int DEFAULT_QUEUE_SIZE = 32;
-    private static final Logger LOG = Logger.getLogger(ConcurrentDirectoryHasher.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentDirectoryHasher.class);
     private final ExecutorService executorService;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
 
@@ -132,14 +133,14 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
                 computeTasks.add(completionService.submit(new FileDigestComputeTask(queues.get(i),
                     fileHasher, currentState)));
             } catch (final NoSuchAlgorithmException e) {
-                LOG.log(Level.SEVERE, "A cryptoalgorithm is not found. This is bad.", e);
+                LOG.error("A cryptoalgorithm is not found. This is bad.", e);
             }
         }
 
         try {
             // first, wait for the fileWalkerTask to finish.
             if (fileWalkerTask.get() != null) {
-                LOG.log(Level.SEVERE, "It should be impossible to get a result here.");
+                LOG.error("It should be impossible to get a result here.");
             }
 
             for (final Future<DirHasherResult> task : computeTasks) {
@@ -149,9 +150,9 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
                 }
             }
         } catch (final InterruptedException ex) {
-            LOG.log(Level.WARNING, "Interruption has occurred.", ex);
+            LOG.warn("Interruption has occurred.", ex);
         } catch (final ExecutionException ex) {
-            LOG.log(Level.WARNING, "Execution was interrupted.", ex);
+            LOG.warn("Execution was interrupted.", ex);
         }
     }
 
@@ -283,7 +284,7 @@ class ConcurrentDirectoryHasher extends AbstractDirectoryHasher
                             break;
                         }
                     } catch (final IOException ex) {
-                        LOG.log(Level.INFO, "Could not process file: " + file.getPath());
+                        LOG.info("Could not process file: " + file.getPath());
                         // pass
                     }
                 }

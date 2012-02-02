@@ -33,15 +33,19 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
- * 
- * @author kojak
+ *
+ * @author Erwin van Eijk <erwin.vaneijk@gmail.com>
  */
 public class FileWalkerTest
 {
@@ -71,8 +75,8 @@ public class FileWalkerTest
      */
     @Test
     public void testAddWalkerVisitor() {
-        WalkerVisitor visitor = null;
-        FileWalker instance = new FileWalker();
+        final WalkerVisitor visitor = null;
+        final FileWalker instance = new FileWalker();
         instance.addWalkerVisitor(visitor);
         assertEquals(1, instance.getWalkerVisitors().size());
         assertEquals(null, instance.getWalkerVisitors().get(0));
@@ -83,10 +87,10 @@ public class FileWalkerTest
      */
     @Test
     public void testWalkWithUnknownFile() {
-        File file = new File("unknown");
-        FileWalker instance = new FileWalker();
-        int expResult = 0;
-        int result = instance.walk(file);
+        final File file = new File("unknown");
+        final FileWalker instance = new FileWalker();
+        final int expResult = 0;
+        final int result = instance.walk(file);
         assertEquals(expResult, result);
     }
 
@@ -103,7 +107,8 @@ public class FileWalkerTest
             return this.number;
         }
 
-        public void visit(File file) {
+        @Override
+        public void visit(final File file) {
             number += 1;
         }
     }
@@ -113,12 +118,12 @@ public class FileWalkerTest
      */
     @Test
     public void testWalkWithKnownDirStructure() {
-        File file = new File("testdata");
-        FileWalker instance = new FileWalker();
-        WalkerVisitorImpl visitor = new WalkerVisitorImpl();
+        final File file = new File("testdata");
+        final FileWalker instance = new FileWalker();
+        final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        int expResult = 13;
-        int result = instance.walk(file);
+        final int expResult = 13;
+        final int result = instance.walk(file);
         assertEquals(expResult, result);
         assertEquals(13, visitor.getNumber());
     }

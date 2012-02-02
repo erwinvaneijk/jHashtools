@@ -28,8 +28,6 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import static java.util.logging.Logger.getLogger;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,8 +37,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
@@ -49,6 +45,9 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Construct the output that can later on be used for verification.
  *
@@ -56,8 +55,7 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
  */
 public class DigestOutputCreator
 {
-
-    private static final Logger LOG = getLogger(DigestOutputCreator.class.getCanonicalName());
+    private static final Logger LOG = LoggerFactory.getLogger(DigestOutputCreator.class);
     private final PrintWriter out;
     private final DirectoryHasher directoryHasher;
     private File outputFile;
@@ -108,7 +106,7 @@ public class DigestOutputCreator
             try {
                 directoryHasher.updateDigests(digests, new File(pathname));
             } catch (final Throwable t) {
-                LOG.log(Level.FINEST, "We don't care", t);
+                LOG.debug("We don't care", t);
             }
         }
     }
@@ -125,7 +123,7 @@ public class DigestOutputCreator
     private DirHasherResult persistDigestsToFile() {
         FileOutputStream file = null;
         try {
-            LOG.log(Level.INFO, "Writing the results to " + outputFile.getName());
+            LOG.info("Writing the results to " + outputFile.getName());
             file = new FileOutputStream(outputFile);
             final PersistenceProvider persistenceProvider = PersistenceProviderCreator
                 .create(this.persistenceStyle);
@@ -136,18 +134,18 @@ public class DigestOutputCreator
                 .getValue().getAlgorithms());
             return directoryHasher.getDigests(outputFile);
         } catch (final PersistenceException ex) {
-            LOG.log(Level.SEVERE, "Cannot persist content to file", ex);
+            LOG.error("Cannot persist content to file", ex);
         } catch (final IOException ex) {
-            LOG.log(Level.SEVERE, "Cannot create file", ex);
+            LOG.error("Cannot create file", ex);
         } catch (final NoSuchAlgorithmException ex) {
-            LOG.log(Level.SEVERE, "Cannot create the algorithm", ex);
+            LOG.error("Cannot create the algorithm", ex);
         } finally {
             try {
                 if (file != null) {
                     file.close();
                 }
             } catch (final IOException ex) {
-                LOG.log(Level.SEVERE, "Cannot close file", ex);
+                LOG.error("Cannot close file", ex);
             }
         }
         return null;

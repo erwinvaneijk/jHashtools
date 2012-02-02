@@ -33,16 +33,18 @@
 
 package nl.minjus.nfi.dt.jhashtools.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
- * 
- * @author kojak
+ *
+ * @author Erwin van Eijk <erwin.vaneijk@gmail.com>
  */
 public class StringOperationsTest
 {
@@ -72,9 +74,9 @@ public class StringOperationsTest
      */
     @Test
     public void testHexify() {
-        byte[] buf = new byte[] { 0x10, 0x11, 0x12, 0x13 };
-        String expResult = "10111213";
-        String result = StringOperations.hexify(buf);
+        final byte[] buf = new byte[] { 0x10, 0x11, 0x12, 0x13 };
+        final String expResult = "10111213";
+        final String result = StringOperations.hexify(buf);
         assertEquals(expResult, result);
     }
 

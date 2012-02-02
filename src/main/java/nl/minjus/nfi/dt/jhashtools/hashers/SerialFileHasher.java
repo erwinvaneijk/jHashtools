@@ -73,6 +73,10 @@ class SerialFileHasher extends AbstractFileHasher
      */
     @Override
     public DigestResult getDigest(final File file) throws IOException {
+        if (file == null) {
+            return null;
+        }
+
         if (!file.exists()) {
             throw new FileNotFoundException(file.toString());
         }

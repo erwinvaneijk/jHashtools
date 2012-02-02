@@ -32,17 +32,19 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Calendar;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
-
-import static org.junit.Assert.*;
-
 /**
- * 
- * @author kojak
+ *
+ * @author Erwin van Eijk <erwin.vaneijk@gmail.com>
  */
 public class ConstructionInfoTest
 {
@@ -61,7 +63,7 @@ public class ConstructionInfoTest
 
     @Test
     public void testSetup() {
-        ConstructionInfo info = new ConstructionInfo();
+        final ConstructionInfo info = new ConstructionInfo();
         assertNotNull(info.getConstructionDate());
         assertNotNull(info.getOperatingSystem());
         assertNotNull(info.getVersionInformation());
@@ -72,7 +74,7 @@ public class ConstructionInfoTest
 
     @Test
     public void testSetters() {
-        ConstructionInfo info = new ConstructionInfo();
+        final ConstructionInfo info = new ConstructionInfo();
         info.setConstructionDate(Calendar.getInstance().getTime());
 
         info.setOperatingSystem("fooIS");
@@ -85,11 +87,11 @@ public class ConstructionInfoTest
         assertTrue(Calendar.getInstance().getTime().after(info.getConstructionDate()));
     }
 
-    private void requestDelay(int delayInMilisecs) {
+    private void requestDelay(final int delayInMilisecs) {
         try {
             // insert a delay here. Otherwise, Date.after() will fail sometimes
             Thread.sleep(delayInMilisecs);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // We really do not care.
         }
     }

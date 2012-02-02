@@ -32,20 +32,27 @@
  */
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
- * @author kojak
+ * @author Erwin van Eijk <erwin.vaneijk@gmail.com>
  */
 public class DirMultiHashTest
 {
@@ -75,12 +82,12 @@ public class DirMultiHashTest
 
     @Test
     public void testGetDigests() {
-        DirectoryHasher directoryHasher = new SerialDirectoryHasher();
+        final DirectoryHasher directoryHasher = new SerialDirectoryHasher();
         try {
             directoryHasher.addAlgorithm("sha-256");
             directoryHasher.addAlgorithm("sha-1");
             directoryHasher.addAlgorithm("md5");
-            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
+            final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(13, digests.size());
             assertEquals(knownDigests.size(), 13);
             assertEquals(knownDigests.getByAlgorithm("sha-256").size(), digests.size());
@@ -90,16 +97,16 @@ public class DirMultiHashTest
             assertEquals(digests.getByAlgorithm("sha-256").size(), digests.size());
             assertEquals(digests.getByAlgorithm("sha-1").size(), digests.size());
 
-            for (Map.Entry<File, DigestResult> entry : knownDigests) {
-                File filename = entry.getKey();
-                DigestResult knownResults = entry.getValue();
+            for (final Map.Entry<File, DigestResult> entry : knownDigests) {
+                final File filename = entry.getKey();
+                final DigestResult knownResults = entry.getValue();
                 assertTrue(digests.containsKey(filename));
-                DigestResult foundResults = digests.get(filename);
-                for (Digest digest : knownResults) {
+                final DigestResult foundResults = digests.get(filename);
+                for (final Digest digest : knownResults) {
                     assertTrue(filename + "--" + digest.toString(), foundResults.contains(digest));
                 }
             }
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             fail("We should not have this");
         }
     }

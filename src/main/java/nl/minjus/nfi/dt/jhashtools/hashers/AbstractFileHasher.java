@@ -34,7 +34,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
@@ -46,9 +45,6 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
 abstract class AbstractFileHasher implements FileHasher
 {
     public static final int BLOCK_READ_SIZE = 1024 * 1024;
-
-    @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger(AbstractFileHasher.class.getName());
 
     private final Collection<DigestAlgorithm> digests;
 
