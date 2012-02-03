@@ -28,25 +28,26 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
-import static org.junit.Assert.*;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  */
 public class SerialDirectoryHasherTest
 {
     private DirHasherResult knownDigests = null;
-    private ExecutorService executorService;
 
     public SerialDirectoryHasherTest()
     {
@@ -95,7 +96,7 @@ public class SerialDirectoryHasherTest
     @Test
     public void testVerboseSettings() {
         try {
-            DirectoryHasher directoryHasher = new ConcurrentDirectoryHasher(this.executorService, "sha-256");
+            DirectoryHasher directoryHasher = new SerialDirectoryHasher("sha-256");
             assertEquals("initially no verbose behaviour", false, directoryHasher.isVerbose());
             directoryHasher.setVerbose(true);
             assertTrue(directoryHasher.isVerbose());

@@ -60,7 +60,7 @@ public class Version
             return attributes.getValue("Implementation-Version") + "-"
                 + attributes.getValue("Implementation-Build");
         } catch (final IOException ex) {
-            return "1.0-unknown";
+            return "1.2-unknown";
         }
     }
 }

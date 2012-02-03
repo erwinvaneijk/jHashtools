@@ -31,13 +31,12 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ExecutorService;
 
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
 
 /**
  * This utility class knows how to create new instances of DirectoryHasher's.
- *
+ * 
  * @author Erwin van Eijk
  */
 public class DirectoryHasherCreator
@@ -50,29 +49,29 @@ public class DirectoryHasherCreator
     {
     }
 
-    public static DirectoryHasher create(final ExecutorService anExecutorService) {
-        if (anExecutorService == null) {
+    public static DirectoryHasher create(final ConcurrencyMode concurrencyMode) {
+        if (concurrencyMode == ConcurrencyMode.SINGLE) {
             return new SerialDirectoryHasher();
         } else {
-            return new ConcurrentDirectoryHasher(anExecutorService);
+            return new ActingDirectoryHasher();
         }
     }
 
-    public static DirectoryHasher create(final ExecutorService anExecutorService,
-        final Collection<String> digests) throws NoSuchAlgorithmException
+    public static DirectoryHasher create(final ConcurrencyMode concurrencyMode, final Collection<String> digests)
+            throws NoSuchAlgorithmException
     {
-        if (anExecutorService == null) {
+        if (concurrencyMode == ConcurrencyMode.SINGLE) {
             return new SerialDirectoryHasher(digests);
         } else {
             return new ActingDirectoryHasher(digests);
         }
     }
 
-    public static DirectoryHasher create(final ExecutorService anExecutorService, final String digestAlgorithm)
-        throws NoSuchAlgorithmException
+    public static DirectoryHasher create(final ConcurrencyMode concurrencyMode, final String digestAlgorithm)
+            throws NoSuchAlgorithmException
     {
         final Collection<String> digestAlgorithms = new ArrayList<String>();
         digestAlgorithms.add(digestAlgorithm);
-        return create(anExecutorService, digestAlgorithms);
+        return create(concurrencyMode, digestAlgorithms);
     }
 }

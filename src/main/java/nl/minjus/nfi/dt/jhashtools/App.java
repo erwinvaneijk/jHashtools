@@ -31,7 +31,6 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Executors;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
@@ -59,24 +58,26 @@ import org.slf4j.LoggerFactory;
 public class App
 {
 
-    private static final int FIXED_THREAD_POOL_SIZE = 10;
     private static final int EXIT_PERSISTENCE_ERROR = 2;
     private static final String USAGE = "[options] dir [dir...]";
     private static final String HEADER = "hashtree - Creating a list of digests for files "
-        + "and/or directories.\nCopyright (c) 2010, Erwin van Eijk";
+        + "and/or directories.\nCopyright (c) 2010 - 2012, Erwin van Eijk";
     private static final String FOOTER = "";
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
     private static final int DEFAULT_TERMINAL_WIDTH = 80;
     private static final String DEFAULT_ALGORITHM = "sha-256";
 
     public static void main(final String[] arguments) {
+        LOG.info("Version: " + Version.getVersion());
+        final long startTime = System.currentTimeMillis();
+        
         final CommandLine line = App.getCommandLine(arguments);
+        
         final String[] filesToProcess = line.getArgs();
 
         final DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
-        LOG.info("Version: " + Version.getVersion());
-
+        
         if (line.hasOption("i") && line.hasOption("o")) {
             LOG.warn("Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
@@ -97,6 +98,7 @@ public class App
             System.exit(2);
         }
 
+        LOG.info("Done: {}", (System.currentTimeMillis() - startTime)/1000.0);
         System.exit(0);
     }
 
@@ -150,7 +152,7 @@ public class App
     private static DirectoryHasher createDirectoryHasher(final CommandLine line) {
         DirectoryHasher directoryHasher = null;
         try {
-            directoryHasher = getThreadingModel(line);
+            directoryHasher = getDirectoryHasherByThreadingModel(line);
             directoryHasher.setVerbose(line.hasOption("verbose"));
 
             setRequestedAlgorithms(line, directoryHasher);
@@ -193,17 +195,12 @@ public class App
         }
     }
 
-    private static DirectoryHasher getThreadingModel(final CommandLine line) {
+    private static DirectoryHasher getDirectoryHasherByThreadingModel(final CommandLine line) {
         DirectoryHasher directoryHasher;
         final ConcurrencyMode concurrencyMode = (line.hasOption("single")) ? ConcurrencyMode.SINGLE
             : ConcurrencyMode.MULTI_THREADING;
-
-        if (concurrencyMode == ConcurrencyMode.SINGLE) {
-            directoryHasher = DirectoryHasherCreator.create(null);
-        } else {
-            directoryHasher = DirectoryHasherCreator.create(Executors
-                .newFixedThreadPool(FIXED_THREAD_POOL_SIZE));
-        }
+        
+        directoryHasher = DirectoryHasherCreator.create(concurrencyMode);
         return directoryHasher;
     }
 

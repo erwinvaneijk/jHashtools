@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.concurrent.Executors;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
@@ -96,7 +97,7 @@ public class IntegrationTest
             digestAlgorithms.add("sha-256");
             digestAlgorithms.add("md5");
             digestAlgorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(),
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING,
                 digestAlgorithms);
             DirHasherResult digests = directoryHasher
                 .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
@@ -123,7 +124,7 @@ public class IntegrationTest
             algorithms.add("sha-256");
             algorithms.add("md5");
             algorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(Executors.newCachedThreadPool(),
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING,
                 algorithms);
             DirHasherResult digests = directoryHasher
                 .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));

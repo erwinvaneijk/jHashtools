@@ -1,24 +1,31 @@
-<!-- ~ Copyright (c) 2010 Erwin van Eijk <erwin.vaneijk@gmail.com>. All rights 
-	reserved. ~ ~ Redistribution and use in source and binary forms, with or 
-	without modification, are ~ permitted provided that the following conditions 
-	are met: ~ ~ 1. Redistributions of source code must retain the above copyright 
-	notice, this list of ~ conditions and the following disclaimer. ~ ~ 2. Redistributions 
-	in binary form must reproduce the above copyright notice, this list ~ of 
-	conditions and the following disclaimer in the documentation and/or other 
-	materials ~ provided with the distribution. ~ ~ THIS SOFTWARE IS PROVIDED 
-	BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED ~ WARRANTIES, 
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-	AND ~ FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
-	<COPYRIGHT HOLDER> OR ~ CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-	INCIDENTAL, SPECIAL, EXEMPLARY, OR ~ CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
-	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR ~ SERVICES; LOSS OF USE, 
+<!-- 
+    Copyright (c) 2010-2012 Erwin van Eijk <erwin.vaneijk@gmail.com>. 
+
+	All rights reserved. 
+	
+	Redistribution and use in source and binary forms, with or 
+	without modification, are permitted provided that the following conditions 
+	are met: 
+		1. Redistributions of source code must retain the above copyright 
+		   notice, this list of ~ conditions and the following disclaimer. 
+		2. Redistributions in binary form must reproduce the above copyright 
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials ~ provided with the distribution.
+		   
+	THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
+	WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
+	<COPYRIGHT HOLDER> OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+	INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
 	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ~ ANY THEORY 
-	OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING ~ 
+	OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
 	NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
-	EVEN IF ~ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. ~ ~ The views and conclusions 
-	contained in the software and documentation are those of the ~ authors and 
-	should not be interpreted as representing official policies, either expressed 
-	~ or implied, of <copyright holder>. -->
+	EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+	
+	The views and conclusions contained in the software and documentation are those of the
+	authors and should not be interpreted as representing official policies, either expressed 
+	or implied, of <copyright holder>. -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -36,12 +43,12 @@
 		</license>
 	</licenses>
 	<repositories>
-        <repository>
-            <id>jetlang.googlecode.com</id>
-            <name>Jetlang Repository for Maven</name>
-            <url>http://jetlang.googlecode.com/svn/repo/</url>
-        </repository>
-    </repositories>
+		<repository>
+			<id>jetlang.googlecode.com</id>
+			<name>Jetlang Repository for Maven</name>
+			<url>http://jetlang.googlecode.com/svn/repo/</url>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 			<!-- Added test excludes for Abstract -->
@@ -188,43 +195,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											exec-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.2.1,)
-										</versionRange>
-										<goals>
-											<goal>exec</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 	<dependencies>
 		<dependency>
@@ -281,10 +251,18 @@
 			<version>140</version>
 		</dependency>
 		<dependency>
-            <groupId>org.jetlang</groupId>
-            <artifactId>jetlang</artifactId>
-            <version>0.2.7</version>
-        </dependency>
+			<groupId>org.jetlang</groupId>
+			<artifactId>jetlang</artifactId>
+			<version>0.2.7</version>
+		</dependency>
+		<!-- Log4J to Maven Log -->
+		<dependency>
+			<groupId>com.pyx4j</groupId>
+			<artifactId>maven-plugin-log4j</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		<!-- Slf4j to Log4J -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
