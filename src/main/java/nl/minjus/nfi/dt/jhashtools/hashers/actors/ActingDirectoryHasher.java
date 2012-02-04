@@ -40,8 +40,9 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
     /**
      * Constructor.
      */
-    public ActingDirectoryHasher()
+    public ActingDirectoryHasher() throws NoSuchAlgorithmException
     {
+        super("sha-256");
         executorService = Executors.newCachedThreadPool();
         fiberFactory = new PoolFiberFactory(executorService);
         channels = new Channels();
@@ -88,11 +89,11 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
 
     @Override
     public void updateDigests(final DirHasherResult digests, final File file) {
-        
+
         if (!file.exists()) {
             throw new IllegalArgumentException();
         }
-        
+
         final int numHashers =
             2 * Math.max(1, Runtime.getRuntime().availableProcessors() - NUM_REDUCERS - NUM_FILE_FEEDERS);
         final CountDownLatch onstop = new CountDownLatch(numHashers + NUM_REDUCERS + NUM_FILE_FEEDERS);

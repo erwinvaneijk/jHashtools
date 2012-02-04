@@ -59,18 +59,17 @@ public class ConcurrentFileHasher extends AbstractFileHasher
     private final ExecutorService executorService;
     private final Exchanger<ByteBuffer> exchanger;
 
-    public ConcurrentFileHasher()
-    {
-        super();
-        this.executorService = Executors.newSingleThreadExecutor();
-        this.exchanger = new Exchanger<ByteBuffer>();
-    }
-
     public ConcurrentFileHasher(final DigestAlgorithm digest) throws NoSuchAlgorithmException
     {
         super(digest);
         this.exchanger = new Exchanger<ByteBuffer>();
         this.executorService = Executors.newSingleThreadExecutor();
+    }
+
+    public ConcurrentFileHasher(final ExecutorService service)
+    {
+        this.exchanger = new Exchanger<ByteBuffer>();
+        this.executorService = service;
     }
 
     public ConcurrentFileHasher(final Collection<DigestAlgorithm> digests) throws NoSuchAlgorithmException

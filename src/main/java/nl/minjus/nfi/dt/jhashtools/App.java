@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 public class App
 {
 
+    private static final double MILLISEC_TO_SEC_FACTOR = 1000.0;
     private static final int EXIT_PERSISTENCE_ERROR = 2;
     private static final String USAGE = "[options] dir [dir...]";
     private static final String HEADER = "hashtree - Creating a list of digests for files "
@@ -70,14 +71,13 @@ public class App
     public static void main(final String[] arguments) {
         LOG.info("Version: " + Version.getVersion());
         final long startTime = System.currentTimeMillis();
-        
+
         final CommandLine line = App.getCommandLine(arguments);
-        
+
         final String[] filesToProcess = line.getArgs();
 
         final DirectoryHasher directoryHasher = createDirectoryHasher(line);
 
-        
         if (line.hasOption("i") && line.hasOption("o")) {
             LOG.warn("Make up your mind. Cannot do -i and -o at the same time.");
             System.exit(1);
@@ -98,7 +98,7 @@ public class App
             System.exit(2);
         }
 
-        LOG.info("Done: {}", (System.currentTimeMillis() - startTime)/1000.0);
+        LOG.info("Done: {}", (System.currentTimeMillis() - startTime) / MILLISEC_TO_SEC_FACTOR);
         System.exit(0);
     }
 
@@ -199,7 +199,7 @@ public class App
         DirectoryHasher directoryHasher;
         final ConcurrencyMode concurrencyMode = (line.hasOption("single")) ? ConcurrencyMode.SINGLE
             : ConcurrencyMode.MULTI_THREADING;
-        
+
         directoryHasher = DirectoryHasherCreator.create(concurrencyMode);
         return directoryHasher;
     }

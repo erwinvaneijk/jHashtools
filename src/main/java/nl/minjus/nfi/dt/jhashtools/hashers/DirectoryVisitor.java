@@ -57,7 +57,7 @@ public class DirectoryVisitor implements WalkerVisitor
         this.fileHasher = FileHasherCreator.create(null, algorithm);
     }
 
-    public DirectoryVisitor() throws NoSuchAlgorithmException
+    public DirectoryVisitor()
     {
         resultMap = new DirHasherResult();
         this.verbose = false;

@@ -44,6 +44,6 @@ public interface WalkerVisitor
      * @param theFile
      *            the file that is being visited.
      */
-    void visit(File theFile) throws InterruptedException;
+    void visit(File theFile);
 
 }

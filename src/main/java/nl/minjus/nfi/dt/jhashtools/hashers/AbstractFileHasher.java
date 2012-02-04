@@ -77,7 +77,7 @@ abstract class AbstractFileHasher implements FileHasher
      *             when the algorithm is not supported by the underlying JVM.
      */
     @Override
-    public void addAlgorithm(final DigestAlgorithm algorithmName) throws NoSuchAlgorithmException {
+    public void addAlgorithm(final DigestAlgorithm algorithmName) {
         this.digests.add(algorithmName);
     }
 

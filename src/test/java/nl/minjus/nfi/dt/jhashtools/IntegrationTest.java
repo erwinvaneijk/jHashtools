@@ -39,7 +39,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.concurrent.Executors;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
@@ -57,16 +56,16 @@ public class IntegrationTest
     @Test
     public void testIncludeFiles() throws IOException, PersistenceException {
         Reader reader = new FileReader("testdata/include-md5-sha1.txt");
-        PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
-        DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
+        final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
+        final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
         assertEquals(3976, setOne.size());
 
         reader = new FileReader("testdata/include-sha1-sha256-sha512.txt");
-        DirHasherResult setTwo = provider.load(reader, DirHasherResult.class);
+        final DirHasherResult setTwo = provider.load(reader, DirHasherResult.class);
         assertEquals(3976, setTwo.size());
 
-        DirHasherResult setOneSha1 = setOne.getByAlgorithm("sha-1");
-        DirHasherResult setTwoSha1 = setTwo.getByAlgorithm("sha-1");
+        final DirHasherResult setOneSha1 = setOne.getByAlgorithm("sha-1");
+        final DirHasherResult setTwoSha1 = setTwo.getByAlgorithm("sha-1");
         DirHasherResult diff = setOneSha1.exclude(setTwoSha1);
         assertEquals(0, diff.size());
 
@@ -93,26 +92,26 @@ public class IntegrationTest
     // @Test(timeout=120000)
     public void testLargeTree() {
         try {
-            Collection<String> digestAlgorithms = new ArrayList<String>();
+            final Collection<String> digestAlgorithms = new ArrayList<String>();
             digestAlgorithms.add("sha-256");
             digestAlgorithms.add("md5");
             digestAlgorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING,
+            final DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING,
                 digestAlgorithms);
-            DirHasherResult digests = directoryHasher
+            final DirHasherResult digests = directoryHasher
                 .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
-            Reader reader = new FileReader("boost-hashes.txt");
-            PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
-            DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
+            final Reader reader = new FileReader("boost-hashes.txt");
+            final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
+            final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
 
             assert setOne.matches(digests);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             fail(ex.toString() + " should not happen");
-        } catch (PersistenceException ex) {
+        } catch (final PersistenceException ex) {
             fail(ex.toString() + " should not happen");
         }
     }
@@ -120,26 +119,26 @@ public class IntegrationTest
     // @Test(timeout=120000)
     public void testLargeTreeConcurrent() {
         try {
-            Collection<String> algorithms = new LinkedList<String>();
+            final Collection<String> algorithms = new LinkedList<String>();
             algorithms.add("sha-256");
             algorithms.add("md5");
             algorithms.add("sha-1");
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING,
+            final DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING,
                 algorithms);
-            DirHasherResult digests = directoryHasher
+            final DirHasherResult digests = directoryHasher
                 .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
-            Reader reader = new FileReader("boost-hashes.txt");
-            PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
-            DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
+            final Reader reader = new FileReader("boost-hashes.txt");
+            final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
+            final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
 
             assert setOne.matches(digests);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             fail(ex.toString() + " should not happen");
-        } catch (PersistenceException ex) {
+        } catch (final PersistenceException ex) {
             fail(ex.toString() + " should not happen");
         }
     }

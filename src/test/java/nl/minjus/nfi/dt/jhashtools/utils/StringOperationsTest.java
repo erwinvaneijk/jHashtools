@@ -35,12 +35,15 @@ package nl.minjus.nfi.dt.jhashtools.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.*;
 
 /**
  *
@@ -85,4 +88,10 @@ public class StringOperationsTest
         assertNull(StringOperations.hexify(null));
     }
 
+    @Test
+    public void testSplit() {
+        final String str = "aaaabbbbccccdddd";
+        final String result = StringOperations.split(str, 4);
+        assertThat(result, is(equalTo("aaaa bbbb cccc dddd")));
+    }
 }

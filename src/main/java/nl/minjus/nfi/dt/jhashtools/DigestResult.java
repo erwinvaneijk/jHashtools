@@ -64,7 +64,7 @@ public class DigestResult extends TreeSet<Digest>
         this.add(value);
     }
 
-    public DigestResult(final Collection<? extends Object> coll)
+    public DigestResult(final Collection<?> coll)
     {
         for (final Object d : coll) {
             if (d instanceof MessageDigest) {

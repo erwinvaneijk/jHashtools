@@ -34,6 +34,8 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
@@ -74,6 +76,27 @@ public class ConcurrentDirectoryHasherTest
         }
     }
 
+    @Test
+    public void testGetMultipleDigests() {
+        try {
+            Collection<String> algorithms = new LinkedList<String>();
+            algorithms.add("sha-256");
+            DirectoryHasher directoryHasher = new ActingDirectoryHasher(algorithms);
+            DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
+            assertEquals(knownDigests.size(), digests.size());
+            DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
+            DirHasherResult result = digests.intersect(knownDigestSha256);
+            assertEquals(knownDigestSha256, result);
+            assertEquals(digests, digests.intersect(knownDigests));
+            for (Map.Entry<File, DigestResult> digest : digests) {
+                int count = digests.count(digest.getValue());
+                assertEquals(1, count);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            fail(ex.toString() + " should not happen");
+        }
+    }
+    
     @Test
     public void testUpdateDigests() {
         try {

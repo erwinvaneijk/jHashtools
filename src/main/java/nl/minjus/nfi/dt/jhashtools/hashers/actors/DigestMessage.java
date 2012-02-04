@@ -10,7 +10,7 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
  * @author Erwin van Eijk
  *
  */
-public class DigestMessage implements Message
+public class DigestMessage
 {
 
     private final File file;
@@ -23,15 +23,20 @@ public class DigestMessage implements Message
         this.file = file;
     }
 
-    @Override
-    public boolean isStop() {
-        return false;
-    }
-
+    /**
+     * Get the file in this message.
+     *
+     * @return the filename
+     */
     public File getFile() {
         return this.file;
     }
 
+    /**
+     * Get the digest of the file.
+     *
+     * @return a digest
+     */
     public DigestResult getDigestResult() {
         return this.digest;
     }

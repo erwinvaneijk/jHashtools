@@ -81,6 +81,7 @@ public class DigestOutputCreator
         this.digests = new DirHasherResult();
         this.outputFile = null;
         this.forceOverwrite = theOverwriteOption;
+        this.persistenceStyle = PersistenceStyle.JSON;
     }
 
     public void setPersistenceStyle(final PersistenceStyle thePersistenceStyle) {
@@ -97,7 +98,7 @@ public class DigestOutputCreator
     }
 
     /**
-     * Gnerate the digests for the algorithms starting at <c>anArrayOfPathNames<c>.
+     * Generate the digests for the algorithms starting at <c>anArrayOfPathNames<c>.
      *
      * @param anArrayOfPathNames
      */

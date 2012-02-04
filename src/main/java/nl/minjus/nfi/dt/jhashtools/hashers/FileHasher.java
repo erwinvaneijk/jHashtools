@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
@@ -43,7 +42,7 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
  */
 public interface FileHasher
 {
-    void addAlgorithm(DigestAlgorithm algorithmName) throws NoSuchAlgorithmException;
+    void addAlgorithm(DigestAlgorithm algorithmName);
 
     DigestResult getDigest(File file) throws FileNotFoundException, IOException;
 

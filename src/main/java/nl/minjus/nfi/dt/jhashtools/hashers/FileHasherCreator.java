@@ -56,7 +56,7 @@ public class FileHasherCreator
         if (anExecutorService == null) {
             hasher = new SerialFileHasher();
         } else {
-            hasher = new ConcurrentFileHasher();
+            hasher = new ConcurrentFileHasher(anExecutorService);
         }
         return hasher;
     }

@@ -29,14 +29,13 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
 
 /**
  * This utility class knows how to create new instances of DirectoryHasher's.
- * 
+ *
  * @author Erwin van Eijk
  */
 public class DirectoryHasherCreator
@@ -53,25 +52,21 @@ public class DirectoryHasherCreator
         if (concurrencyMode == ConcurrencyMode.SINGLE) {
             return new SerialDirectoryHasher();
         } else {
-            return new ActingDirectoryHasher();
+            try {
+                return new ActingDirectoryHasher();
+            } catch (final NoSuchAlgorithmException ex) {
+                return null;
+            }
         }
     }
 
     public static DirectoryHasher create(final ConcurrencyMode concurrencyMode, final Collection<String> digests)
-            throws NoSuchAlgorithmException
+        throws NoSuchAlgorithmException
     {
         if (concurrencyMode == ConcurrencyMode.SINGLE) {
             return new SerialDirectoryHasher(digests);
         } else {
             return new ActingDirectoryHasher(digests);
         }
-    }
-
-    public static DirectoryHasher create(final ConcurrencyMode concurrencyMode, final String digestAlgorithm)
-            throws NoSuchAlgorithmException
-    {
-        final Collection<String> digestAlgorithms = new ArrayList<String>();
-        digestAlgorithms.add(digestAlgorithm);
-        return create(concurrencyMode, digestAlgorithms);
     }
 }
