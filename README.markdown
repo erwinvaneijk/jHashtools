@@ -1,6 +1,6 @@
-jHashtools
-==========
-v1.0, Erwin van Eijk<erwin.vaneijk@gmail.com>
+jHashtools![Project status](http://stillmaintained.com/nicoulaj/maven-zsh-completion.png)
+=========================================================================================
+v1.2, Erwin van Eijk<erwin.vaneijk@gmail.com>
 
 History
 -------
