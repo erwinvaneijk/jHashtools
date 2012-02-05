@@ -102,6 +102,16 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                  <exclude>META-INF/*.SF</exclude>
+                  <exclude>META-INF/*.DSA</exclude>
+                  <exclude>META-INF/*.RSA</exclude>                                       
+                  </excludes>
+                </filter>
+              </filters>
 						</configuration>
 					</execution>
 				</executions>
@@ -297,7 +307,7 @@
 	</properties>
 	<scm>
 		<url>git://github.com/erwinvaneijk/jHashtools.git</url>
-		<developerConnection>Erwin van Eijk &lt;erwin.vaneijk@gmail.com&gt;</developerConnection>
+    <developerConnection>scm:git:https://github.com/erwinvaneijk/jHashtools.git</developerConnection>
 		<tag>hashing, concurrent</tag>
 	</scm>
 </project>
