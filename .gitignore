@@ -8,3 +8,6 @@
 /.settings
 /.project
 /doc
+.idea/
+projectFilesBackup
+/src/main/generated-sources/

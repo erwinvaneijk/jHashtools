@@ -30,15 +30,16 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
 
 /**
  * An abstraction for a set of map entries.
@@ -51,7 +52,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
 
     private ConstructionInfo constructionInfo;
 
-    private final TreeMap<File, DigestResult> content;
+    private final ConcurrentSkipListMap<File, DigestResult> content;
 
     /**
      * Constructor.
@@ -69,7 +70,8 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
      */
     public DirHasherResult(final boolean ignoreCase)
     {
-        this.content = new TreeMap<File, DigestResult>(new FileComparator(ignoreCase));
+        final Comparator<File> comparator = new FileComparator(ignoreCase);
+        this.content = new ConcurrentSkipListMap<>(comparator);
         this.constructionInfo = new ConstructionInfo();
     }
 
@@ -188,7 +190,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
     public boolean equals(final Object other) {
         if (this != other && other instanceof DirHasherResult) {
             final DirHasherResult o = (DirHasherResult) other;
-            return this.content.equals(o.content);
+            return this.content.entrySet().equals(o.content.entrySet());
         } else {
             return false;
         }
@@ -300,10 +302,10 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
     /**
      * Get the entries that are in both selections.
      *
-     * @param o
-     *            the other result to compare this to.
+     * @param o the other result to compare this to.
      * @return the correct subset.
      */
+    /*
     public DirHasherResult intersect(final DirHasherResult o) {
         final DirHasherResult result = new DirHasherResult();
         for (final Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
@@ -324,6 +326,29 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
         }
         return result;
     }
+*/
+    public DirHasherResult intersect(final DirHasherResult o) {
+        final DirHasherResult result = new DirHasherResult();
+        for (final Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
+            final File key = entry.getKey();
+            final DigestResult digestForKey = entry.getValue();
+            if (o.containsKey(key)) {
+                final DigestResult otherKey = o.get(key);
+                try {
+                    final DigestResult minimalResult = new DigestResult(digestForKey, otherKey);
+                    if (digestForKey.matches(otherKey)) {
+                        result.put(key, minimalResult);
+                    } else if (otherKey.matches(digestForKey)) {
+                        result.put(key, minimalResult);
+                    }
+                } catch (final NoMatchingAlgorithmsError ex) {
+                    LOG.error("Algorithm not supported: " + otherKey.toString());
+                }
+            }
+        }
+        return result;
+    }
+
 
     /**
      * Get all the entries that are in a or b but not in both.
