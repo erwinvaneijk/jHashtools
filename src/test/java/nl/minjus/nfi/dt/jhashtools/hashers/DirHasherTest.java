@@ -28,7 +28,10 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,10 +39,6 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
-
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,6 +49,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+
 /**
  * Test the serial dirHasher.
  * 
@@ -59,7 +62,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class DirHasherTest
 {
 
-    @Parameters
+    @Parameters(name="{index}: hasher:{0}")
     public static Collection<Object[]> data() {
         Collection<Object[]> collection = new LinkedList<Object[]>();
         try {
@@ -76,8 +79,7 @@ public class DirHasherTest
             collection.add(new Object[] { new ActingDirectoryHasher("md5"),
                     "md5" });
         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            fail("All the algorithms should exist");
         }
         return collection;
     }
@@ -115,11 +117,11 @@ public class DirHasherTest
     public void testGetDigests() {
         final DirHasherResult digests = 
                 directoryHasher.getDigests(new File("testdata"));
-        assertEquals(knownDigests.size(), digests.size());
+        assertThat(digests.size(), is(equalTo(knownDigests.size())));
         final DirHasherResult knownDigestSha256 = knownDigests
                 .getByAlgorithm(this.algorithm);
-        assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
-        assertEquals(digests, digests.intersect(knownDigests));
+        assertThat(digests.intersect(knownDigestSha256), is(equalTo(knownDigestSha256)));
+        assertThat(digests.intersect(knownDigests), is(equalTo(digests)));
     }
 
     @Test

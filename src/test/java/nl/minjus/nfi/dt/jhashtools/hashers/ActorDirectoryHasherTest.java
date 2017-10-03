@@ -28,20 +28,23 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  */
@@ -100,9 +103,10 @@ public class ActorDirectoryHasherTest
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             final DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
-            assertEquals(digests, digests.intersect(knownDigests));
-            assertEquals(digests, knownDigests.intersect(digests));
+            assertThat(digests.intersect(knownDigestSha256), is(equalTo(knownDigestSha256)));
+            assertThat(digests.intersect(knownDigests), is(equalTo(digests)));
+            final DirHasherResult d2 = knownDigests.intersect(digests);
+            assertThat(d2, is(equalTo(knownDigestSha256)));
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }

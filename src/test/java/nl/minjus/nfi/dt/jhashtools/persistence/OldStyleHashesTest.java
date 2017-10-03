@@ -28,16 +28,17 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
 
 import java.io.IOException;
 
-import static junit.framework.Assert.assertEquals;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import nl.minjus.nfi.dt.jhashtools.Digest;
 
 public class OldStyleHashesTest
 {
@@ -45,48 +46,48 @@ public class OldStyleHashesTest
     @Test
     public void testSingleDigestValue() throws IOException, RecognitionException {
         OldStyleHashesParser parser = createParser("1111\n");
-        String result = parser.digestValue();
+        String result = parser.digestValue().digestString;
         assertEquals("1111", result);
     }
 
     @Test
     public void testMultiDigestValue() throws IOException, RecognitionException {
         OldStyleHashesParser parser = createParser("1111 2222\n");
-        String result = parser.digestValue();
+        String result = parser.digestValue().digestString;
         assertEquals("11112222", result);
     }
 
     @Test
     public void testMd5Digest() throws IOException, RecognitionException {
         OldStyleHashesParser parser = createParser("MD5: 1111 2222 3333 4444 5555 6666 7777 8888\n");
-        Digest result = parser.digest();
+        Digest result = parser.digest().digestResult;
         assertEquals(new Digest("md5", "11112222333344445555666677778888"), result);
     }
 
     @Test
     public void testMd5DigestShort() throws IOException, RecognitionException {
         OldStyleHashesParser parser = createParser("MD5: 11112222333344445555666677778888\n");
-        Digest result = parser.digest();
+        Digest result = parser.digest().digestResult;
         assertEquals(new Digest("md5", "11112222333344445555666677778888"), result);
     }
 
     @Test
     public void testSha1Digest() throws IOException, RecognitionException {
         OldStyleHashesParser parser = createParser("SHA-1: 0000 1111 2222 3333 4444 5555 6666 7777 8888 9999\n");
-        Digest result = parser.digest();
+        Digest result = parser.digest().digestResult;
         assertEquals(new Digest("sha-1", "0000111122223333444455556666777788889999"), result);
     }
 
     @Test
     public void testSha256Digest() throws IOException, RecognitionException {
         OldStyleHashesParser parser = createParser("SHA-256: 0000 1111 2222 3333 4444 5555 6666 7777 8888 9999 aaaa bbbb cccc dddd eeee ffff\n");
-        Digest result = parser.digest();
+        Digest result = parser.digest().digestResult;
         assertEquals(
             new Digest("sha-256", "0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff"), result);
     }
 
     private OldStyleHashesParser createParser(String testString) throws IOException {
-        CharStream stream = new ANTLRStringStream(testString);
+        CharStream stream = CharStreams.fromString(testString);
         OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         OldStyleHashesParser parser = new OldStyleHashesParser(tokens);

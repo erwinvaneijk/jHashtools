@@ -75,6 +75,20 @@ public class DigestResult extends TreeSet<Digest>
         }
     }
 
+    /**
+     * Get a newly constructed key that contains only the digests that are available on either side.
+     *
+     * @param left the left key
+     * @param right the right key
+     */
+    public DigestResult(final DigestResult left, final DigestResult right) {
+        for (Digest d: left) {
+            if (right.contains(d)) {
+                add(d);
+            }
+        }
+    }
+
     @Override
     public boolean add(final Digest value) {
         containedDigestMask = DigestResult.updateAlgorithmMask(containedDigestMask, value.getAlgorithm());
@@ -139,7 +153,11 @@ public class DigestResult extends TreeSet<Digest>
      */
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int h = 0;
+        for (Digest d: this) {
+            h += d.hashCode();
+        }
+        return h % 2147483647;
     }
 
     /**

@@ -2,16 +2,14 @@ grammar OldStyleHashes;
 
 options {
 	language = Java;
-	k = 5;
 }
 	
-@parser::header { package nl.minjus.nfi.dt.jhashtools.persistence; 
-import nl.minjus.nfi.dt.jhashtools.Digest;
+@parser::header {
 
+import nl.minjus.nfi.dt.jhashtools.Digest;
 }
 
-@lexer::header {  package nl.minjus.nfi.dt.jhashtools.persistence;
-
+@lexer::header {
  }
 
 digest returns [Digest digestResult]

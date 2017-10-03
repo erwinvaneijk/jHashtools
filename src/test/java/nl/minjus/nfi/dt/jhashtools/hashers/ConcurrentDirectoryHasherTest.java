@@ -34,17 +34,18 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  */
@@ -60,7 +61,7 @@ public class ConcurrentDirectoryHasherTest
     @Test
     public void testGetDigests() {
         try {
-            DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
+            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING, Arrays.asList("sha-256"));
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertEquals(knownDigests.size(), digests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");

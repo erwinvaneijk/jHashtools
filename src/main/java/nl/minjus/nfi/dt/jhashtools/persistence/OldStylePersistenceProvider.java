@@ -37,19 +37,19 @@ import java.io.Reader;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.codehaus.jackson.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrentFileHasher;
-
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.codehaus.jackson.type.TypeReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class supports the Old Style hashes.txt files that are now generated using JSON. The old format should be
@@ -124,7 +124,7 @@ public class OldStylePersistenceProvider implements PersistenceProvider
                     } else {
                         try {
                             final OldStyleHashesParser parser = createParser(line);
-                            final Digest theDigest = parser.digest();
+                            final Digest theDigest = parser.digest().digestResult;
                             result.add(theDigest);
                         } catch (final RecognitionException ex) {
                             LOG.info("Could not recognize [" + line + "]");
@@ -142,7 +142,7 @@ public class OldStylePersistenceProvider implements PersistenceProvider
     }
 
     private OldStyleHashesParser createParser(final String testString) throws IOException {
-        final CharStream stream = new ANTLRStringStream(testString);
+        final CharStream stream = CharStreams.fromString(testString);
         final OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
         return new OldStyleHashesParser(tokens);
