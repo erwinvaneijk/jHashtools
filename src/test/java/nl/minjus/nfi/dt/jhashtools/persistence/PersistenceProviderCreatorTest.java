@@ -5,9 +5,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class PersistenceProviderCreatorTest {
+    @Rule
+    public ExpectedException _exception = ExpectedException.none();
 
     @Test
     public void testCreateJson() {
@@ -29,5 +33,11 @@ public class PersistenceProviderCreatorTest {
         } catch (final RuntimeException ex) {
             // pass!
         }
+    }
+
+    @Test
+    public void testCreateBogus() {
+        _exception.expect(IllegalArgumentException.class);
+        PersistenceProviderCreator.create(PersistenceStyle.valueOf("Foo"));
     }
 }

@@ -35,6 +35,8 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
  */
 public class PersistenceProviderCreator
 {
+    private PersistenceProviderCreator() {}
+
     /**
      * Create a new PersistenceProvider for <c>thePersistenceStyle<c>.
      *
@@ -53,9 +55,6 @@ public class PersistenceProviderCreator
                 break;
             case XML:
                 throw new RuntimeException("XML is not yet supported.");
-            default:
-                throw new UnsupportedOperationException("We know nothing of persistenceStyle "
-                    + thePersistenceStyle);
         }
         return persistenceProvider;
     }

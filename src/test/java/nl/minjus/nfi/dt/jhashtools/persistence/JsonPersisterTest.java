@@ -32,30 +32,58 @@
  */
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.map.*;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.type.TypeReference;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import java.io.*;
-import java.util.*;
-
-import static org.junit.Assert.*;
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
 /**
  * @author eijk
  */
-public class JsonPersisterTest
-{
+public class JsonPersisterTest {
+    @Rule
+    public final ExpectedException _exception = ExpectedException.none();
 
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;
@@ -78,18 +106,15 @@ public class JsonPersisterTest
     public void tearDown() {
     }
 
-    static class LargeArrayClass
-    {
+    static class LargeArrayClass {
 
         List<Long> set;
 
-        public LargeArrayClass()
-        {
+        public LargeArrayClass() {
             this(0);
         }
 
-        public LargeArrayClass(int n)
-        {
+        public LargeArrayClass(int n) {
             this.set = new ArrayList<Long>(n);
             for (long i = 0; i < n; i++) {
                 set.add((int) i, i);
@@ -105,13 +130,11 @@ public class JsonPersisterTest
         }
     }
 
-    static class LargeArraySerializer extends JsonSerializer<LargeArrayClass>
-    {
+    static class LargeArraySerializer extends JsonSerializer<LargeArrayClass> {
 
         @Override
         public void serialize(LargeArrayClass largeArrayClass, JsonGenerator jsonGenerator,
-            SerializerProvider serializerProvider) throws IOException, JsonProcessingException
-        {
+                              SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeArrayFieldStart("set");
             for (Long l : largeArrayClass.set) {
@@ -121,13 +144,11 @@ public class JsonPersisterTest
         }
     }
 
-    static class LargeArrayDeserializer extends JsonDeserializer<LargeArrayClass>
-    {
+    static class LargeArrayDeserializer extends JsonDeserializer<LargeArrayClass> {
 
         @Override
         public LargeArrayClass deserialize(JsonParser jp, DeserializationContext deserializationContext)
-            throws IOException, JsonProcessingException
-        {
+            throws IOException, JsonProcessingException {
             LargeArrayClass instance = new LargeArrayClass(10);
             jp.nextToken();
             while (jp.nextToken() != JsonToken.END_OBJECT) {
@@ -146,8 +167,7 @@ public class JsonPersisterTest
 
     @JsonSerialize(using = LargeArraySerializer.class)
     @JsonDeserialize(using = LargeArrayDeserializer.class)
-    class LargeArrayClassMixIn
-    {
+    class LargeArrayClassMixIn {
     }
 
     @Test
@@ -178,8 +198,7 @@ public class JsonPersisterTest
             provider.persist(out, mySet);
 
             Reader input = new StringReader(out.toString());
-            TypeReference<Set<Integer>> setType = new TypeReference<Set<Integer>>()
-            {
+            TypeReference<Set<Integer>> setType = new TypeReference<Set<Integer>>() {
             };
             Set<Integer> otherSet = provider.load(input, setType);
             assertEquals(mySet.size(), otherSet.size());
@@ -192,8 +211,8 @@ public class JsonPersisterTest
             }
             assertTrue(!it1.hasNext());
             assertTrue(!it2.hasNext());
-
-        } catch (PersistenceException ex) {
+        }
+        catch (PersistenceException ex) {
             fail("Should not get here");
         }
     }
@@ -210,8 +229,7 @@ public class JsonPersisterTest
             provider.persist(out, mySet);
 
             Reader reader = new StringReader(out.toString());
-            TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>()
-            {
+            TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>() {
             };
             Set<Integer> otherSet = provider.load(reader, setType);
             assertEquals(mySet.size(), otherSet.size());
@@ -224,7 +242,8 @@ public class JsonPersisterTest
             }
             assertTrue(!it1.hasNext());
             assertTrue(!it2.hasNext());
-        } catch (PersistenceException ex) {
+        }
+        catch (PersistenceException ex) {
             fail("Should not get here");
         }
     }
@@ -243,16 +262,16 @@ public class JsonPersisterTest
             instance.persist(out, obj);
             String str = out.toString();
             assertEquals(this.testDigestResultInJson, str);
-        } catch (PersistenceException ex) {
+        }
+        catch (PersistenceException ex) {
             fail("This should not raise an exception");
         }
     }
 
     /**
      * Test of load method, of class JsonPersistenceProvider.
-     * 
-     * @throws PersistenceException
-     *             when problems occur with the persistence.
+     *
+     * @throws PersistenceException when problems occur with the persistence.
      */
     @Test
     public void testLoad() throws PersistenceException {
@@ -263,6 +282,41 @@ public class JsonPersisterTest
         assertEquals(1, result.size());
         assertEquals("sha-1", result.digest().getAlgorithm());
         assertEquals("0000111122223333444455556666777788889999aaaa", result.digest().toHex());
+    }
+
+
+    @Test
+    public void testFailingLoad() throws Exception {
+        Reader stream = mock(Reader.class);
+        Class<DigestResult> clazz = DigestResult.class;
+        JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        when(stream.read()).thenThrow(new IOException());
+        _exception.expect(PersistenceException.class);
+        DigestResult result = instance.load(stream, clazz);
+    }
+
+    @Test
+    public void testFailingLoadTypeReader() throws Exception {
+        Reader stream = mock(Reader.class);
+        Class<DigestResult> clazz = DigestResult.class;
+        JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        when(stream.read()).thenThrow(new IOException());
+        _exception.expect(PersistenceException.class);
+        TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>() {
+        };
+        TreeSet<Integer> result = instance.load(stream,  setType);
+    }
+
+    @Test
+    public void testFailingPersist() throws Exception {
+        OutputStream writer = mock(OutputStream.class);
+        DigestResult digestResult  = new DigestResult();
+        doThrow(IOException.class).when(writer).write(any(byte[].class));
+        doThrow(IOException.class).when(writer).write(any(int.class));
+        doThrow(IOException.class).when(writer).write(any(byte[].class), any(int.class), any(int.class) );
+        _exception.expect(PersistenceException.class);
+        JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        instance.persist(writer, digestResult);
     }
 
     @Test
