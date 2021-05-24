@@ -1,12 +1,11 @@
 package nl.minjus.nfi.dt.jhashtools.utils;
 
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.io.File;
+
+import org.junit.Test;
 
 public class FileOperationsTest {
     @Test

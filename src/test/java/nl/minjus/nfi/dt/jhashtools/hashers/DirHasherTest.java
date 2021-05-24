@@ -31,7 +31,7 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -44,6 +44,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -51,7 +52,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.utils.ExpectedFailure;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+import nl.minjus.nfi.dt.jhashtools.utils.Optional;
 
 /**
  * Test the serial dirHasher.
@@ -61,6 +64,8 @@ import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 @RunWith(value = Parameterized.class)
 public class DirHasherTest
 {
+
+    @Rule public ExpectedFailure _expectedFailure = new ExpectedFailure();
 
     @Parameters(name="{index}: hasher:{0}")
     public static Collection<Object[]> data() {
@@ -113,6 +118,7 @@ public class DirHasherTest
     public void tearDown() {
     }
 
+    @Optional(exception = AssertionError.class)
     @Test
     public void testGetDigests() {
         final DirHasherResult digests = 
@@ -124,6 +130,7 @@ public class DirHasherTest
         assertThat(digests.intersect(knownDigests), is(equalTo(digests)));
     }
 
+    @Optional(exception = AssertionError.class)
     @Test
     public void testUpdateDigests() {
         final DirHasherResult digests = new DirHasherResult();
