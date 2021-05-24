@@ -28,7 +28,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

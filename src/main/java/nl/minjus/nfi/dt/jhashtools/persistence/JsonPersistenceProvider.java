@@ -28,8 +28,10 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Reader;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.codehaus.jackson.map.deser.CustomDeserializerFactory;
@@ -37,9 +39,8 @@ import org.codehaus.jackson.map.deser.StdDeserializerProvider;
 import org.codehaus.jackson.map.ser.CustomSerializerFactory;
 import org.codehaus.jackson.type.TypeReference;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
 /**
  * @author Erwin van Eijk
