@@ -34,14 +34,21 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  *
@@ -49,6 +56,8 @@ import org.junit.Test;
  */
 public class FileWalkerTest
 {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     public FileWalkerTest()
     {
@@ -126,5 +135,106 @@ public class FileWalkerTest
         final int result = instance.walk(file);
         assertEquals(expResult, result);
         assertEquals(13, visitor.getNumber());
+    }
+
+    /**
+     * Test that symlinks to files are not followed.
+     * This test is skipped if the filesystem does not support symbolic links.
+     */
+    @Test
+    public void testWalkDoesNotFollowFileSymlinks() throws IOException {
+        // Check if symlinks are supported on this filesystem
+        try {
+            final Path tempPath = tempFolder.getRoot().toPath().resolve("symlink_test_temp");
+            Files.createSymbolicLink(tempPath, tempPath.getParent());
+            Files.delete(tempPath);
+        } catch (UnsupportedOperationException | IOException e) {
+            // Symlinks not supported, skip this test
+            return;
+        }
+        
+        // Create a test directory structure with a symlink
+        final File testDir = tempFolder.newFolder("symlinkTest");
+        final File realFile = new File(testDir, "realfile.txt");
+        realFile.createNewFile();
+        
+        // Create a symlink to the real file
+        final Path symlinkPath = testDir.toPath().resolve("symlink.txt");
+        final Path targetPath = realFile.toPath();
+        Files.createSymbolicLink(symlinkPath, targetPath);
+        
+        final FileWalker instance = new FileWalker();
+        final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
+        instance.addWalkerVisitor(visitor);
+        
+        instance.walk(testDir);
+        
+        // Only the real file should be visited, not the symlink
+        // The symlink itself is also a file, but it should be skipped
+        // So we expect only 1 visit (the real file)
+        assertEquals("Symlinks should not be followed, only real files visited", 1, visitor.getNumber());
+    }
+
+    /**
+     * Test that symlinks to directories are not followed.
+     * This test is skipped if the filesystem does not support symbolic links.
+     */
+    @Test
+    public void testWalkDoesNotFollowDirectorySymlinks() throws IOException {
+        // Check if symlinks are supported on this filesystem
+        try {
+            final Path tempPath = tempFolder.getRoot().toPath().resolve("symlink_test_temp");
+            Files.createSymbolicLink(tempPath, tempPath.getParent());
+            Files.delete(tempPath);
+        } catch (UnsupportedOperationException | IOException e) {
+            // Symlinks not supported, skip this test
+            return;
+        }
+        
+        // Create a test directory structure with a symlink to a directory
+        final File testDir = tempFolder.newFolder("symlinkDirTest");
+        final File realDir = new File(testDir, "realdir");
+        realDir.mkdir();
+        
+        // Create a file in the real directory
+        final File fileInRealDir = new File(realDir, "file.txt");
+        fileInRealDir.createNewFile();
+        
+        // Create a symlink to the real directory
+        final Path symlinkPath = testDir.toPath().resolve("linkdir");
+        final Path targetPath = realDir.toPath();
+        Files.createSymbolicLink(symlinkPath, targetPath);
+        
+        final FileWalker instance = new FileWalker();
+        final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
+        instance.addWalkerVisitor(visitor);
+        
+        instance.walk(testDir);
+        
+        // Only the real directory and its file should be visited
+        // The symlink directory should be skipped, and its contents should NOT be walked
+        // So we expect only 1 visit (the file in the real directory)
+        assertEquals("Symlink directories should not be followed", 1, visitor.getNumber());
+    }
+
+    /**
+     * Test that regular files are still visited correctly.
+     */
+    @Test
+    public void testWalkVisitsRegularFiles() throws IOException {
+        final File testDir = tempFolder.newFolder("regularTest");
+        final File file1 = new File(testDir, "file1.txt");
+        final File file2 = new File(testDir, "file2.txt");
+        file1.createNewFile();
+        file2.createNewFile();
+        
+        final FileWalker instance = new FileWalker();
+        final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
+        instance.addWalkerVisitor(visitor);
+        
+        instance.walk(testDir);
+        
+        // Both files should be visited
+        assertEquals("Both regular files should be visited", 2, visitor.getNumber());
     }
 }

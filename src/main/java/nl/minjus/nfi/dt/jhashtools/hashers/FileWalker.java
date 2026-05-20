@@ -29,6 +29,8 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -97,23 +99,48 @@ class FileWalker
     }
 
     private void walkTheFile(final File aPath) {
+        if (!aPath.exists()) {
+            return;
+        }
+        // Skip symbolic links
+        if (isSymlink(aPath)) {
+            LOG.debug("Skipping symlink: {}", aPath.getPath());
+            return;
+        }
         try {
-            if (!aPath.exists()) {
-                return;
-            }
             if (aPath.isFile()) {
                 fireVisitorsWith(aPath);
             } else if (aPath.isDirectory()) {
-                for (final File child : aPath.listFiles()) {
-                    if (child.isFile()) {
-                        fireVisitorsWith(child);
-                    } else {
+                final File[] children = aPath.listFiles();
+                if (children != null) {
+                    for (final File child : children) {
                         walkTheFile(child);
                     }
                 }
             }
         } catch (final InterruptedException e) {
             LOG.info("Execution interrupted");
+        }
+    }
+
+    /**
+     * Check if a file is a symbolic link.
+     * Uses Files.isSymbolicLink() which checks the file itself, not its parent paths.
+     *
+     * @param file the file to check
+     * @return true if the file is a symbolic link
+     */
+    private boolean isSymlink(final File file) {
+        if (file == null || !file.exists()) {
+            return false;
+        }
+        try {
+            // Use Files.isSymbolicLink() which checks if the file itself is a symlink
+            // This avoids false positives from system-level symlinks like /var -> /private/var
+            return Files.isSymbolicLink(file.toPath());
+        } catch (SecurityException e) {
+            LOG.warn("Could not determine if file is symlink (permission denied): {}", file, e);
+            return false;
         }
     }
 
