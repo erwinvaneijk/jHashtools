@@ -61,13 +61,18 @@ mvn test -X
 
 ## Code Quality
 
+Before submitting a pull request, ensure all quality checks pass:
+
 ```bash
-# Run checkstyle
+# Run checkstyle - MUST PASS for merge
 mvn checkstyle:check
 
 # Run coverage checks (cobertura)
 mvn cobertura:check
 ```
+
+**Note:** `mvn checkstyle:check` must pass without introducing new violations.
+Existing violations in other parts of the codebase are being addressed separately.
 
 ## Git Commit Guidelines
 
