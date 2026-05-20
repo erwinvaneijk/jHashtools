@@ -29,7 +29,6 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class offers a 'walker' that will go through a directory and offer the resulting files to one or more visitors.
+ * This class offers a 'walker' that will go through a directory and offer
+ * the resulting files to one or more visitors.
  *
  * @author Erwin van Eijk
  */
@@ -125,9 +125,11 @@ class FileWalker
 
     /**
      * Check if a file is a symbolic link.
-     * Uses Files.isSymbolicLink() which checks the file itself, not its parent paths.
+     * Uses Files.isSymbolicLink() which checks the file itself,
+     * not its parent paths.
      *
-     * @param file the file to check
+     * @param file
+     *            the file to check
      * @return true if the file is a symbolic link
      */
     private boolean isSymlink(final File file) {
@@ -135,11 +137,12 @@ class FileWalker
             return false;
         }
         try {
-            // Use Files.isSymbolicLink() which checks if the file itself is a symlink
-            // This avoids false positives from system-level symlinks like /var -> /private/var
+            // Use Files.isSymbolicLink() to check the file itself
+            // This avoids false positives from system-level symlinks
+            // like /var -> /private/var
             return Files.isSymbolicLink(file.toPath());
         } catch (SecurityException e) {
-            LOG.warn("Could not determine if file is symlink (permission denied): {}", file, e);
+            LOG.warn("Could not determine if file is symlink: {}", file, e);
             return false;
         }
     }

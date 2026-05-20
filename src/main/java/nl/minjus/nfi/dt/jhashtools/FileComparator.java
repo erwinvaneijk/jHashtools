@@ -39,8 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements a Comparator for File where each file is deemed the same of the path would point to the same
- * file regardless of how it is named.
+ * This class implements a Comparator for File where each file is deemed the same
+ * of the path would point to the same file regardless of naming.
  */
 class FileComparator implements Comparator<File>
 {
@@ -88,7 +88,7 @@ class FileComparator implements Comparator<File>
     }
 
     @Override
-    public int compare(File o1, File o2) {
+    public int compare(final File o1, final File o2) {
         try {
             final String filename1 = getNormalizedPath(o1);
             final String filename2 = getNormalizedPath(o2);
@@ -107,19 +107,20 @@ class FileComparator implements Comparator<File>
      * This normalizes the path by resolving . and .. segments, but does not
      * follow symbolic links.
      *
-     * @param file the file to get the normalized path for
+     * @param file
+     *            the file to get the normalized path for
      * @return the normalized path
-     * @throws IOException if the file does not exist
+     * @throws IOException
+     *             if the file does not exist
      */
-    private String getNormalizedPath(File file) throws IOException {
+    private String getNormalizedPath(final File file) throws IOException {
         String path = filenameCache.get(file);
         if (path == null) {
             path = normalizePath(file);
             filenameCache.put(file, path);
             return path;
-        } else {
-            return path;
         }
+        return path;
     }
 
     /**
@@ -128,37 +129,42 @@ class FileComparator implements Comparator<File>
      * and getAbsolutePath() for symlinks (to avoid following them).
      * For non-existent files, uses absolute path with manual normalization.
      *
-     * @param file the file to normalize
+     * @param file
+     *            the file to normalize
      * @return the normalized path
-     * @throws IOException if the path cannot be determined
+     * @throws IOException
+     *             if the path cannot be determined
      */
-    private String normalizePath(File file) throws IOException {
+    private String normalizePath(final File file) throws IOException {
         if (file == null) {
             return "";
         }
-        
-        // For non-existent files, canonical path resolution may fail or not work as expected
-        // Try canonical path first (works for existing files and normalizes paths)
+
+        // For non-existent files, canonical path resolution may fail
+        // Try canonical path first (normalizes paths for existing files)
         try {
-            // Check if this is a symbolic link (only makes sense for existing files)
+            // Check if this is a symbolic link
             if (file.exists() && isSymlink(file)) {
                 // For symlinks, use absolute path to avoid resolving the link
                 return file.getAbsolutePath();
             }
-            // For non-symlinks (or non-existent files), use canonical path for normalization
+            // For non-symlinks, use canonical path for normalization
             return file.getCanonicalPath();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // If canonical path fails, fall back to absolute path
-            LOG.debug("Could not get canonical path for {}, using absolute path: {}", file, e.getMessage());
+            LOG.debug("Could not get canonical path for {}, using absolute: {}",
+                file, e.getMessage());
             return file.getAbsolutePath();
         }
     }
 
     /**
      * Check if a file is a symbolic link.
-     * Uses Files.isSymbolicLink() which checks the file itself, not its parent paths.
+     * Uses Files.isSymbolicLink() which checks the file itself,
+     * not its parent paths.
      *
-     * @param file the file to check (must exist)
+     * @param file
+     *            the file to check (must exist)
      * @return true if the file is a symbolic link
      */
     private boolean isSymlink(final File file) {
@@ -167,8 +173,8 @@ class FileComparator implements Comparator<File>
         }
         try {
             return Files.isSymbolicLink(file.toPath());
-        } catch (SecurityException e) {
-            LOG.warn("Could not determine if file is symlink (permission denied): {}", file, e);
+        } catch (final SecurityException e) {
+            LOG.warn("Could not determine if file is symlink: {}", file, e);
             return false;
         }
     }
