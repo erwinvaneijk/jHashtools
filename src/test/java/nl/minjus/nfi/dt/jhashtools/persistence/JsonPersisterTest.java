@@ -36,14 +36,14 @@ import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.map.*;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.*;
 
 import java.io.*;
@@ -154,8 +154,7 @@ public class JsonPersisterTest
     public void testLargeArray() throws Exception {
         StringWriter out = new StringWriter();
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.getSerializationConfig().addMixInAnnotations(LargeArrayClass.class,
-            LargeArrayClassMixIn.class);
+        objectMapper.addMixIn(LargeArrayClass.class, LargeArrayClassMixIn.class);
 
         LargeArrayClass a = new LargeArrayClass(10);
         objectMapper.writeValue(out, a);

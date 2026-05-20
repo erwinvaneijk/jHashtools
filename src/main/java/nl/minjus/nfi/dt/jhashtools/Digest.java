@@ -37,8 +37,8 @@ import java.util.Arrays;
 
 import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * This class holds some convenience for handling the results delivered by MessageDigest#digest.

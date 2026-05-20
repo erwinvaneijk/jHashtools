@@ -32,12 +32,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig.Feature;
-import org.codehaus.jackson.map.deser.CustomDeserializerFactory;
-import org.codehaus.jackson.map.deser.StdDeserializerProvider;
-import org.codehaus.jackson.map.ser.CustomSerializerFactory;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
@@ -52,8 +51,7 @@ public class JsonPersistenceProvider implements PersistenceProvider
 
     public JsonPersistenceProvider(boolean prettyPrint)
     {
-        OBJECT_MAPPER.getSerializationConfig().set(Feature.INDENT_OUTPUT, prettyPrint);
-        OBJECT_MAPPER.getSerializationConfig().set(Feature.WRITE_DATES_AS_TIMESTAMPS, !prettyPrint);
+        OBJECT_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, prettyPrint);
     }
 
     public JsonPersistenceProvider()
@@ -62,13 +60,10 @@ public class JsonPersistenceProvider implements PersistenceProvider
     }
 
     static {
-        final CustomSerializerFactory sf = new CustomSerializerFactory();
-        sf.addGenericMapping(DirHasherResult.class, new DirHasherResultSerializer());
-        OBJECT_MAPPER.setSerializerFactory(sf);
-
-        final CustomDeserializerFactory df = new CustomDeserializerFactory();
-        df.addSpecificMapping(DirHasherResult.class, new DirHasherResultDeserializer());
-        OBJECT_MAPPER.setDeserializerProvider(new StdDeserializerProvider(df));
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(DirHasherResult.class, new DirHasherResultSerializer());
+        module.addDeserializer(DirHasherResult.class, new DirHasherResultDeserializer());
+        OBJECT_MAPPER.registerModule(module);
     }
 
     @Override

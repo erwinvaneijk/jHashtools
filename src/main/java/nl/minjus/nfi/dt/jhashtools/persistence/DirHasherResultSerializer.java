@@ -30,17 +30,15 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.TreeMap;
+import java.util.Map;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.JavaType;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * @author Erwin van Eijk
@@ -56,9 +54,12 @@ class DirHasherResultSerializer extends JsonSerializer<DirHasherResult>
         jsonGenerator.writeObject(dirHasherResult.getConstructionInfo());
 
         jsonGenerator.writeFieldName("content");
-        final JavaType mapType = TypeFactory.mapType(TreeMap.class, File.class, DigestResult.class);
-        final JsonSerializer<Object> ser = serializerProvider.findValueSerializer(mapType);
-        ser.serialize(dirHasherResult.getContent(), jsonGenerator, serializerProvider);
+        jsonGenerator.writeStartObject();
+        for (Map.Entry<File, DigestResult> entry : dirHasherResult.getContent().entrySet()) {
+            jsonGenerator.writeFieldName(entry.getKey().getPath());
+            jsonGenerator.writeObject(entry.getValue());
+        }
+        jsonGenerator.writeEndObject();
         jsonGenerator.writeEndObject();
     }
 }

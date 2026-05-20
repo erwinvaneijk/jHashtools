@@ -36,11 +36,11 @@ import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * Arrange the deserialization of the JSON structure for DirHasherResult.
@@ -76,10 +76,12 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
             }
             if ("content".equals(fieldName)) {
                 aJsonParser.nextToken();
-                result.putAll((Map<File, DigestResult>) aJsonParser
-                    .readValueAs(new TypeReference<Map<File, DigestResult>>()
-                    {
-                    }));
+                while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
+                    final String filePath = aJsonParser.getCurrentName();
+                    aJsonParser.nextToken();
+                    final DigestResult digestResult = aJsonParser.readValueAs(DigestResult.class);
+                    result.put(new File(filePath), digestResult);
+                }
             }
         }
         return result;
