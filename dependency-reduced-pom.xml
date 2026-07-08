@@ -32,8 +32,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.13.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>8</release>
           <encoding>${project.build.sourceEncoding}</encoding>
           <showDeprecation>true</showDeprecation>
         </configuration>
@@ -222,6 +221,6 @@
   </reporting>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <antlr.version>4.7</antlr.version>
+    <antlr.version>4.13.2</antlr.version>
   </properties>
 </project>
