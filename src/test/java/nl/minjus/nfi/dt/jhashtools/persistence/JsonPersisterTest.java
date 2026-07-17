@@ -294,4 +294,75 @@ public class JsonPersisterTest
         assertEquals("sha-1", digestResult.digest().getAlgorithm());
         assertEquals("0000111122223333444455556666777788889999aaaa", digestResult.digest().toHex());
     }
+
+    @Test
+    public void testPrettyPrintProducesIndentedOutput() throws PersistenceException {
+        DirHasherResult obj = new DirHasherResult();
+        DigestResult dr = new DigestResult();
+        dr.add(new Digest("sha-1", "0000111122223333444455556666777788889999aaaa"));
+        obj.put("file.txt", dr);
+
+        ByteArrayOutputStream prettyOut = new ByteArrayOutputStream();
+        new JsonPersistenceProvider(true).persist(prettyOut, obj);
+
+        // Reset OBJECT_MAPPER to compact for other tests
+        ByteArrayOutputStream compactOut = new ByteArrayOutputStream();
+        new JsonPersistenceProvider(false).persist(compactOut, obj);
+
+        assertTrue("Pretty-printed JSON must contain newlines", prettyOut.toString().contains("\n"));
+        assertTrue("Pretty-printed output should be longer than compact output",
+            prettyOut.toString().length() > compactOut.toString().length());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testPersistIOExceptionIsWrapped() throws PersistenceException {
+        OutputStream failingStream = new OutputStream() {
+            @Override
+            public void write(final int b) throws IOException {
+                throw new IOException("Simulated failure");
+            }
+
+            @Override
+            public void write(final byte[] b, final int off, final int len) throws IOException {
+                throw new IOException("Simulated failure");
+            }
+        };
+        new JsonPersistenceProvider().persist(failingStream, new DigestResult());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testLoadMalformedJsonThrows() throws PersistenceException {
+        new JsonPersistenceProvider().load(new StringReader("{not valid json]"), DigestResult.class);
+    }
+
+    @Test
+    public void testRoundTripMultipleFilesAndDigests() throws PersistenceException {
+        DirHasherResult obj = new DirHasherResult();
+
+        DigestResult dr1 = new DigestResult();
+        dr1.add(new Digest("md5", "a4850cd827a34a7e54dacf6814e06f55"));
+        dr1.add(new Digest("sha-1", "23e7ace892b507b07e4dfcf1f028ee3130bc682e"));
+        obj.put("file1.txt", dr1);
+
+        DigestResult dr2 = new DigestResult();
+        dr2.add(new Digest("md5", "44af6da725a24c2d8363a42069ee110f"));
+        obj.put("file2.txt", dr2);
+
+        JsonPersistenceProvider provider = new JsonPersistenceProvider();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        provider.persist(out, obj);
+
+        DirHasherResult loaded = provider.load(new StringReader(out.toString()), DirHasherResult.class);
+        assertEquals(2, loaded.size());
+        assertEquals(obj, loaded);
+    }
+
+    @Test
+    public void testLoadDirHasherResultWithTypeReference() throws PersistenceException {
+        TypeReference<DirHasherResult> typeRef = new TypeReference<DirHasherResult>() { };
+        JsonPersistenceProvider provider = new JsonPersistenceProvider();
+        DirHasherResult result = provider.load(new StringReader(this.testDirHasherResultInJson), typeRef);
+        assertEquals(1, result.size());
+        assertTrue("Should contain myfile", result.containsKey("myfile"));
+    }
 }

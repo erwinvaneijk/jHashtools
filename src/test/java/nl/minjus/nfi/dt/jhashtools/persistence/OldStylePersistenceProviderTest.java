@@ -28,14 +28,16 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import org.junit.Test;
 
 import java.io.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class OldStylePersistenceProviderTest
 {
@@ -64,5 +66,95 @@ public class OldStylePersistenceProviderTest
         } catch (PersistenceException e) {
             fail(e.toString());
         }
+    }
+
+    @Test
+    public void testPersistDirHasherResult() throws PersistenceException {
+        DigestResult digestResult = new DigestResult();
+        digestResult.add(new Digest("md5", "a4850cd827a34a7e54dacf6814e06f55"));
+        DirHasherResult obj = new DirHasherResult();
+        obj.put("somefile.txt", digestResult);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
+        provider.persist(out, obj);
+
+        String output = out.toString();
+        assertTrue("Output must start with header", output.startsWith("Generated with: "));
+        assertTrue("Output must contain file name", output.contains("somefile.txt"));
+        assertTrue("Output must contain digest algorithm", output.contains("md5"));
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testPersistNullThrows() throws PersistenceException {
+        new OldStylePersistenceProvider().persist(new ByteArrayOutputStream(), null);
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testPersistNonDirHasherResultThrows() throws PersistenceException {
+        new OldStylePersistenceProvider().persist(new ByteArrayOutputStream(), "not a DirHasherResult");
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testLoadWithTypeReferenceThrows() throws PersistenceException {
+        TypeReference<DirHasherResult> typeRef = new TypeReference<DirHasherResult>() { };
+        new OldStylePersistenceProvider().load(new StringReader(""), typeRef);
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testLoadWrongClassThrows() throws PersistenceException {
+        new OldStylePersistenceProvider().load(
+            new StringReader("Generated with: something\n"),
+            String.class);
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testLoadBadHeaderThrows() throws PersistenceException {
+        new OldStylePersistenceProvider().load(
+            new StringReader("WRONG HEADER\nsomefile.txt\n"),
+            DirHasherResult.class);
+    }
+
+    @Test
+    public void testLoadHeaderOnlyReturnsEmptyResult() throws PersistenceException {
+        DirHasherResult result = new OldStylePersistenceProvider().load(
+            new StringReader("Generated with: jHashtools\n"),
+            DirHasherResult.class);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testLoadSingleFileWithDigests() throws PersistenceException {
+        // The parser grammar requires uppercase MD5: / SHA-1: / SHA-256: tokens.
+        String input = "Generated with: jHashtools 1.0\n"
+            + "somefile.txt\n"
+            + "\tMD5:\ta4850cd827a34a7e54dacf6814e06f55\n"
+            + "\tSHA-1:\t23e7ace892b507b07e4dfcf1f028ee3130bc682e\n";
+
+        DirHasherResult result = new OldStylePersistenceProvider().load(
+            new StringReader(input), DirHasherResult.class);
+
+        assertEquals(1, result.size());
+        assertTrue("Result must contain somefile.txt", result.containsKey("somefile.txt"));
+        DigestResult dr = result.get("somefile.txt");
+        assertEquals("md5:a4850cd827a34a7e54dacf6814e06f55", dr.getDigest("md5").toString());
+        assertEquals("sha-1:23e7ace892b507b07e4dfcf1f028ee3130bc682e", dr.getDigest("sha-1").toString());
+    }
+
+    @Test
+    public void testLoadMultipleFiles() throws PersistenceException {
+        String input = "Generated with: jHashtools 1.0\n"
+            + "file1.txt\n"
+            + "\tMD5:\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+            + "file2.txt\n"
+            + "\tSHA-1:\tbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n";
+
+        DirHasherResult result = new OldStylePersistenceProvider().load(
+            new StringReader(input), DirHasherResult.class);
+
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey("file1.txt"));
+        assertTrue(result.containsKey("file2.txt"));
     }
 }
