@@ -24,4 +24,9 @@ public class PersistenceStyleTest {
         PersistenceStyle expected = PersistenceStyle.convert("old");
         assertThat(expected, is(equalTo(PersistenceStyle.OLDSTYLE)));
     }
+
+    @Test(expected = RuntimeException.class)
+    public void testConvertUnknownStringThrows() {
+        PersistenceStyle.convert("unknown");
+    }
 }
