@@ -201,7 +201,19 @@ Each item below is its own commit.
 
 ## Baseline (filled in at step 0)
 
-- JDK:
-- `mvn clean verify` result:
-- Test count:
-- Reference output fixture location:
+- JDK: only Homebrew OpenJDK 27 is installed (no JDK 25). It builds `--release 8` (with an "obsolete" warning)
+  and is used for all steps; `--release 25` is used as the target from step 6.
+- Maven: 3.9.16
+- `mvn clean verify` result: compile, tests and shade succeed; the build then fails in `cobertura:check`
+  (Cobertura 2.5.1 cannot run on JDK 27). Compiler warnings: `-source/-target 8 obsolete`, and `'yield' may become a
+  restricted identifier` in `hashers/actors/FileNameGenerator.java`, which is a compile error at `--release 14+`
+  and must be fixed in step 6.
+- Test count: 172 run, 0 failures, 0 errors, 0 skipped.
+- Reference output fixture: a session-local snapshot (not in the repo) of the `hashers` sources plus a `hello.txt`,
+  hashed with the baseline jar. It covers `--help`, JSON and old-style output with `-a`, old-style output with
+  `--md5 -1 -2`, JSON verification of fresh output and of a frozen baseline file, and `--single`. Outputs are
+  compared after normalising timestamps and object hashes.
+- Existing behaviour recorded as-is (not fixed by this migration):
+  - Verifying old-style files fails with a `NullPointerException` in `DigestResult.add`, both with `-a` (the
+    grammar has no `md2`) and with `--md5 -1 -2`.
+  - `--single -2 <dir>` without `-o` exits with status 2.
