@@ -35,12 +35,12 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 /**
  */

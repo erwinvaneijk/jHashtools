@@ -35,10 +35,10 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
-import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import nl.minjus.nfi.dt.jhashtools.utils.StringOperations;
 
 /**
  * This class holds some convenience for handling the results delivered by MessageDigest#digest.

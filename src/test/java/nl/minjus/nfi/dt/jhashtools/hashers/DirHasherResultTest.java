@@ -28,21 +28,22 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * 

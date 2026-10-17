@@ -39,16 +39,16 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 
 /**
  * @author Erwin van Eijk <erwin.vaneijk@gmail.com>

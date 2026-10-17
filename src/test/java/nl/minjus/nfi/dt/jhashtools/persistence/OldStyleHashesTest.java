@@ -80,9 +80,11 @@ public class OldStyleHashesTest
 
     @Test
     public void testSha256Digest() throws IOException, RecognitionException {
-        OldStyleHashesParser parser = createParser("SHA-256: 0000 1111 2222 3333 4444 5555 6666 7777 8888 9999 aaaa bbbb cccc dddd eeee ffff\n");
+        OldStyleHashesParser parser =
+            createParser("SHA-256: 0000 1111 2222 3333 4444 5555 6666 7777 8888 9999 aaaa bbbb cccc dddd eeee ffff\n");
         Digest result = parser.digest().digestResult;
-        assertThat(result).isEqualTo(new Digest("sha-256", "0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff"));
+        assertThat(result)
+            .isEqualTo(new Digest("sha-256", "0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff"));
     }
 
     private OldStyleHashesParser createParser(String testString) throws IOException {

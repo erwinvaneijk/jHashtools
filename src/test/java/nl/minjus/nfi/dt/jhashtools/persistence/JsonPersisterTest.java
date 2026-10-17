@@ -32,29 +32,30 @@
  */
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
+import java.io.*;
+import java.util.*;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
 /**
  * @author eijk
@@ -76,7 +77,8 @@ public class JsonPersisterTest
     @BeforeEach
     public void setUp() {
         this.testDigestResultInJson = "[\"sha-1:0000111122223333444455556666777788889999aaaa\"]";
-        this.testDirHasherResultInJson = "{\"constructionInfo\":{\"constructionDate\":1273412558116,\"operatingSystem\":\"Mac OS X:10.6.3\",\"versionInformation\":\"1.0-unknown\",\"username\":\"eijk\"},\"content\":{\"myfile\":[\"sha-1:0000111122223333444455556666777788889999aaaa\"]}}";
+        this.testDirHasherResultInJson =
+            "{\"constructionInfo\":{\"constructionDate\":1273412558116,\"operatingSystem\":\"Mac OS X:10.6.3\",\"versionInformation\":\"1.0-unknown\",\"username\":\"eijk\"},\"content\":{\"myfile\":[\"sha-1:0000111122223333444455556666777788889999aaaa\"]}}";
     }
 
     @AfterEach

@@ -4,13 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-public class PersistenceStyleTest {
+public class PersistenceStyleTest
+{
     @Test
     public void testFindXml() {
         PersistenceStyle xml = PersistenceStyle.XML;
         assertThat(PersistenceStyle.convert("xml")).isEqualTo(xml);
     }
-    
+
     @Test
     public void testFindJson() {
         PersistenceStyle expected = PersistenceStyle.convert("json");

@@ -81,8 +81,9 @@ public final class DigestResult extends TreeSet<Digest>
      * @param left the left key
      * @param right the right key
      */
-    public DigestResult(final DigestResult left, final DigestResult right) {
-        for (Digest d: left) {
+    public DigestResult(final DigestResult left, final DigestResult right)
+    {
+        for (Digest d : left) {
             if (right.contains(d)) {
                 add(d);
             }
@@ -154,7 +155,7 @@ public final class DigestResult extends TreeSet<Digest>
     @Override
     public int hashCode() {
         int h = 0;
-        for (Digest d: this) {
+        for (Digest d : this) {
             h += d.hashCode();
         }
         return h % 2147483647;

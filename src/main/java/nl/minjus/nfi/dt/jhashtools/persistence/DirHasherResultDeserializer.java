@@ -30,17 +30,15 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-
-import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.core.type.TypeReference;
+
+import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * Arrange the deserialization of the JSON structure for DirHasherResult.

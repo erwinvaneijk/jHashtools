@@ -30,4 +30,3 @@
  * The package for all exceptions.
  */
 package nl.minjus.nfi.dt.jhashtools.exceptions;
-

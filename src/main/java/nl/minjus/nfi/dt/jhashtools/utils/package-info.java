@@ -30,4 +30,3 @@
  * The package for various utility routines.
  */
 package nl.minjus.nfi.dt.jhashtools.utils;
-

@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
+import org.jetlang.channels.Channel;
+import org.jetlang.fibers.Fiber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DigestAlgorithm;
 import nl.minjus.nfi.dt.jhashtools.hashers.FileHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.FileHasherCreator;
-
-import org.jetlang.channels.Channel;
-import org.jetlang.fibers.Fiber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The actor responsible for hashing files.

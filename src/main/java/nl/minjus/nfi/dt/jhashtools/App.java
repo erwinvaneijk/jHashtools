@@ -32,13 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
-import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
-import nl.minjus.nfi.dt.jhashtools.utils.Version;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -48,6 +41,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
+import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
+import nl.minjus.nfi.dt.jhashtools.utils.Version;
 
 /**
  * Entry point of the cli version of the tooling.

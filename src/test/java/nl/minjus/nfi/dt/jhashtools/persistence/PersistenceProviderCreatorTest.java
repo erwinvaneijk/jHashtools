@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
-public class PersistenceProviderCreatorTest {
+public class PersistenceProviderCreatorTest
+{
 
     @Test
     public void testCreateJson() {

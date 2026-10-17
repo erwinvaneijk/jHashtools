@@ -33,16 +33,17 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
-import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
+import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
 
 /**
  * 

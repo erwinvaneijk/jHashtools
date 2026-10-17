@@ -42,7 +42,8 @@ public class AllowedFailureExtension implements TestExecutionExceptionHandler
 
     @Override
     public void handleTestExecutionException(final ExtensionContext context, final Throwable throwable)
-        throws Throwable {
+        throws Throwable
+    {
         final boolean allowed = AnnotationSupport.findAnnotation(context.getElement(), AllowedFailure.class)
             .map(annotation -> Arrays.stream(annotation.value()).anyMatch(type -> type.isInstance(throwable)))
             .orElse(false);

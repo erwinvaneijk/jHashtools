@@ -1,11 +1,11 @@
 package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import org.jetlang.channels.Channel;
 import org.jetlang.fibers.Fiber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * An actor that can reduce all the computed digests into one

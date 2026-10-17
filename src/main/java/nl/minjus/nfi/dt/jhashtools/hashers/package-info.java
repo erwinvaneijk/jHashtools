@@ -30,4 +30,3 @@
  * The various hashers live here.
  */
 package nl.minjus.nfi.dt.jhashtools.hashers;
-

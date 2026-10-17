@@ -67,7 +67,8 @@ public abstract class Actor<InType, OutType>
         // subscribe to incoming channel
         inChannel.subscribe(fiber, onRecieve);
 
-        final Callback<Void> onStop = new Callback<Void>() {
+        final Callback<Void> onStop = new Callback<Void>()
+        {
             @Override
             public void onMessage(final Void message) {
                 LOG.debug("Kill signal found");

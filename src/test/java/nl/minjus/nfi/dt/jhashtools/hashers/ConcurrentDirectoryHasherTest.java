@@ -60,7 +60,8 @@ public class ConcurrentDirectoryHasherTest
     @Test
     public void testGetDigests() {
         try {
-            DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING, Arrays.asList("sha-256"));
+            DirectoryHasher directoryHasher =
+                DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING, Arrays.asList("sha-256"));
             DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
             assertThat(digests.size()).isEqualTo(knownDigests.size());
             DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
@@ -96,7 +97,7 @@ public class ConcurrentDirectoryHasherTest
             fail(ex.toString() + " should not happen");
         }
     }
-    
+
     @Test
     public void testUpdateDigests() {
         try {

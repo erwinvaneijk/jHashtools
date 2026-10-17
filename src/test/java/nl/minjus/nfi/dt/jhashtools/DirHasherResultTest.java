@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 
-public class DirHasherResultTest {
+public class DirHasherResultTest
+{
 
     @Test
     public void testIntersection() throws Exception {

@@ -43,14 +43,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 
 /**
  *

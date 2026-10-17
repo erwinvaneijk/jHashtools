@@ -39,9 +39,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
 import org.junit.jupiter.api.Test;
+
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
  * Created by IntelliJ IDEA. User: eijk Date: May 22, 2010 Time: 5:45:24 PM To change this template use File | Settings
@@ -57,7 +57,8 @@ public class ConcurrentFileHasherTest
         final DigestResult result = serialFileHasher.getDigest(stream);
 
         assertThat(result
-            .getDigest("sha-256").toString()).isEqualTo("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
+            .getDigest("sha-256").toString())
+            .isEqualTo("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
     }
 
     @Test
@@ -69,7 +70,8 @@ public class ConcurrentFileHasherTest
         final FileHasher fileHasher = new SerialFileHasher(algorithms);
         final DigestResult result = fileHasher.getDigest(stream);
 
-        assertThat(result.getDigest("sha-1").toString()).as("sha1 do not match").isEqualTo("sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f");
+        assertThat(result.getDigest("sha-1").toString()).as("sha1 do not match")
+            .isEqualTo("sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f");
 
         assertThat(result.getDigest("md5")
             .toString()).as("md5 do not match").isEqualTo("md5:bed8e0d55ab120d38325af63da19125f");
@@ -84,7 +86,8 @@ public class ConcurrentFileHasherTest
         final FileHasher fileHasher = new ConcurrentFileHasher(algorithms);
         final DigestResult result = fileHasher.getDigest(stream);
 
-        assertThat(result.getDigest("sha-1").toString()).as("sha1 do not match").isEqualTo("sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f");
+        assertThat(result.getDigest("sha-1").toString()).as("sha1 do not match")
+            .isEqualTo("sha-1:2b3a601a1ee759eec30ddcde458d459aa26ba78f");
 
         assertThat(result.getDigest("md5")
             .toString()).as("md5 do not match").isEqualTo("md5:bed8e0d55ab120d38325af63da19125f");

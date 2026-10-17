@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.junit.jupiter.api.Test;
+
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
@@ -18,8 +20,6 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 
-import org.junit.jupiter.api.Test;
-
 public class DirHasherResultVerifierTest
 {
 
@@ -27,7 +27,7 @@ public class DirHasherResultVerifierTest
     public void testConstructor() {
         final DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING);
         final DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher, PersistenceStyle.JSON);
-        verifier.generateDigests(new String[]{"testdata"});
+        verifier.generateDigests(new String[] { "testdata" });
         final DirHasherResult result = directoryHasher.getDigests(new File("testdata"));
 
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);

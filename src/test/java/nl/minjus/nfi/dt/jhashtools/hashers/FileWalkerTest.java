@@ -149,23 +149,23 @@ public class FileWalkerTest
             // Symlinks not supported, skip this test
             return;
         }
-        
+
         // Create a test directory structure with a symlink
         final File testDir = Files.createDirectory(tempFolder.resolve("symlinkTest")).toFile();
         final File realFile = new File(testDir, "realfile.txt");
         realFile.createNewFile();
-        
+
         // Create a symlink to the real file
         final Path symlinkPath = testDir.toPath().resolve("symlink.txt");
         final Path targetPath = realFile.toPath();
         Files.createSymbolicLink(symlinkPath, targetPath);
-        
+
         final FileWalker instance = new FileWalker();
         final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        
+
         instance.walk(testDir);
-        
+
         // Only the real file should be visited, not the symlink
         // The symlink itself is also a file, but it should be skipped
         // So we expect only 1 visit (the real file)
@@ -187,27 +187,27 @@ public class FileWalkerTest
             // Symlinks not supported, skip this test
             return;
         }
-        
+
         // Create a test directory structure with a symlink to a directory
         final File testDir = Files.createDirectory(tempFolder.resolve("symlinkDirTest")).toFile();
         final File realDir = new File(testDir, "realdir");
         realDir.mkdir();
-        
+
         // Create a file in the real directory
         final File fileInRealDir = new File(realDir, "file.txt");
         fileInRealDir.createNewFile();
-        
+
         // Create a symlink to the real directory
         final Path symlinkPath = testDir.toPath().resolve("linkdir");
         final Path targetPath = realDir.toPath();
         Files.createSymbolicLink(symlinkPath, targetPath);
-        
+
         final FileWalker instance = new FileWalker();
         final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        
+
         instance.walk(testDir);
-        
+
         // Only the real directory and its file should be visited
         // The symlink directory should be skipped, and its contents should NOT be walked
         // So we expect only 1 visit (the file in the real directory)
@@ -224,13 +224,13 @@ public class FileWalkerTest
         final File file2 = new File(testDir, "file2.txt");
         file1.createNewFile();
         file2.createNewFile();
-        
+
         final FileWalker instance = new FileWalker();
         final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        
+
         instance.walk(testDir);
-        
+
         // Both files should be visited
         assertThat(visitor.getNumber()).as("Both regular files should be visited").isEqualTo(2);
     }

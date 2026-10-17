@@ -33,10 +33,10 @@ import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
-import nl.minjus.nfi.dt.jhashtools.DigestOutputCreator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.DigestOutputCreator;
 
 /**
  * This class offers a 'walker' that will go through a directory and offer

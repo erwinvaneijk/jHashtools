@@ -38,15 +38,15 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Construct the output that can later on be used for verification.
