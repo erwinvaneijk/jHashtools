@@ -12,10 +12,25 @@ import nl.minjus.nfi.dt.jhashtools.Digest;
 @lexer::header {
  }
 
+@parser::members {
+	/**
+	 * Converts a label such as "SHA-256:" to an algorithm name. Older files use "SHA:" and "SHA256:".
+	 */
+	private static String algorithmName(final String label) {
+		final String name = label.substring(0, label.length() - 1).toLowerCase(java.util.Locale.ROOT);
+		switch (name) {
+			case "sha":
+				return "sha-1";
+			case "sha256":
+				return "sha-256";
+			default:
+				return name;
+		}
+	}
+}
+
 digest returns [Digest digestResult]
-	:	MD5 value=digestValue { $digestResult = new Digest("md5", $value.digestString); }
-	|	SHA1 value=digestValue { $digestResult = new Digest("sha-1", $value.digestString); }
-	|	SHA256 value=digestValue { $digestResult = new Digest("sha-256", $value.digestString); }
+	:	label=ALGORITHM value=digestValue EOF { $digestResult = new Digest(algorithmName($label.text), $value.digestString); }
 	;
 	
 digestValue returns [String digestString]
@@ -26,11 +41,9 @@ digestValue returns [String digestString]
 	|	
 	;
 
-MD5	:	'MD5:';
-
-SHA1	:	('SHA-1:'|'SHA:');
-
-SHA256	:	('SHA-256:'|'SHA256:');
+// An algorithm label as written by the old-style writer, e.g. "md5:", "sha-512:" or the legacy "SHA256:".
+ALGORITHM
+	:	('A'..'Z'|'a'..'z') ('A'..'Z'|'a'..'z'|'0'..'9'|'-')* ':';
 
 HEX_DIGITS
 	:	('A'..'F'|'a'..'f'|'0'..'9')+;
