@@ -13,10 +13,7 @@ jHashtools is a command-line tool, built with Maven, for computing and verifying
 - `persistence`: reading/writing digest files (JSON via Jackson, and the "old style" format parsed with ANTLR from `src/main/antlr4`)
 - `utils`, `exceptions`: helpers and the project's exception types
 
-**Current state vs. target:** the build is being modernised (see sections 11 and 15). Some tools below
-(`./mvnw`, JaCoCo, Spotless, Error Prone, JUnit 5) are the *target* setup. Until a tool has been
-introduced in `pom.xml`, use the existing equivalent (`mvn`, Cobertura, Checkstyle, JUnit 4) and do not
-claim a check passed that does not exist yet.
+Building requires JDK 25 or newer; `./mvnw` uses `JAVA_HOME`, so point it at that JDK. See section 11 for the toolchain.
 
 ## 1. Think Before Coding
 
@@ -129,8 +126,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 - **MUST** write unit tests for all new methods and classes
 - Test layout mirrors the main package layout under `src/test/java`
-- New tests use **JUnit 5 (Jupiter)** with **AssertJ** assertions; existing JUnit 4 tests run via the vintage engine until migrated in a dedicated commit
-- Use `@TempDir` (JUnit 5) or `TemporaryFolder` (JUnit 4) for filesystem tests; this is a filesystem tool, so test against real temporary files rather than mocking the filesystem
+- Tests use **JUnit Jupiter** (JUnit 6) with **AssertJ** assertions; parameterised test classes use `@ParameterizedClass`
+- Use `@TempDir` for filesystem tests; this is a filesystem tool, so test against real temporary files rather than mocking the filesystem
 - Mock other external dependencies where needed
 - Reuse helpers in `src/test/java/.../utils` (`KnownDigests`, `OsUtils`, ...)
 - Cover OS-specific behaviour explicitly, including symbolic links (which must not be followed when walking directories)
@@ -146,24 +143,26 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Ask before adding a new dependency; prefer the JDK when it suffices
 - Never add a dependency with known critical CVEs
 
-## 11. Modernisation Targets
+## 11. Toolchain
 
-The guide pushes toward current tooling. These are the target versions; migrate each in its own commit (section 3).
-
-| Current | Target |
+| Area | Tool |
 |---|---|
-| Java 8 (`<release>8</release>`) | Java 25 LTS (Java 21 LTS as fallback), via `<maven.compiler.release>` |
-| `slf4j-log4j12` 1.6.4 + `maven-plugin-log4j` | SLF4J 2.x + Logback (or `slf4j-simple`) |
-| `bcprov-jdk16` 140 | `bcprov-jdk18on` (current), or remove if JDK `MessageDigest` covers the needed algorithms |
-| `commons-cli` 1.2 | `commons-cli` 1.9+, or picocli |
-| ANTLR 4.7 | ANTLR 4.13.x |
-| JUnit 4 + Hamcrest 1.3 | JUnit 5 + AssertJ |
-| Cobertura | JaCoCo |
-| Checkstyle (reporting only) | Spotless (enforced) + Error Prone |
-| `buildnumber-maven-plugin` 1.0-beta-3, `build-helper-maven-plugin` 1.7 | current 3.x releases, or remove if no longer needed |
-| `maven-assembly-plugin` | remove; `maven-shade-plugin` already builds the executable jar |
-| system `mvn` | Maven Wrapper (`./mvnw`) |
-| generated ANTLR sources committed in `src/main/generated-sources` | generated into `target/generated-sources` at build time |
+| Language | Java 25 (`maven.compiler.release`), enforced by `maven-enforcer-plugin` |
+| Build | Maven Wrapper (`./mvnw`, Maven 3.9), `maven-shade-plugin` for the executable jar |
+| Tests | JUnit Jupiter 6 + AssertJ |
+| Coverage | JaCoCo `check` in `verify` |
+| Formatting | Spotless with `eclipse-formatter.xml`, `spotless:check` in `verify` |
+| Static analysis | Error Prone (javac plugin, `.mvn/jvm.config`), `-Xlint:all` |
+| Logging | SLF4J 2 + `slf4j-simple` (WARN and above to stderr, `simplelogger.properties`) |
+| Parsing | ANTLR 4.13, generated into `target/generated-sources/antlr4` |
+| CI | GitHub Actions (`.github/workflows/build.yml`), `./mvnw -B -Pci clean verify` |
+
+Known follow-ups, each for its own commit (section 3):
+
+- Error Prone style and modernisation checks are switched off in `pom.xml` (`-Xep:...:OFF`); enable them as the code is modernised
+- `HelpFormatter` (commons-cli) is deprecated; its replacement changes the `--help` layout
+- jetlang (actor-based hasher) is no longer maintained
+- The sources mix LF and CRLF line endings; Spotless preserves them
 
 ## 12. Java Best Practices
 
@@ -199,7 +198,7 @@ The guide pushes toward current tooling. These are the target versions; migrate 
 - Test: `./mvnw test`; full verification: `./mvnw clean verify`
 - Formatting: Spotless with an Eclipse formatter profile matching the house style (section 5); `./mvnw spotless:check` / `./mvnw spotless:apply`. Do not switch to google-java-format: it would reformat every file
 - Static analysis: Error Prone at compile time; fix findings rather than suppressing them, and justify any `@SuppressWarnings`
-- **MUST** compile without warnings: `-Xlint:all`, with `-Werror` in CI
+- **MUST** compile without warnings: `-Xlint:all`; the `ci` profile (`./mvnw -Pci ...`) adds `-Werror`
 - **NEVER** hand-edit ANTLR-generated parser/lexer classes; change the grammar in `src/main/antlr4` and rebuild
 - Dependency updates: `./mvnw versions:display-dependency-updates`
 - `maven-enforcer-plugin` pins the required JDK and Maven versions
@@ -207,9 +206,7 @@ The guide pushes toward current tooling. These are the target versions; migrate 
 
 ## 16. Before Committing
 
-- [ ] `./mvnw clean verify` passes (tests, coverage check, static analysis)
-- [ ] `./mvnw spotless:check` is clean
-- [ ] No compiler warnings under `-Xlint:all`
+- [ ] `./mvnw -Pci clean verify` passes (tests, coverage, formatting, Error Prone, no compiler warnings)
 - [ ] If the ANTLR grammar changed, the build regenerates the parser and its tests pass
 - [ ] All public classes and methods have Javadoc
 - [ ] No commented-out code or debug statements

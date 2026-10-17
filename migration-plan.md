@@ -3,6 +3,39 @@
 This plan moves jHashtools from its current build (Java 8, Cobertura, JUnit 4, log4j 1.x bindings, Checkstyle
 reporting) to the target setup described in `CLAUDE.md` (section 11).
 
+## Status
+
+Completed on branch `chore/tooling-migration`. Every step passed `./mvnw clean verify`, and the CLI output
+matched the baseline fixture (stdout, written files and exit codes) except for the intended changes listed below.
+
+Deviations from the plan:
+
+- **JUnit 6** (6.1.3) instead of JUnit 5: the current Jupiter release, with the same API.
+  `DirHasherTest` uses `@ParameterizedClass`.
+- **ANTLR upgrade after the Java bump.** ANTLR 4.13 requires Java 11+. `src/main/generated-sources` turned out to be
+  gitignored local output, not committed.
+- **jetlang** was updated to 0.2.23 (latest release, 2019) rather than left alone.
+- **Coverage thresholds:** the old Cobertura limits (85/90/80%) were far above the measured coverage. JaCoCo uses floors
+  at the measured level instead (bundle line 0.81 / branch 0.77; per package 0.72 / 0.63), and the per-class rule was
+  dropped.
+- **Error Prone:** style and modernisation checks are switched off. Correctness findings were fixed, including one real
+  bug (`DigestMask` case mapping under a Turkish locale), which was committed separately with a test.
+- **`-Werror`** is enabled in a `ci` Maven profile, not always.
+- **Not done:** Dependabot (optional in the plan), and running the GitHub Actions workflow. Running it needs a push.
+
+Intended behaviour changes:
+
+- Warnings and errors are logged to stderr. Before, all log output was silently dropped.
+- commons-cli `DefaultParser`: `-o=file` uses `file` instead of `=file`, and `--sha-1=foo` is rejected.
+- The buildnumber plugin no longer runs SCM check/update during the build.
+
+Found but not fixed (out of scope):
+
+- Verifying old-style digest files fails with a `NullPointerException` (see baseline).
+- `DirHasherResultVerifierTest` reads back a file it has not closed and never flushes the writer it asserts on, so its
+  assertions always pass and its coverage varies between runs.
+- `FileNameGenerator` logs through `java.util.logging` rather than SLF4J.
+
 ## Ground rules
 
 - **One concern per step, one commit (or small series) per step.** No feature work mixed in (CLAUDE.md section 3).
