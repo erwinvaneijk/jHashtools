@@ -22,3 +22,20 @@ This tool
 This tool does the same as the above mentioned use case. It was implemented in
 java because that's the language that's used most at the moment and it strikes
 are quite good balance between ease of writing and speed.
+
+Building
+--------
+Building requires JDK 25 or newer (`JAVA_HOME` must point to it); Maven is
+provided by the Maven Wrapper:
+
+    ./mvnw clean verify
+
+This runs the tests, coverage, formatting and static analysis checks and
+produces the executable jar `target/jHashtools-<version>.jar`. See
+CONTRIBUTING.md for details.
+
+Usage
+-----
+    java -jar target/jHashtools-1.2.jar --help
+    java -jar target/jHashtools-1.2.jar -2 -s json -o digests.json <dir>
+    java -jar target/jHashtools-1.2.jar -2 -s json -i digests.json <dir>

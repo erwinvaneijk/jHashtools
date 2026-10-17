@@ -33,9 +33,8 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,14 +43,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
+
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -83,12 +82,12 @@ public class FileHasherTest
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.testFile = new File("testdata/testfile1.bin");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -101,10 +100,10 @@ public class FileHasherTest
             final FileHasher instance = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
             final String expResult = expectedDigests.get(1);
             final DigestResult results = instance.getDigest(this.testFile);
-            assertEquals(1, results.size());
-            assertNotNull(results.getDigest(DEFAULT_ALGORITHM));
+            assertThat(results.size()).isEqualTo(1);
+            assertThat(results.getDigest(DEFAULT_ALGORITHM)).isNotNull();
             final String digest = results.getHexDigest(DEFAULT_ALGORITHM);
-            assertEquals("Digests are not the same", expResult, digest);
+            assertThat(digest).as("Digests are not the same").isEqualTo(expResult);
         } catch (final FileNotFoundException ex) {
             fail(ex.toString());
         } catch (final IOException ex) {
@@ -124,10 +123,10 @@ public class FileHasherTest
             final FileHasher instance = new ConcurrentFileHasher(DigestAlgorithmFactory.create("sha-256"));
             final String expResult = expectedDigests.get(1);
             final DigestResult results = instance.getDigest(this.testFile);
-            assertEquals(1, results.size());
-            assertNotNull(results.getDigest(DEFAULT_ALGORITHM));
+            assertThat(results.size()).isEqualTo(1);
+            assertThat(results.getDigest(DEFAULT_ALGORITHM)).isNotNull();
             final String digest = results.getHexDigest(DEFAULT_ALGORITHM);
-            assertEquals("Digests are not the same", expResult, digest);
+            assertThat(digest).as("Digests are not the same").isEqualTo(expResult);
         } catch (final FileNotFoundException ex) {
             fail(ex.toString());
         } catch (final IOException ex) {
@@ -144,7 +143,7 @@ public class FileHasherTest
             final String expResult = expectedDigests.get(1);
             final DigestResult results = FileHasherCreator.computeDigest(this.testFile);
             final String result = results.digest().toHex();
-            assertEquals(expResult, result);
+            assertThat(result).isEqualTo(expResult);
         } catch (final FileNotFoundException ex) {
             fail(ex.toString());
         } catch (final IOException ex) {

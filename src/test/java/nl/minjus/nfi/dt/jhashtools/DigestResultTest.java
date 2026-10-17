@@ -33,11 +33,17 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 import nl.minjus.nfi.dt.jhashtools.exceptions.NoMatchingAlgorithmsError;
-import org.junit.*;
-
-import static org.junit.Assert.*;
 
 /**
  * 
@@ -50,26 +56,26 @@ public class DigestResultTest
     {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
     @Test
     public void testGetHexDigest() {
         DigestResult d = new DigestResult(new Digest("crc", "1111"));
-        assertEquals("1111", d.getHexDigest("crc"));
+        assertThat(d.getHexDigest("crc")).isEqualTo("1111");
     }
 
     @Test
@@ -86,15 +92,15 @@ public class DigestResultTest
     @Test
     public void testEmptyDigestResult() {
         DigestResult dr = new DigestResult();
-        assertFalse(dr.containsResult("gpg"));
+        assertThat(dr.containsResult("gpg")).isFalse();
     }
 
     @Test
     public void testEquals() {
         DigestResult dr = new DigestResult(new Digest("crc", "deadbeef"));
-        assertTrue(dr.equals(dr));
-        assertFalse(dr.equals(null));
-        assertFalse(dr.equals(new Object()));
+        assertThat(dr.equals(dr)).isTrue();
+        assertThat(dr.equals(null)).isFalse();
+        assertThat(dr.equals(new Object())).isFalse();
     }
 
     @Test
@@ -104,15 +110,15 @@ public class DigestResultTest
 
         DigestResult o = new DigestResult(new Digest("md5", "deadbeefdeadbeefdeadbeefdeadbeef"));
 
-        assertTrue(dr.matches(dr));
-        assertFalse(dr.matches(null));
+        assertThat(dr.matches(dr)).isTrue();
+        assertThat(dr.matches(null)).isFalse();
 
-        assertTrue(dr.matches(o));
-        assertTrue(o.matches(dr));
+        assertThat(dr.matches(o)).isTrue();
+        assertThat(o.matches(dr)).isTrue();
 
         o = new DigestResult(new Digest("md5", "deadbeefdeadbeefdeadbeefdeaddead"));
-        assertTrue(!dr.matches(o));
-        assertTrue(!o.matches(dr));
+        assertThat(!dr.matches(o)).isTrue();
+        assertThat(!o.matches(dr)).isTrue();
 
         o = new DigestResult(new Digest("sha-1", "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"));
         try {

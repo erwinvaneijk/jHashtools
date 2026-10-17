@@ -36,11 +36,11 @@ import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Exchanger;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
  * This callable can be use to create a thread that is able to compute digests in a separate thread.

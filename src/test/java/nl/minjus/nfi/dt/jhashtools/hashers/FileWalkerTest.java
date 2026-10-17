@@ -33,22 +33,19 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  *
@@ -56,26 +53,26 @@ import org.junit.rules.TemporaryFolder;
  */
 public class FileWalkerTest
 {
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    public Path tempFolder;
 
     public FileWalkerTest()
     {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -87,8 +84,8 @@ public class FileWalkerTest
         final WalkerVisitor visitor = null;
         final FileWalker instance = new FileWalker();
         instance.addWalkerVisitor(visitor);
-        assertEquals(1, instance.getWalkerVisitors().size());
-        assertEquals(null, instance.getWalkerVisitors().get(0));
+        assertThat(instance.getWalkerVisitors().size()).isEqualTo(1);
+        assertThat(instance.getWalkerVisitors().get(0)).isEqualTo(null);
     }
 
     /**
@@ -100,10 +97,10 @@ public class FileWalkerTest
         final FileWalker instance = new FileWalker();
         final int expResult = 0;
         final int result = instance.walk(file);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
-    class WalkerVisitorImpl implements WalkerVisitor
+    static class WalkerVisitorImpl implements WalkerVisitor
     {
         private int number;
 
@@ -133,8 +130,8 @@ public class FileWalkerTest
         instance.addWalkerVisitor(visitor);
         final int expResult = 13;
         final int result = instance.walk(file);
-        assertEquals(expResult, result);
-        assertEquals(13, visitor.getNumber());
+        assertThat(result).isEqualTo(expResult);
+        assertThat(visitor.getNumber()).isEqualTo(13);
     }
 
     /**
@@ -145,34 +142,34 @@ public class FileWalkerTest
     public void testWalkDoesNotFollowFileSymlinks() throws IOException {
         // Check if symlinks are supported on this filesystem
         try {
-            final Path tempPath = tempFolder.getRoot().toPath().resolve("symlink_test_temp");
+            final Path tempPath = tempFolder.resolve("symlink_test_temp");
             Files.createSymbolicLink(tempPath, tempPath.getParent());
             Files.delete(tempPath);
         } catch (UnsupportedOperationException | IOException e) {
             // Symlinks not supported, skip this test
             return;
         }
-        
+
         // Create a test directory structure with a symlink
-        final File testDir = tempFolder.newFolder("symlinkTest");
+        final File testDir = Files.createDirectory(tempFolder.resolve("symlinkTest")).toFile();
         final File realFile = new File(testDir, "realfile.txt");
         realFile.createNewFile();
-        
+
         // Create a symlink to the real file
         final Path symlinkPath = testDir.toPath().resolve("symlink.txt");
         final Path targetPath = realFile.toPath();
         Files.createSymbolicLink(symlinkPath, targetPath);
-        
+
         final FileWalker instance = new FileWalker();
         final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        
+
         instance.walk(testDir);
-        
+
         // Only the real file should be visited, not the symlink
         // The symlink itself is also a file, but it should be skipped
         // So we expect only 1 visit (the real file)
-        assertEquals("Symlinks should not be followed, only real files visited", 1, visitor.getNumber());
+        assertThat(visitor.getNumber()).as("Symlinks should not be followed, only real files visited").isEqualTo(1);
     }
 
     /**
@@ -183,38 +180,38 @@ public class FileWalkerTest
     public void testWalkDoesNotFollowDirectorySymlinks() throws IOException {
         // Check if symlinks are supported on this filesystem
         try {
-            final Path tempPath = tempFolder.getRoot().toPath().resolve("symlink_test_temp");
+            final Path tempPath = tempFolder.resolve("symlink_test_temp");
             Files.createSymbolicLink(tempPath, tempPath.getParent());
             Files.delete(tempPath);
         } catch (UnsupportedOperationException | IOException e) {
             // Symlinks not supported, skip this test
             return;
         }
-        
+
         // Create a test directory structure with a symlink to a directory
-        final File testDir = tempFolder.newFolder("symlinkDirTest");
+        final File testDir = Files.createDirectory(tempFolder.resolve("symlinkDirTest")).toFile();
         final File realDir = new File(testDir, "realdir");
         realDir.mkdir();
-        
+
         // Create a file in the real directory
         final File fileInRealDir = new File(realDir, "file.txt");
         fileInRealDir.createNewFile();
-        
+
         // Create a symlink to the real directory
         final Path symlinkPath = testDir.toPath().resolve("linkdir");
         final Path targetPath = realDir.toPath();
         Files.createSymbolicLink(symlinkPath, targetPath);
-        
+
         final FileWalker instance = new FileWalker();
         final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        
+
         instance.walk(testDir);
-        
+
         // Only the real directory and its file should be visited
         // The symlink directory should be skipped, and its contents should NOT be walked
         // So we expect only 1 visit (the file in the real directory)
-        assertEquals("Symlink directories should not be followed", 1, visitor.getNumber());
+        assertThat(visitor.getNumber()).as("Symlink directories should not be followed").isEqualTo(1);
     }
 
     /**
@@ -222,19 +219,19 @@ public class FileWalkerTest
      */
     @Test
     public void testWalkVisitsRegularFiles() throws IOException {
-        final File testDir = tempFolder.newFolder("regularTest");
+        final File testDir = Files.createDirectory(tempFolder.resolve("regularTest")).toFile();
         final File file1 = new File(testDir, "file1.txt");
         final File file2 = new File(testDir, "file2.txt");
         file1.createNewFile();
         file2.createNewFile();
-        
+
         final FileWalker instance = new FileWalker();
         final WalkerVisitorImpl visitor = new WalkerVisitorImpl();
         instance.addWalkerVisitor(visitor);
-        
+
         instance.walk(testDir);
-        
+
         // Both files should be visited
-        assertEquals("Both regular files should be visited", 2, visitor.getNumber());
+        assertThat(visitor.getNumber()).as("Both regular files should be visited").isEqualTo(2);
     }
 }

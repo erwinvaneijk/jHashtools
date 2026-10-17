@@ -30,17 +30,15 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-
-import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.core.type.TypeReference;
+
+import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * Arrange the deserialization of the JSON structure for DirHasherResult.
@@ -69,7 +67,7 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
     {
         final DirHasherResult result = new DirHasherResult();
         while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
-            final String fieldName = aJsonParser.getCurrentName();
+            final String fieldName = aJsonParser.currentName();
             if ("constructionInfo".equals(fieldName)) {
                 aJsonParser.nextToken();
                 result.setConstructionInfo(aJsonParser.readValueAs(ConstructionInfo.class));
@@ -77,7 +75,7 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
             if ("content".equals(fieldName)) {
                 aJsonParser.nextToken();
                 while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
-                    final String filePath = aJsonParser.getCurrentName();
+                    final String filePath = aJsonParser.currentName();
                     aJsonParser.nextToken();
                     final DigestResult digestResult = aJsonParser.readValueAs(DigestResult.class);
                     result.put(new File(filePath), digestResult);

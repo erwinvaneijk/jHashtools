@@ -32,10 +32,10 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * @author Erwin van Eijk

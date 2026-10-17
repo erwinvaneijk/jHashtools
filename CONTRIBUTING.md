@@ -13,50 +13,51 @@ jHashtools/
 │   │   │       ├── ConstructionInfo.java
 │   │   │       ├── DirHasherResult.java
 │   │   │       ├── DigestResult.java
-│   │   │       ├── hasher/            # Hashing implementations
-│   │   │       └── persistence/       # Persistence providers (JSON)
-│   │   └── antlr4/                  # ANTLR4 grammar files
-│   │       └── DirHasherResult.g4
+│   │   │       ├── hashers/           # Hashing implementations (serial, concurrent, actors)
+│   │   │       └── persistence/       # Persistence providers (JSON, old style)
+│   │   ├── antlr4/                  # ANTLR4 grammar for the old-style format
+│   │   │   └── nl/minjus/nfi/dt/jhashtools/persistence/OldStyleHashes.g4
+│   │   └── resources/
+│   │       └── simplelogger.properties  # Logging configuration
 │   └── test/                       # Test source code
 │       └── java/
 │           └── nl/minjus/nfi/dt/jhashtools/
 │               └── ...              # Unit and integration tests
 ├── pom.xml                        # Maven configuration
-├── checkstyle_checks.xml         # Checkstyle rules
-├── import_control.xml            # Import control rules
-├── logging.properties             # Logging configuration
-└── README.markdown                # Project documentation
+├── mvnw, .mvn/                    # Maven Wrapper and JVM options for the build
+├── eclipse-formatter.xml          # Formatter profile used by Spotless
+└── README.md                      # Project documentation
 ```
 
 ## Prerequisites
 
-- Java 8 or later
-- Maven 3.6+ (for building with the updated plugins)
+- JDK 25 or later, with `JAVA_HOME` pointing to it
+- No Maven installation is needed: use the Maven Wrapper (`./mvnw`, Maven 3.9)
 
 ## Building
 
 ```bash
 # Compile the project
-mvn compile
+./mvnw compile
 
-# Build the JAR with dependencies
-mvn package
+# Build the executable JAR (target/jHashtools-<version>.jar)
+./mvnw package
 
-# Build and install to local Maven repository
-mvn install
+# Full verification: tests, coverage, formatting and static analysis
+./mvnw clean verify
+
+# As CI runs it: additionally fails on any compiler or Error Prone warning
+./mvnw -Pci clean verify
 ```
 
 ## Testing
 
 ```bash
 # Run all tests
-mvn test
+./mvnw test
 
 # Run a specific test class
-mvn test -Dtest=JsonPersisterTest
-
-# Run tests with verbose output
-mvn test -X
+./mvnw test -Dtest=JsonPersisterTest
 ```
 
 ## Code Quality
@@ -64,15 +65,17 @@ mvn test -X
 Before submitting a pull request, ensure all quality checks pass:
 
 ```bash
-# Run checkstyle - MUST PASS for merge
-mvn checkstyle:check
+# Check formatting - MUST PASS for merge (also runs as part of verify)
+./mvnw spotless:check
 
-# Run coverage checks (cobertura)
-mvn cobertura:check
+# Fix formatting
+./mvnw spotless:apply
+
+# Coverage (JaCoCo) is checked as part of verify; the report is in target/site/jacoco
+./mvnw verify
 ```
 
-**Note:** `mvn checkstyle:check` must pass without introducing new violations.
-Existing violations in other parts of the codebase are being addressed separately.
+**Note:** formatting is defined by `eclipse-formatter.xml`; run `./mvnw spotless:apply` before committing.
 
 ## Git Commit Guidelines
 
@@ -142,8 +145,8 @@ Co-Authored-By: Mistral Vibe <vibe@mistral.ai>
 
 When submitting a pull request:
 
-1. Ensure all tests pass (`mvn test`)
-2. Ensure checkstyle passes (`mvn checkstyle:check`)
+1. Ensure the full build passes (`./mvnw -Pci clean verify`)
+2. Ensure formatting passes (`./mvnw spotless:check`)
 3. Use conventional commit messages
 4. Provide a clear description of the changes
 5. Reference any related issues

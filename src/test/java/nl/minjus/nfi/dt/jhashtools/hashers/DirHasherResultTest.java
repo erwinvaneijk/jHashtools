@@ -28,18 +28,22 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import nl.minjus.nfi.dt.jhashtools.Digest;
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import org.junit.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
 /**
  * 
@@ -55,15 +59,15 @@ public class DirHasherResultTest
     {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         setOne = new DirHasherResult();
         setOne.put(new File("one"), new DigestResult(new Digest("crc", "1111")));
@@ -76,7 +80,7 @@ public class DirHasherResultTest
         setTwo.put(new File("three"), new DigestResult(new Digest("crc", "2222")));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         setOne.clear();
         setTwo.clear();
@@ -88,26 +92,26 @@ public class DirHasherResultTest
     @Test
     public void testExclude() {
         DirHasherResult result = setOne.exclude(setTwo);
-        assertEquals(0, result.size());
+        assertThat(result.size()).isEqualTo(0);
     }
 
     @Test
     public void testExcludeOneLeft() {
         setTwo.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
         DirHasherResult result = setTwo.exclude(setOne);
-        assertEquals(1, result.size());
-        assertEquals(4, setTwo.size());
-        assertEquals(3, setOne.size());
-        assertTrue(result.containsKey(new File("four")));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(setTwo.size()).isEqualTo(4);
+        assertThat(setOne.size()).isEqualTo(3);
+        assertThat(result.containsKey(new File("four"))).isTrue();
     }
 
     @Test
     public void testExcludeOneLeftOtherSize() {
         setOne.put(new File("four"), new DigestResult(new Digest("crc", "2222")));
         DirHasherResult result = setTwo.exclude(setOne);
-        assertEquals(0, result.size());
-        assertEquals(3, setTwo.size());
-        assertEquals(4, setOne.size());
+        assertThat(result.size()).isEqualTo(0);
+        assertThat(setTwo.size()).isEqualTo(3);
+        assertThat(setOne.size()).isEqualTo(4);
     }
 
     @Test
@@ -116,12 +120,12 @@ public class DirHasherResultTest
         setTwo.put(new File("four"), new DigestResult(new Digest("crc", "3333")));
 
         DirHasherResult result = setTwo.exclude(setOne);
-        assertEquals(4, setTwo.size());
-        assertEquals(4, setOne.size());
-        assertEquals(1, result.size());
+        assertThat(setTwo.size()).isEqualTo(4);
+        assertThat(setOne.size()).isEqualTo(4);
+        assertThat(result.size()).isEqualTo(1);
 
-        assertTrue(result.containsKey("four"));
-        assertEquals("3333", result.get("four").digest().toHex());
+        assertThat(result.containsKey("four")).isTrue();
+        assertThat(result.get("four").digest().toHex()).isEqualTo("3333");
     }
 
     @Test
@@ -129,31 +133,31 @@ public class DirHasherResultTest
         setTwo.clear();
 
         DirHasherResult result = setTwo.exclude(setOne);
-        assertEquals(0, setTwo.size());
-        assertEquals(3, setOne.size());
-        assertEquals(0, result.size());
+        assertThat(setTwo.size()).isEqualTo(0);
+        assertThat(setOne.size()).isEqualTo(3);
+        assertThat(result.size()).isEqualTo(0);
 
         result = setOne.exclude(setTwo);
-        assertEquals(0, setTwo.size());
-        assertEquals(3, setOne.size());
-        assertEquals(3, result.size());
-        assertEquals(setOne, result);
+        assertThat(setTwo.size()).isEqualTo(0);
+        assertThat(setOne.size()).isEqualTo(3);
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result).isEqualTo(setOne);
     }
 
     @Test
     public void testEquals() {
-        assertTrue(setOne != setTwo);
-        assertEquals(setOne, setTwo);
-        assertEquals(setTwo, setOne);
+        assertThat(setOne).isNotSameAs(setTwo);
+        assertThat(setTwo).isEqualTo(setOne);
+        assertThat(setOne).isEqualTo(setTwo);
     }
 
     @Test
     public void testIntersect() {
         DirHasherResult result = setOne.intersect(setTwo);
 
-        assertEquals(3, result.size());
-        assertEquals(setOne, result);
-        assertEquals(result, setOne);
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result).isEqualTo(setOne);
+        assertThat(setOne).isEqualTo(result);
     }
 
     @Test
@@ -165,17 +169,17 @@ public class DirHasherResultTest
         setTwo.put(new File(System.getProperty("user.dir") + File.separator + "five"), new DigestResult(
             new Digest("crc", "2222")));
 
-        assertEquals(setOne, setTwo);
+        assertThat(setTwo).isEqualTo(setOne);
     }
 
     @Test
     public void testNotIntersect() {
         DirHasherResult result = setOne.notIntersect(setTwo);
 
-        assertEquals(0, result.size());
+        assertThat(result.size()).isEqualTo(0);
 
         result = setTwo.notIntersect(setOne);
-        assertEquals(0, result.size());
+        assertThat(result.size()).isEqualTo(0);
     }
 
     @Test
@@ -185,12 +189,12 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.notIntersect(setTwo);
 
-        assertEquals(2, result.size());
-        assertTrue(result.containsKey("four"));
-        assertTrue(result.containsKey("five"));
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.containsKey("four")).isTrue();
+        assertThat(result.containsKey("five")).isTrue();
 
         DirHasherResult result2 = setTwo.notIntersect(setOne);
-        assertEquals(result, result2);
+        assertThat(result2).isEqualTo(result);
     }
 
     @Test
@@ -200,13 +204,13 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.intersect(setTwo);
 
-        assertEquals(3, result.size());
-        assertTrue(!result.containsKey(new File("four")));
-        assertTrue(result.get(new File("three")).containsResult("crc"));
-        assertEquals(new Digest("crc", "2222"), result.get(new File("three")).getDigest("crc"));
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(!result.containsKey(new File("four"))).isTrue();
+        assertThat(result.get(new File("three")).containsResult("crc")).isTrue();
+        assertThat(result.get(new File("three")).getDigest("crc")).isEqualTo(new Digest("crc", "2222"));
 
         DirHasherResult result2 = setTwo.intersect(setOne);
-        assertEquals(result, result2);
+        assertThat(result2).isEqualTo(result);
     }
 
     @Test
@@ -216,12 +220,12 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.intersect(setTwo);
 
-        assertEquals(3, result.size());
-        assertTrue(!result.containsKey(new File("four")));
-        assertTrue(!result.containsKey(new File("five")));
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(!result.containsKey(new File("four"))).isTrue();
+        assertThat(!result.containsKey(new File("five"))).isTrue();
 
         DirHasherResult result2 = setTwo.intersect(setOne);
-        assertEquals(result, result2);
+        assertThat(result2).isEqualTo(result);
     }
 
     @Test
@@ -236,13 +240,13 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.intersect(setTwo);
 
-        assertEquals(3, result.size());
-        assertTrue(!result.containsKey("four"));
-        assertTrue(!result.containsKey("five"));
-        assertTrue(result.get("three").containsResult("crc"));
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(!result.containsKey("four")).isTrue();
+        assertThat(!result.containsKey("five")).isTrue();
+        assertThat(result.get("three").containsResult("crc")).isTrue();
 
         DirHasherResult result2 = setTwo.intersect(setOne);
-        assertEquals(result, result2);
+        assertThat(result2).isEqualTo(result);
     }
 
     @Test
@@ -252,8 +256,8 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.includeWrong(setTwo);
 
-        assertEquals(1, result.size());
-        assertTrue(result.containsKey("four"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.containsKey("four")).isTrue();
     }
 
     @Test
@@ -263,8 +267,8 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.notIntersect(setTwo);
 
-        assertEquals(1, result.size());
-        assertTrue(result.containsKey("four"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.containsKey("four")).isTrue();
     }
 
     @Test
@@ -275,8 +279,8 @@ public class DirHasherResultTest
         // get all the entries that are in one, but not in two.
         DirHasherResult result = setOne.missing(setTwo);
 
-        assertEquals(1, result.size());
-        assertTrue(result.containsKey("four"));
-        assertTrue(!result.containsKey("five"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.containsKey("four")).isTrue();
+        assertThat(!result.containsKey("five")).isTrue();
     }
 }

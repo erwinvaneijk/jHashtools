@@ -1,16 +1,14 @@
 package nl.minjus.nfi.dt.jhashtools;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
@@ -32,14 +30,14 @@ public class DigestOutputCreatorTest
             if (testfile.exists()) {
                 testfile.delete();
             }
-            assertThat(testfile.exists(), is(false));
+            assertThat(testfile.exists()).isFalse();
             creator.setOutputFile(testfile.getCanonicalPath());
             creator.setPersistenceStyle(PersistenceStyle.JSON);
             creator.finish();
-            assertThat(testfile.exists(), is(true));
+            assertThat(testfile.exists()).isTrue();
             testfile.delete();
 
-            assertThat(out.size(), is(greaterThan(100)));
+            assertThat(out.size()).isGreaterThan(100);
 
         } catch (final FileNotFoundException e) {
             fail("The file should have been created.");

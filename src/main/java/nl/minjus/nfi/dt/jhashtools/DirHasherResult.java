@@ -326,7 +326,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
         }
         return result;
     }
-*/
+    */
     public DirHasherResult intersect(final DirHasherResult o) {
         final DirHasherResult result = new DirHasherResult();
         for (final Map.Entry<File, DigestResult> entry : this.content.entrySet()) {
@@ -348,7 +348,6 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
         }
         return result;
     }
-
 
     /**
      * Get all the entries that are in a or b but not in both.

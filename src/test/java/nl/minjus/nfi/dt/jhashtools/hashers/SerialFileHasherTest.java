@@ -28,15 +28,16 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
-import nl.minjus.nfi.dt.jhashtools.DigestResult;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
  * @author Erwin van Eijk
@@ -46,11 +47,12 @@ public class SerialFileHasherTest
     @Test
     public void testGetDigest() throws NoSuchAlgorithmException, IOException {
         String content = "foo";
-        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
+        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         SerialFileHasher serialFileHasher = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
         DigestResult result = serialFileHasher.getDigest(stream);
 
-        assertEquals("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae", result
-            .getDigest("sha-256").toString());
+        assertThat(result
+            .getDigest("sha-256").toString())
+            .isEqualTo("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
     }
 }

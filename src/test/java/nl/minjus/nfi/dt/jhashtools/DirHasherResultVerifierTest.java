@@ -1,9 +1,7 @@
 package nl.minjus.nfi.dt.jhashtools;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,6 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
+import org.junit.jupiter.api.Test;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
@@ -20,8 +21,6 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 
-import org.junit.Test;
-
 public class DirHasherResultVerifierTest
 {
 
@@ -29,7 +28,7 @@ public class DirHasherResultVerifierTest
     public void testConstructor() {
         final DirectoryHasher directoryHasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING);
         final DirHasherResultVerifier verifier = new DirHasherResultVerifier(directoryHasher, PersistenceStyle.JSON);
-        verifier.generateDigests(new String[]{"testdata"});
+        verifier.generateDigests(new String[] { "testdata" });
         final DirHasherResult result = directoryHasher.getDigests(new File("testdata"));
 
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
@@ -41,13 +40,13 @@ public class DirHasherResultVerifierTest
             provider.persist(out, result);
             verifier.loadDigestsFromFile(testfile.getCanonicalPath());
             final ByteArrayOutputStream anOutput = new ByteArrayOutputStream();
-            verifier.verify(new PrintWriter(anOutput));
-            assertThat(anOutput.size(), is(equalTo(0)));
+            verifier.verify(new PrintWriter(anOutput, false, StandardCharsets.UTF_8));
+            assertThat(anOutput.size()).isEqualTo(0);
             testfile.delete();
 
             verifier.setIgnoreCase(false);
-            verifier.verify(new PrintWriter(anOutput));
-            assertThat(anOutput.size(), is(equalTo(0)));
+            verifier.verify(new PrintWriter(anOutput, false, StandardCharsets.UTF_8));
+            assertThat(anOutput.size()).isEqualTo(0);
             testfile.delete();
         } catch (final FileNotFoundException e) {
             fail("Should not happen");

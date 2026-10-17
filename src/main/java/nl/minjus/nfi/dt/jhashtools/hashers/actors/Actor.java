@@ -67,7 +67,8 @@ public abstract class Actor<InType, OutType>
         // subscribe to incoming channel
         inChannel.subscribe(fiber, onRecieve);
 
-        final Callback<Void> onStop = new Callback<Void>() {
+        final Callback<Void> onStop = new Callback<Void>()
+        {
             @Override
             public void onMessage(final Void message) {
                 LOG.debug("Kill signal found");
@@ -98,7 +99,7 @@ public abstract class Actor<InType, OutType>
      * @param message
      *            the message to stuff into the oubound queue.
      */
-    protected void yield(final OutType message) {
+    protected void emit(final OutType message) {
         this.outChannel.publish(message);
     }
 }

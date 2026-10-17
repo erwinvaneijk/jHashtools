@@ -32,15 +32,13 @@
  */
 package nl.minjus.nfi.dt.jhashtools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -53,23 +51,23 @@ public class ConstructionInfoTest
     {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
     @Test
     public void testSetup() {
         final ConstructionInfo info = new ConstructionInfo();
-        assertNotNull(info.getConstructionDate());
-        assertNotNull(info.getOperatingSystem());
-        assertNotNull(info.getVersionInformation());
-        assertNotNull(info.getUsername());
+        assertThat(info.getConstructionDate()).isNotNull();
+        assertThat(info.getOperatingSystem()).isNotNull();
+        assertThat(info.getVersionInformation()).isNotNull();
+        assertThat(info.getUsername()).isNotNull();
         requestDelay(10);
-        assertTrue(Calendar.getInstance().getTime().after(info.getConstructionDate()));
+        assertThat(Calendar.getInstance().getTime().after(info.getConstructionDate())).isTrue();
     }
 
     @Test
@@ -78,13 +76,13 @@ public class ConstructionInfoTest
         info.setConstructionDate(Calendar.getInstance().getTime());
 
         info.setOperatingSystem("fooIS");
-        assertEquals("fooIS", info.getOperatingSystem());
+        assertThat(info.getOperatingSystem()).isEqualTo("fooIS");
         info.setVersionInformation("user");
-        assertEquals("user", info.getVersionInformation());
+        assertThat(info.getVersionInformation()).isEqualTo("user");
         info.setUsername("Username");
-        assertEquals("Username", info.getUsername());
+        assertThat(info.getUsername()).isEqualTo("Username");
         requestDelay(10);
-        assertTrue(Calendar.getInstance().getTime().after(info.getConstructionDate()));
+        assertThat(Calendar.getInstance().getTime().after(info.getConstructionDate())).isTrue();
     }
 
     private void requestDelay(final int delayInMilisecs) {

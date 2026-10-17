@@ -28,9 +28,9 @@
 
 package nl.minjus.nfi.dt.jhashtools.utils;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class VersionTest
 {
@@ -44,6 +44,6 @@ public class VersionTest
         // only
         // present in the jar-file, which is not there (yet) when this test is
         // run. Currently I have no way of overcoming that obstacle.
-        assertEquals("Version should be ", "1.2-unknown", version);
+        assertThat(version).as("Version should be ").isEqualTo("1.2-unknown");
     }
 }

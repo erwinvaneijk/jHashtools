@@ -29,7 +29,7 @@
 package nl.minjus.nfi.dt.jhashtools.utils;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -55,11 +55,11 @@ public class Version
         final int mark = pathToClass.indexOf("!");
         final String pathToManifest = pathToClass.substring(0, mark + 1) + "/META-INF/MANIFEST.MF";
         try {
-            final Manifest manifest = new Manifest(new URL(pathToManifest).openStream());
+            final Manifest manifest = new Manifest(URI.create(pathToManifest).toURL().openStream());
             final Attributes attributes = manifest.getMainAttributes();
             return attributes.getValue("Implementation-Version") + "-"
                 + attributes.getValue("Implementation-Build");
-        } catch (final IOException ex) {
+        } catch (final IOException | IllegalArgumentException ex) {
             return "1.2-unknown";
         }
     }

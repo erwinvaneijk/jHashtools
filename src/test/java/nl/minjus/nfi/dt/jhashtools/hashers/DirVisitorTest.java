@@ -33,12 +33,17 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import org.junit.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -51,19 +56,19 @@ public class DirVisitorTest
     {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -76,9 +81,9 @@ public class DirVisitorTest
     public void testVisit() throws NoSuchAlgorithmException {
         File theFile = new File("testdata/testfile1.bin");
         DirectoryVisitor instance = new DirectoryVisitor();
-        assertTrue(!instance.isVerbose());
+        assertThat(instance.isVerbose()).isFalse();
         instance.visit(theFile);
-        assertEquals(1, instance.getResults().size());
+        assertThat(instance.getResults().size()).isEqualTo(1);
     }
 
     /**
@@ -90,7 +95,7 @@ public class DirVisitorTest
             File theFile = new File("does-not-exist");
             DirectoryVisitor instance = new DirectoryVisitor(DigestAlgorithmFactory.create("sha-256"));
             instance.visit(theFile);
-            assertEquals(0, instance.getResults().size());
+            assertThat(instance.getResults().size()).isEqualTo(0);
         } catch (Throwable t) {
             fail("Nothing should be thrown here");
         }
@@ -119,7 +124,7 @@ public class DirVisitorTest
         boolean verbose = true;
         DirectoryVisitor instance = new DirectoryVisitor();
         instance.setVerbose(verbose);
-        assertTrue(instance.isVerbose());
+        assertThat(instance.isVerbose()).isTrue();
     }
 
 }

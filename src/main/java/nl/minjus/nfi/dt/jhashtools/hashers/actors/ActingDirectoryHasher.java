@@ -7,15 +7,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
-import nl.minjus.nfi.dt.jhashtools.hashers.AbstractDirectoryHasher;
-import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
-
 import org.jetlang.core.Disposable;
 import org.jetlang.fibers.Fiber;
 import org.jetlang.fibers.PoolFiberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
+import nl.minjus.nfi.dt.jhashtools.hashers.AbstractDirectoryHasher;
+import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 
 /**
  * This class is the point of entry for an Actor based concurrent variant for getting a part of a file system processed

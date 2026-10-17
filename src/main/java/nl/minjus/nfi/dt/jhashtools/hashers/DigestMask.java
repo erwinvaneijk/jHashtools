@@ -34,6 +34,7 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -105,12 +106,12 @@ public class DigestMask
 
         Short result = MASKS.get(algorithm);
         if (result == null) {
-            result = MASKS.get(algorithm.toLowerCase());
+            result = MASKS.get(algorithm.toLowerCase(Locale.ROOT));
             if (result == null) {
                 synchronized (LOCK) {
-                    result = MASKS.get(algorithm.toLowerCase());
+                    result = MASKS.get(algorithm.toLowerCase(Locale.ROOT));
                     if (result == null) {
-                        MASKS.put(algorithm.toUpperCase(), maxValue);
+                        MASKS.put(algorithm.toUpperCase(Locale.ROOT), maxValue);
                         REVERSE_MASKS.put(maxValue, algorithm);
                         final short returnValue = maxValue;
                         maxValue = (short) (maxValue << 1);

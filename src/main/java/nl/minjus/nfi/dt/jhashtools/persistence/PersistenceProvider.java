@@ -31,9 +31,9 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 import java.io.OutputStream;
 import java.io.Reader;
 
-import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
 /**
  * This interface can be used to do persistence.

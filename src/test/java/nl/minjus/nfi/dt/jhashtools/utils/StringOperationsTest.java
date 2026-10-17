@@ -33,17 +33,13 @@
 
 package nl.minjus.nfi.dt.jhashtools.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -56,19 +52,19 @@ public class StringOperationsTest
     {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -80,18 +76,18 @@ public class StringOperationsTest
         final byte[] buf = new byte[] { 0x10, 0x11, 0x12, 0x13 };
         final String expResult = "10111213";
         final String result = StringOperations.hexify(buf);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     @Test
     public void testNullCaseHexify() {
-        assertNull(StringOperations.hexify(null));
+        assertThat(StringOperations.hexify(null)).isNull();
     }
 
     @Test
     public void testSplit() {
         final String str = "aaaabbbbccccdddd";
         final String result = StringOperations.split(str, 4);
-        assertThat(result, is(equalTo("aaaa bbbb cccc dddd")));
+        assertThat(result).isEqualTo("aaaa bbbb cccc dddd");
     }
 }

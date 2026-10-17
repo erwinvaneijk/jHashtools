@@ -29,10 +29,12 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -110,7 +112,7 @@ public class DirHasherResultVerifier
     {
         Reader reader;
         this.file = new File(aFilename);
-        reader = new FileReader(this.file);
+        reader = new InputStreamReader(new FileInputStream(this.file), StandardCharsets.UTF_8);
 
         final PersistenceProvider persistenceProvider = PersistenceProviderCreator
             .create(this.persistenceStyle);

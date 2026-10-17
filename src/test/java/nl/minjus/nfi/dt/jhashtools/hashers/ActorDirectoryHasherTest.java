@@ -28,18 +28,15 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
@@ -57,7 +54,7 @@ public class ActorDirectoryHasherTest
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         knownDigests = KnownDigests.getKnownResults();
     }
@@ -67,14 +64,14 @@ public class ActorDirectoryHasherTest
         try {
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
             final DirHasherResult result = digests.intersect(knownDigestSha256);
-            assertEquals(knownDigestSha256, result);
-            assertEquals(digests, digests.intersect(knownDigests));
+            assertThat(result).isEqualTo(knownDigestSha256);
+            assertThat(digests.intersect(knownDigests)).isEqualTo(digests);
             for (final Map.Entry<File, DigestResult> digest : digests) {
                 final int count = digests.count(digest.getValue());
-                assertEquals(1, count);
+                assertThat(count).isEqualTo(1);
             }
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
@@ -87,10 +84,10 @@ public class ActorDirectoryHasherTest
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
             final DirHasherResult digests = new DirHasherResult();
             directoryHasher.updateDigests(digests, new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
-            assertEquals(digests, digests.intersect(knownDigests));
+            assertThat(digests.intersect(knownDigestSha256)).isEqualTo(knownDigestSha256);
+            assertThat(digests.intersect(knownDigests)).isEqualTo(digests);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
@@ -101,12 +98,12 @@ public class ActorDirectoryHasherTest
         try {
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertThat(digests.intersect(knownDigestSha256), is(equalTo(knownDigestSha256)));
-            assertThat(digests.intersect(knownDigests), is(equalTo(digests)));
+            assertThat(digests.intersect(knownDigestSha256)).isEqualTo(knownDigestSha256);
+            assertThat(digests.intersect(knownDigests)).isEqualTo(digests);
             final DirHasherResult d2 = knownDigests.intersect(digests);
-            assertThat(d2, is(equalTo(knownDigestSha256)));
+            assertThat(d2).isEqualTo(knownDigestSha256);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
@@ -117,9 +114,9 @@ public class ActorDirectoryHasherTest
         try {
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertEquals(0, digests.exclude(knownDigestSha256).size());
+            assertThat(digests.exclude(knownDigestSha256).size()).isEqualTo(0);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
@@ -130,10 +127,10 @@ public class ActorDirectoryHasherTest
         try {
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("md5");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestMd5 = knownDigests.getByAlgorithm("md5");
-            assertEquals(knownDigestMd5, digests.intersect(knownDigestMd5));
-            assertEquals(digests, digests.intersect(knownDigests));
+            assertThat(digests.intersect(knownDigestMd5)).isEqualTo(knownDigestMd5);
+            assertThat(digests.intersect(knownDigests)).isEqualTo(digests);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
@@ -144,10 +141,10 @@ public class ActorDirectoryHasherTest
         try {
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-1");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestSha = knownDigests.getByAlgorithm("sha-1");
-            assertEquals(knownDigestSha, digests.intersect(knownDigestSha));
-            assertEquals(digests, digests.intersect(knownDigests));
+            assertThat(digests.intersect(knownDigestSha)).isEqualTo(knownDigestSha);
+            assertThat(digests.intersect(knownDigests)).isEqualTo(digests);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
@@ -159,11 +156,11 @@ public class ActorDirectoryHasherTest
             final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
             directoryHasher.addAlgorithm("md5");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult knownDigestSha256 = knownDigests.getByAlgorithm("sha-256");
-            assertEquals(knownDigestSha256, digests.intersect(knownDigestSha256));
+            assertThat(digests.intersect(knownDigestSha256)).isEqualTo(knownDigestSha256);
             final DirHasherResult remainingDigests = digests.intersect(knownDigests);
-            assertEquals(digests, remainingDigests);
+            assertThat(remainingDigests).isEqualTo(digests);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
@@ -176,9 +173,9 @@ public class ActorDirectoryHasherTest
             directoryHasher.addAlgorithm("sha-1");
             directoryHasher.addAlgorithm("md5");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(knownDigests.size(), digests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.size());
             final DirHasherResult remainingDigests = digests.intersect(knownDigests);
-            assertEquals(digests, remainingDigests);
+            assertThat(remainingDigests).isEqualTo(digests);
         } catch (final NoSuchAlgorithmException ex) {
             fail(ex.toString() + " should not happen");
         }
