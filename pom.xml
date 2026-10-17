@@ -352,7 +352,7 @@
         <dependency>
             <groupId>org.jetlang</groupId>
             <artifactId>jetlang</artifactId>
-            <version>0.2.9</version>
+            <version>0.2.23</version>
         </dependency>
         <!-- Logging: SLF4J API with the simple stderr provider, configured in simplelogger.properties -->
         <dependency>
