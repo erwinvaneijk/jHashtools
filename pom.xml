@@ -403,6 +403,26 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <!-- Used by CI: compiler and Error Prone warnings fail the build. -->
+        <profile>
+            <id>ci</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs combine.children="append">
+                                <arg>-Werror</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <scm>
         <url>git://github.com/erwinvaneijk/jHashtools.git</url>
         <connection>scm:git:https://github.com/erwinvaneijk/jHashtools.git</connection>
