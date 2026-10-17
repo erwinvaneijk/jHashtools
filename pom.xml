@@ -242,7 +242,7 @@
                         </goals>
                         <configuration>
                             <haltOnFailure>true</haltOnFailure>
-                            <!-- Floors at the coverage measured when moving to JaCoCo; raise them, never lower them. -->
+                            <!-- Floors at the measured coverage; raise them when coverage improves, never lower them. -->
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -250,12 +250,12 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.81</minimum>
+                                            <minimum>0.84</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.77</minimum>
+                                            <minimum>0.83</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -265,12 +265,12 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.72</minimum>
+                                            <minimum>0.76</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.63</minimum>
+                                            <minimum>0.77</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
