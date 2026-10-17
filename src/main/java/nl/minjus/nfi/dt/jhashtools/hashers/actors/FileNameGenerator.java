@@ -36,11 +36,11 @@ public class FileNameGenerator extends Actor<File, File>
             return;
         }
         if (aPath.isFile()) {
-            yield(aPath);
+            this.yield(aPath);
         } else if (aPath.isDirectory()) {
             for (final File child : aPath.listFiles()) {
                 if (child.isFile()) {
-                    yield(child);
+                    this.yield(child);
                 } else {
                     walkTheFile(child);
                 }
