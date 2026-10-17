@@ -45,6 +45,7 @@
 
     <properties>
         <antlr.version>4.7</antlr.version>
+        <slf4j.version>2.0.20</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -333,18 +334,16 @@
             <artifactId>jetlang</artifactId>
             <version>0.2.9</version>
         </dependency>
-        <!-- Log4J to Maven Log -->
-        <dependency>
-            <groupId>com.pyx4j</groupId>
-            <artifactId>maven-plugin-log4j</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
-        <!-- Slf4j to Log4J -->
+        <!-- Logging: SLF4J API with the simple stderr provider, configured in simplelogger.properties -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.4</version>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
     <reporting>
