@@ -31,9 +31,9 @@ Intended behaviour changes:
 
 Found but not fixed (out of scope):
 
-- Verifying old-style digest files fails with a `NullPointerException` (see baseline).
+- Verifying old-style digest files fails with a `NullPointerException` (see baseline): #26.
 - `DirHasherResultVerifierTest` reads back a file it has not closed and never flushes the writer it asserts on, so its
-  assertions always pass and its coverage varies between runs.
+  assertions always pass and its coverage varies between runs: #27.
 - `FileNameGenerator` logs through `java.util.logging` rather than SLF4J.
 
 ## Ground rules
