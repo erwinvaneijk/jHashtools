@@ -29,6 +29,7 @@
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.*;
@@ -36,6 +37,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
+import nl.minjus.nfi.dt.jhashtools.Digest;
+import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 
@@ -67,5 +70,72 @@ public class OldStylePersistenceProviderTest
         } catch (PersistenceException e) {
             fail(e.toString());
         }
+    }
+
+    @Test
+    public void testRoundTripKeepsEveryAlgorithmTheWriterEmits() throws PersistenceException {
+        final DigestResult digests = new DigestResult();
+        digests.add(new Digest("md2", "01".repeat(16)));
+        digests.add(new Digest("md5", "23".repeat(16)));
+        digests.add(new Digest("sha-1", "45".repeat(20)));
+        digests.add(new Digest("sha-256", "67".repeat(32)));
+        digests.add(new Digest("sha-384", "89".repeat(48)));
+        digests.add(new Digest("sha-512", "ab".repeat(64)));
+        final DirHasherResult written = new DirHasherResult();
+        written.put("some/file.txt", digests);
+        final OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        provider.persist(out, written);
+        final DirHasherResult loaded =
+            provider.load(new StringReader(out.toString(StandardCharsets.UTF_8)), DirHasherResult.class);
+
+        assertThat(loaded.size()).isEqualTo(1);
+        assertThat(loaded.get(new File("some/file.txt"))).isEqualTo(digests);
+    }
+
+    @Test
+    public void testLegacyAlgorithmLabelsAreRecognised() throws PersistenceException {
+        final String content = "Generated with: test\n"
+            + "file.txt\n"
+            + "\tMD5:\t" + "23".repeat(16) + "\n"
+            + "\tSHA:\t" + "45".repeat(20) + "\n"
+            + "\tSHA256:\t" + "67".repeat(32) + "\n";
+        final OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
+
+        final DirHasherResult loaded = provider.load(new StringReader(content), DirHasherResult.class);
+
+        final DigestResult digests = loaded.get(new File("file.txt"));
+        assertThat(digests.getDigest("md5")).isEqualTo(new Digest("md5", "23".repeat(16)));
+        assertThat(digests.getDigest("sha-1")).isEqualTo(new Digest("sha-1", "45".repeat(20)));
+        assertThat(digests.getDigest("sha-256")).isEqualTo(new Digest("sha-256", "67".repeat(32)));
+    }
+
+    @Test
+    public void testMalformedDigestLineIsRejectedWithItsLineNumber() {
+        final String content = """
+            Generated with: test
+            file.txt
+            \tthis is not a digest
+            """;
+        final OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
+
+        assertThatThrownBy(() -> provider.load(new StringReader(content), DirHasherResult.class))
+            .isInstanceOf(PersistenceException.class)
+            .hasMessageContaining("line 3");
+    }
+
+    @Test
+    public void testInvalidHexDigitsAreRejected() {
+        final String content = """
+            Generated with: test
+            file.txt
+            \tmd5:\t0123 zzzz
+            """;
+        final OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
+
+        assertThatThrownBy(() -> provider.load(new StringReader(content), DirHasherResult.class))
+            .isInstanceOf(PersistenceException.class)
+            .hasMessageContaining("line 3");
     }
 }

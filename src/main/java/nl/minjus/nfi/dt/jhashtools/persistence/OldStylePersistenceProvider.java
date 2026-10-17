@@ -38,18 +38,19 @@ import java.util.Calendar;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrentFileHasher;
 
 /**
  * This class supports the Old Style hashes.txt files that are now generated using JSON. The old format should be
@@ -60,7 +61,19 @@ import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrentFileHasher;
 public class OldStylePersistenceProvider implements PersistenceProvider
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentFileHasher.class);
+    /**
+     * Turns every lexer and parser error into an exception, instead of the default recovery that prints to the
+     * console and continues with a partial result.
+     */
+    private static final BaseErrorListener FAIL_ON_SYNTAX_ERROR = new BaseErrorListener()
+    {
+        @Override
+        public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol, final int line,
+            final int charPositionInLine, final String msg, final RecognitionException e)
+        {
+            throw new ParseCancellationException(msg, e);
+        }
+    };
 
     @Override
     public void persist(final OutputStream out, final Object obj) throws PersistenceException {
@@ -124,10 +137,10 @@ public class OldStylePersistenceProvider implements PersistenceProvider
                     } else {
                         try {
                             final OldStyleHashesParser parser = createParser(line);
-                            final Digest theDigest = parser.digest().digestResult;
-                            result.add(theDigest);
-                        } catch (final RecognitionException ex) {
-                            LOG.info("Could not recognize [" + line + "]");
+                            result.add(parser.digest().digestResult);
+                        } catch (final ParseCancellationException ex) {
+                            throw new PersistenceException("Could not parse the digest on line "
+                                + lineNumberReader.getLineNumber() + ": [" + line.trim() + "]", ex);
                         }
                     }
                 }
@@ -144,7 +157,12 @@ public class OldStylePersistenceProvider implements PersistenceProvider
     private OldStyleHashesParser createParser(final String testString) throws IOException {
         final CharStream stream = CharStreams.fromString(testString);
         final OldStyleHashesLexer lexer = new OldStyleHashesLexer(stream);
-        final CommonTokenStream tokens = new CommonTokenStream(lexer);
-        return new OldStyleHashesParser(tokens);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(FAIL_ON_SYNTAX_ERROR);
+        final OldStyleHashesParser parser = new OldStyleHashesParser(new CommonTokenStream(lexer));
+        parser.removeErrorListeners();
+        parser.addErrorListener(FAIL_ON_SYNTAX_ERROR);
+        parser.setErrorHandler(new BailErrorStrategy());
+        return parser;
     }
 }
