@@ -39,3 +39,10 @@ Usage
     java -jar target/jHashtools-1.2.jar --help
     java -jar target/jHashtools-1.2.jar -2 -s json -o digests.json <dir>
     java -jar target/jHashtools-1.2.jar -2 -s json -i digests.json <dir>
+
+Exit status
+-----------
+- `0`: the digests were written, or verification passed.
+- `3`: verification (`-i`) found differences.
+- Any other non-zero value: an error, such as invalid options or an unreadable
+  digest file.

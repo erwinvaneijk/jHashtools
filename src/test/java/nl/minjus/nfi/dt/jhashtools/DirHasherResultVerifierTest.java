@@ -41,9 +41,26 @@ public class DirHasherResultVerifierTest
         final Path data = createData();
         final Path digestFile = writeDigests(data, style);
 
-        final String report = verify(data, digestFile, style);
+        final Verification verification = verify(data, digestFile, style);
 
-        assertThat(report).contains("*** PASSED VERIFICATION ***").doesNotContain("There are differences.");
+        assertThat(verification.passed()).isTrue();
+        assertThat(verification.report()).contains("*** PASSED VERIFICATION ***")
+            .doesNotContain("There are differences.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE" })
+    public void testDigestFileInsideVerifiedDirectoryPassesVerification(final PersistenceStyle style)
+        throws IOException, NoSuchAlgorithmException, PersistenceException
+    {
+        final Path data = createData();
+        final Path digestFile = writeDigests(data, style, data.resolve("digests.txt"));
+
+        final Verification verification = verify(data, digestFile, style);
+
+        assertThat(verification.passed()).isTrue();
+        assertThat(verification.report()).contains("*** PASSED VERIFICATION ***")
+            .doesNotContain("There are differences.");
     }
 
     @ParameterizedTest
@@ -55,9 +72,11 @@ public class DirHasherResultVerifierTest
         final Path digestFile = writeDigests(data, style);
         Files.writeString(data.resolve("a.txt"), "changed\n", StandardCharsets.UTF_8);
 
-        final String report = verify(data, digestFile, style);
+        final Verification verification = verify(data, digestFile, style);
 
-        assertThat(report).contains("There are differences.").contains("a.txt").doesNotContain("PASSED");
+        assertThat(verification.passed()).isFalse();
+        assertThat(verification.report()).contains("There are differences.").contains("a.txt")
+            .doesNotContain("PASSED");
     }
 
     @ParameterizedTest
@@ -69,9 +88,11 @@ public class DirHasherResultVerifierTest
         final Path digestFile = writeDigests(data, style);
         Files.delete(data.resolve("b.txt"));
 
-        final String report = verify(data, digestFile, style);
+        final Verification verification = verify(data, digestFile, style);
 
-        assertThat(report).contains("There are differences.").contains("b.txt").doesNotContain("PASSED");
+        assertThat(verification.passed()).isFalse();
+        assertThat(verification.report()).contains("There are differences.").contains("b.txt")
+            .doesNotContain("PASSED");
     }
 
     private Path createData() throws IOException {
@@ -87,16 +108,24 @@ public class DirHasherResultVerifierTest
     private Path writeDigests(final Path data, final PersistenceStyle style)
         throws IOException, NoSuchAlgorithmException, PersistenceException
     {
+        return writeDigests(data, style, this.tempDir.resolve("digests.txt"));
+    }
+
+    /**
+     * Writes the digests of <code>data</code> to <code>digestFile</code>, closing it before it is read.
+     */
+    private Path writeDigests(final Path data, final PersistenceStyle style, final Path digestFile)
+        throws IOException, NoSuchAlgorithmException, PersistenceException
+    {
         final DirectoryHasher hasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING, ALGORITHMS);
         final DirHasherResult digests = hasher.getDigests(data.toFile());
-        final Path digestFile = this.tempDir.resolve("digests.txt");
         try (OutputStream out = Files.newOutputStream(digestFile)) {
             PersistenceProviderCreator.create(style).persist(out, digests);
         }
         return digestFile;
     }
 
-    private String verify(final Path data, final Path digestFile, final PersistenceStyle style)
+    private Verification verify(final Path data, final Path digestFile, final PersistenceStyle style)
         throws IOException, NoSuchAlgorithmException, PersistenceException
     {
         final DirectoryHasher hasher = DirectoryHasherCreator.create(ConcurrencyMode.MULTI_THREADING, ALGORITHMS);
@@ -105,9 +134,14 @@ public class DirHasherResultVerifierTest
         verifier.generateDigests(new String[] { data.toString() });
 
         final StringWriter report = new StringWriter();
+        final boolean passed;
         try (PrintWriter writer = new PrintWriter(report)) {
-            verifier.verify(writer);
+            passed = verifier.verify(writer);
         }
-        return report.toString();
+        return new Verification(passed, report.toString());
+    }
+
+    private record Verification(boolean passed, String report)
+    {
     }
 }
