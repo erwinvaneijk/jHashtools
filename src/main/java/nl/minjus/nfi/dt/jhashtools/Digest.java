@@ -34,6 +34,7 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Locale;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -112,7 +113,8 @@ public class Digest implements Comparable<Digest>
      */
     public Digest(final MessageDigest digest)
     {
-        this.algorithm = digest.getAlgorithm();
+        // JDK digests keep the requested (lower-case) name, BouncyCastle reports its own (e.g. "RIPEMD160").
+        this.algorithm = digest.getAlgorithm().toLowerCase(Locale.ROOT);
         this.content = digest.digest();
     }
 

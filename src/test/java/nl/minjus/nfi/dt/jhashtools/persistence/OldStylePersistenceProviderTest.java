@@ -75,12 +75,12 @@ public class OldStylePersistenceProviderTest
     @Test
     public void testRoundTripKeepsEveryAlgorithmTheWriterEmits() throws PersistenceException {
         final DigestResult digests = new DigestResult();
-        digests.add(new Digest("md2", "01".repeat(16)));
         digests.add(new Digest("md5", "23".repeat(16)));
         digests.add(new Digest("sha-1", "45".repeat(20)));
         digests.add(new Digest("sha-256", "67".repeat(32)));
         digests.add(new Digest("sha-384", "89".repeat(48)));
         digests.add(new Digest("sha-512", "ab".repeat(64)));
+        digests.add(new Digest("ripemd160", "cd".repeat(20)));
         final DirHasherResult written = new DirHasherResult();
         written.put("some/file.txt", digests);
         final OldStylePersistenceProvider provider = new OldStylePersistenceProvider();

@@ -30,8 +30,11 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * @author Erwin van Eijk
@@ -39,6 +42,12 @@ import java.util.Map;
 class SupportedDigestAlgorithms
 {
     private static Map<String, Boolean> supportedMap = new HashMap<String, Boolean>();
+
+    static {
+        // BouncyCastle provides ripemd160. Register it here as well as in DigestMask, so the answer does not depend
+        // on which of the two classes is initialised first. Adding an already installed provider has no effect.
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     public static boolean isSupportedAlgorithm(final String algorithm) {
         try {

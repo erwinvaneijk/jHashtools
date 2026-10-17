@@ -240,8 +240,9 @@ public class DirHasherResultTest
 
         DirHasherResult result = setOne.intersect(setTwo);
 
-        assertThat(result.size()).isEqualTo(3);
-        assertThat(!result.containsKey("four")).isTrue();
+        // "four" matches on the md4 digest both sides have, so it is part of the intersection (issue #30).
+        assertThat(result.size()).isEqualTo(4);
+        assertThat(result.get("four")).isEqualTo(new DigestResult(new Digest("md4", "1111")));
         assertThat(!result.containsKey("five")).isTrue();
         assertThat(result.get("three").containsResult("crc")).isTrue();
 

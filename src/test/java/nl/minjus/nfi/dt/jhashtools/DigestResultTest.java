@@ -128,4 +128,20 @@ public class DigestResultTest
             // This is correct
         }
     }
+
+    @Test
+    public void testMatchesDetectsDifferencesAfterRepeatedUseOfAnUnregisteredAlgorithm() {
+        // Issue #30: every lookup of an algorithm that is not registered up front, such as md2 in older digest
+        // files, used to allocate a new mask bit until the masks overflowed and matches() compared nothing.
+        for (int i = 0; i < 20; i++) {
+            final DigestResult left = new DigestResult();
+            left.add(new Digest("md2", "01".repeat(16)));
+            left.add(new Digest("sha-256", "23".repeat(32)));
+            final DigestResult right = new DigestResult();
+            right.add(new Digest("md2", "45".repeat(16)));
+            right.add(new Digest("sha-256", "67".repeat(32)));
+
+            assertThat(left.matches(right)).isFalse();
+        }
+    }
 }

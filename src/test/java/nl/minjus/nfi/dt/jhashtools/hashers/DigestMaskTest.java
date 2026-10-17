@@ -53,4 +53,16 @@ public class DigestMaskTest
             Locale.setDefault(defaultLocale);
         }
     }
+
+    @Test
+    public void testRepeatedLookupsReturnTheSameMask() {
+        final DigestMask digestMask = DigestMask.getInstance();
+
+        final Short firstMask = digestMask.getMask("digestmasktest-repeated");
+
+        for (int i = 0; i < 20; i++) {
+            assertThat(digestMask.getMask("digestmasktest-repeated")).isEqualTo(firstMask);
+            assertThat(digestMask.getMask("DIGESTMASKTEST-REPEATED")).isEqualTo(firstMask);
+        }
+    }
 }
