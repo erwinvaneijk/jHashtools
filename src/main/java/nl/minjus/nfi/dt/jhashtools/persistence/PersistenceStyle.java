@@ -47,7 +47,7 @@ public enum PersistenceStyle
     OLDSTYLE;
 
     /**
-     * Convert the description into the suitable enum member.
+     * Convert the description into the suitable enum member. The description is matched ignoring case.
      *
      * @param aDescription
      *            the description to convert.
@@ -56,9 +56,9 @@ public enum PersistenceStyle
      *             if <code>aDescription</code> is not one of the supported styles.
      */
     public static PersistenceStyle convert(final String aDescription) {
-        if ("json".equals(aDescription)) {
+        if ("json".equalsIgnoreCase(aDescription)) {
             return JSON;
-        } else if ("old".equals(aDescription)) {
+        } else if ("old".equalsIgnoreCase(aDescription)) {
             return OLDSTYLE;
         } else {
             throw new UnsupportedPersistenceStyleException("Unsupported style '" + aDescription

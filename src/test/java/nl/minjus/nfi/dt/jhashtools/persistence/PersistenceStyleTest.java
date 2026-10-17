@@ -24,7 +24,19 @@ public class PersistenceStyleTest
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "oldstyle", "xml", "JSON", "" })
+    @ValueSource(strings = { "JSON", "Json" })
+    public void testFindJsonIgnoringCase(final String style) {
+        assertThat(PersistenceStyle.convert(style)).isEqualTo(PersistenceStyle.JSON);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "OLD", "Old" })
+    public void testFindOldStyleIgnoringCase(final String style) {
+        assertThat(PersistenceStyle.convert(style)).isEqualTo(PersistenceStyle.OLDSTYLE);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "oldstyle", "xml", "OLDSTYLE", "" })
     public void testUnsupportedStyleIsRejected(final String style) {
         assertThatThrownBy(() -> PersistenceStyle.convert(style))
             .isInstanceOf(UnsupportedPersistenceStyleException.class)
