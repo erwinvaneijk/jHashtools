@@ -44,12 +44,17 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author eijk
@@ -60,21 +65,21 @@ public class JsonPersisterTest
     private String testDigestResultInJson;
     private String testDirHasherResultInJson;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.testDigestResultInJson = "[\"sha-1:0000111122223333444455556666777788889999aaaa\"]";
         this.testDirHasherResultInJson = "{\"constructionInfo\":{\"constructionDate\":1273412558116,\"operatingSystem\":\"Mac OS X:10.6.3\",\"versionInformation\":\"1.0-unknown\",\"username\":\"eijk\"},\"content\":{\"myfile\":[\"sha-1:0000111122223333444455556666777788889999aaaa\"]}}";
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -161,8 +166,8 @@ public class JsonPersisterTest
 
         StringReader reader = new StringReader(out.toString());
         LargeArrayClass b = objectMapper.readValue(reader, LargeArrayClass.class);
-        assertEquals(a.getSet().size(), b.getSet().size());
-        assertEquals(a.getSet(), b.getSet());
+        assertThat(b.getSet().size()).isEqualTo(a.getSet().size());
+        assertThat(b.getSet()).isEqualTo(a.getSet());
     }
 
     @Test
@@ -181,16 +186,16 @@ public class JsonPersisterTest
             {
             };
             Set<Integer> otherSet = provider.load(input, setType);
-            assertEquals(mySet.size(), otherSet.size());
+            assertThat(otherSet.size()).isEqualTo(mySet.size());
             Iterator<Integer> it1 = mySet.iterator();
             Iterator<Integer> it2 = otherSet.iterator();
             while ((it1.hasNext() && it2.hasNext())) {
                 int val1 = it1.next();
                 int val2 = it2.next();
-                assertEquals(val1, val2);
+                assertThat(val2).isEqualTo(val1);
             }
-            assertTrue(!it1.hasNext());
-            assertTrue(!it2.hasNext());
+            assertThat(it1.hasNext()).isFalse();
+            assertThat(it2.hasNext()).isFalse();
 
         } catch (PersistenceException ex) {
             fail("Should not get here");
@@ -213,16 +218,16 @@ public class JsonPersisterTest
             {
             };
             Set<Integer> otherSet = provider.load(reader, setType);
-            assertEquals(mySet.size(), otherSet.size());
+            assertThat(otherSet.size()).isEqualTo(mySet.size());
             Iterator<Integer> it1 = mySet.iterator();
             Iterator<Integer> it2 = otherSet.iterator();
             while ((it1.hasNext() && it2.hasNext())) {
                 Integer val1 = it1.next();
                 Integer val2 = it2.next();
-                assertEquals(val1, val2);
+                assertThat(val2).isEqualTo(val1);
             }
-            assertTrue(!it1.hasNext());
-            assertTrue(!it2.hasNext());
+            assertThat(it1.hasNext()).isFalse();
+            assertThat(it2.hasNext()).isFalse();
         } catch (PersistenceException ex) {
             fail("Should not get here");
         }
@@ -241,7 +246,7 @@ public class JsonPersisterTest
             JsonPersistenceProvider instance = new JsonPersistenceProvider();
             instance.persist(out, obj);
             String str = out.toString();
-            assertEquals(this.testDigestResultInJson, str);
+            assertThat(str).isEqualTo(this.testDigestResultInJson);
         } catch (PersistenceException ex) {
             fail("This should not raise an exception");
         }
@@ -259,9 +264,9 @@ public class JsonPersisterTest
         Class<DigestResult> clazz = DigestResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
         DigestResult result = instance.load(stream, clazz);
-        assertEquals(1, result.size());
-        assertEquals("sha-1", result.digest().getAlgorithm());
-        assertEquals("0000111122223333444455556666777788889999aaaa", result.digest().toHex());
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.digest().getAlgorithm()).isEqualTo("sha-1");
+        assertThat(result.digest().toHex()).isEqualTo("0000111122223333444455556666777788889999aaaa");
     }
 
     @Test
@@ -279,7 +284,7 @@ public class JsonPersisterTest
 
         Reader reader = new StringReader(str);
         DirHasherResult res = instance.load(reader, DirHasherResult.class);
-        assertEquals(obj, res);
+        assertThat(res).isEqualTo(obj);
     }
 
     @Test
@@ -288,10 +293,10 @@ public class JsonPersisterTest
         Class<DirHasherResult> clazz = DirHasherResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
         DirHasherResult result = instance.load(stream, clazz);
-        assertEquals(1, result.size());
-        assertTrue("Should contain myfile", result.containsKey("myfile"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.containsKey("myfile")).as("Should contain myfile").isTrue();
         DigestResult digestResult = result.get("myfile");
-        assertEquals("sha-1", digestResult.digest().getAlgorithm());
-        assertEquals("0000111122223333444455556666777788889999aaaa", digestResult.digest().toHex());
+        assertThat(digestResult.digest().getAlgorithm()).isEqualTo("sha-1");
+        assertThat(digestResult.digest().toHex()).isEqualTo("0000111122223333444455556666777788889999aaaa");
     }
 }

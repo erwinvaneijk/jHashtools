@@ -1,27 +1,25 @@
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PersistenceStyleTest {
     @Test
     public void testFindXml() {
         PersistenceStyle xml = PersistenceStyle.XML;
-        assertThat(PersistenceStyle.convert("xml"), is(equalTo(xml)));
+        assertThat(PersistenceStyle.convert("xml")).isEqualTo(xml);
     }
     
     @Test
     public void testFindJson() {
         PersistenceStyle expected = PersistenceStyle.convert("json");
-        assertThat(expected, is(equalTo(PersistenceStyle.JSON)));
+        assertThat(expected).isEqualTo(PersistenceStyle.JSON);
     }
 
     @Test
     public void testFindOldStyle() {
         PersistenceStyle expected = PersistenceStyle.convert("old");
-        assertThat(expected, is(equalTo(PersistenceStyle.OLDSTYLE)));
+        assertThat(expected).isEqualTo(PersistenceStyle.OLDSTYLE);
     }
 }

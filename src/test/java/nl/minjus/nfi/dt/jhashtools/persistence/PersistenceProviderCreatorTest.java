@@ -1,24 +1,22 @@
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PersistenceProviderCreatorTest {
 
     @Test
     public void testCreateJson() {
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
-        assertThat(provider, is(instanceOf(JsonPersistenceProvider.class)));
+        assertThat(provider).isInstanceOf(JsonPersistenceProvider.class);
     }
 
     @Test
     public void testCreateOldStyle() {
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.OLDSTYLE);
-        assertThat(provider, is(instanceOf(OldStylePersistenceProvider.class)));
+        assertThat(provider).isInstanceOf(OldStylePersistenceProvider.class);
     }
 
     @Test

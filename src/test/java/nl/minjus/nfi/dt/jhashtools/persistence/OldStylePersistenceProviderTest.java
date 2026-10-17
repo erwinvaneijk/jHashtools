@@ -30,12 +30,12 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class OldStylePersistenceProviderTest
 {
@@ -48,16 +48,15 @@ public class OldStylePersistenceProviderTest
             OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
             DirHasherResult result = provider.load(input, DirHasherResult.class);
             assert result != null;
-            assertEquals(4, result.size());
-            assertEquals("md5:a4850cd827a34a7e54dacf6814e06f55", result.get(new File("hashtree256.py"))
-                .getDigest("md5").toString());
-            assertEquals("sha-1:23e7ace892b507b07e4dfcf1f028ee3130bc682e",
-                result.get(new File("hashtree256.py")).getDigest("sha-1").toString());
+            assertThat(result.size()).isEqualTo(4);
+            assertThat(result.get(new File("hashtree256.py"))
+                .getDigest("md5").toString()).isEqualTo("md5:a4850cd827a34a7e54dacf6814e06f55");
+            assertThat(result.get(new File("hashtree256.py")).getDigest("sha-1").toString()).isEqualTo("sha-1:23e7ace892b507b07e4dfcf1f028ee3130bc682e");
 
-            assertEquals("md5:44af6da725a24c2d8363a42069ee110f", result.get(new File("shatest.py"))
-                .getDigest("md5").toString());
-            assertEquals("sha-256:b7e94899a85df9809030e8ede16b857e90d886279dc1d3d14562142c9303dc39", result
-                .get(new File("shatest.py")).getDigest("sha-256").toString());
+            assertThat(result.get(new File("shatest.py"))
+                .getDigest("md5").toString()).isEqualTo("md5:44af6da725a24c2d8363a42069ee110f");
+            assertThat(result
+                .get(new File("shatest.py")).getDigest("sha-256").toString()).isEqualTo("sha-256:b7e94899a85df9809030e8ede16b857e90d886279dc1d3d14562142c9303dc39");
 
         } catch (IOException ex) {
             fail("We got an IOException. Wrong.");
