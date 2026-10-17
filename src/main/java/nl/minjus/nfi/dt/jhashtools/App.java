@@ -60,6 +60,7 @@ public class App
 
     private static final double MILLISEC_TO_SEC_FACTOR = 1000.0;
     private static final int EXIT_PERSISTENCE_ERROR = 2;
+    private static final int EXIT_VERIFICATION_FAILED = 3;
     private static final String USAGE = "[options] dir [dir...]";
     private static final String HEADER = "hashtree - Creating a list of digests for files "
         + "and/or directories.\nCopyright (c) 2010 - 2012, Erwin van Eijk";
@@ -139,7 +140,9 @@ public class App
             verifier.setIgnoreCase(line.hasOption("ignorecase"));
             verifier.loadDigestsFromFile(filename);
             verifier.generateDigests(filesToProcess);
-            verifier.verify(new PrintWriter(System.out, true, StandardCharsets.UTF_8));
+            if (!verifier.verify(new PrintWriter(System.out, true, StandardCharsets.UTF_8))) {
+                System.exit(EXIT_VERIFICATION_FAILED);
+            }
         } catch (final FileNotFoundException ex) {
             LOG.error("A file could not be found.", ex);
             System.exit(-1);

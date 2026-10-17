@@ -129,8 +129,9 @@ public class DirHasherResultVerifier
      *
      * @param anOutput
      *            where to write the output to.
+     * @return <code>true</code> if the verification passed, <code>false</code> if there are differences.
      */
-    public void verify(final PrintWriter anOutput) {
+    public boolean verify(final PrintWriter anOutput) {
         if (this.isIgnoringCase()) {
             final DirHasherResult ignoredCaseMeasurements = new DirHasherResult(this.isIgnoringCase());
             ignoredCaseMeasurements.putAll(this.measuredDigests);
@@ -145,6 +146,7 @@ public class DirHasherResultVerifier
         anOutput.printf("*** %s ***\n", Calendar.getInstance().getTime().toString());
         if (differences.size() == 0) {
             anOutput.println("*** PASSED VERIFICATION ***");
+            return true;
         } else {
             if (differences.size() == 1
                 && FileOperations.isSameFile(differences.iterator().next().getKey(), this.file))
@@ -152,6 +154,7 @@ public class DirHasherResultVerifier
                 anOutput.println("*** PASSED VERIFICATION ***");
                 anOutput.println("Printing info on " + this.file.getName());
                 differences.prettyPrint(anOutput);
+                return true;
             } else {
                 anOutput.println("There are differences.");
                 // First calculate the files measured, but missing in the
@@ -175,6 +178,7 @@ public class DirHasherResultVerifier
                         anOutput.printf("\t%s\n", d.toString('\t'));
                     }
                 }
+                return false;
             }
         }
     }
