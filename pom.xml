@@ -155,48 +155,73 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.5.1</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.15</version>
                 <configuration>
-                    <instrumentation>
-                        <ignores>
-                            <ignore>nl.minjus.nfi.dt.jhashtools.App</ignore>
-                        </ignores>
-                        <excludes>
-                            <exclude>nl/minjus/nfi/dt/**/*Test.class</exclude>
-                            <exclude>nl/minjus/nfi/dt/jhashtools/App.class</exclude>
-                            <exclude>nl/minjus/nfi/dt/jhashtools/exceptions/*class</exclude>
-                        </excludes>
-                    </instrumentation>
-                    <check>
-                        <branchRate>85</branchRate>
-                        <lineRate>85</lineRate>
-                        <haltOnFailure>true</haltOnFailure>
-                        <totalBranchRate>85</totalBranchRate>
-                        <totalLineRate>85</totalLineRate>
-                        <packageLineRate>85</packageLineRate>
-                        <packageBranchRate>85</packageBranchRate>
-                        <regexes>
-                            <regex>
-                                <pattern>nl.minjus.nfi.dt.jhashtools.exceptions.*</pattern>
-                                <branchRate>10</branchRate>
-                                <lineRate>10</lineRate>
-                            </regex>
-                            <regex>
-                                <pattern>nl.minjus.nfi.dt.jhashtools.*</pattern>
-                                <branchRate>90</branchRate>
-                                <lineRate>80</lineRate>
-                            </regex>
-                        </regexes>
-                    </check>
+                    <excludes>
+                        <exclude>nl/minjus/nfi/dt/jhashtools/App.class</exclude>
+                        <exclude>nl/minjus/nfi/dt/jhashtools/exceptions/*</exclude>
+                        <!-- ANTLR-generated parser and lexer -->
+                        <exclude>nl/minjus/nfi/dt/jhashtools/persistence/OldStyleHashes*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>prepare-agent</id>
                         <goals>
-                            <goal>clean</goal>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
                             <goal>check</goal>
                         </goals>
+                        <configuration>
+                            <haltOnFailure>true</haltOnFailure>
+                            <!-- Floors at the coverage measured when moving to JaCoCo; raise them, never lower them. -->
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.81</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.77</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.72</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.63</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

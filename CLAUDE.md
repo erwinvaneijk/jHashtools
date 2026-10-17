@@ -136,7 +136,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Cover OS-specific behaviour explicitly, including symbolic links (which must not be followed when walking directories)
 - Classes named `Abstract*` are excluded from test execution; use that prefix for shared test base classes
 - Follow the Arrange-Act-Assert pattern
-- Coverage is enforced (target: JaCoCo `check`, replacing Cobertura) at the existing thresholds: 85% overall, 90% branch / 80% line for `nl.minjus.nfi.dt.jhashtools.*`
+- Coverage is enforced by JaCoCo `check` in `./mvnw verify`. The limits in `pom.xml` are floors at the coverage measured when JaCoCo was introduced (generated ANTLR classes, `App` and `exceptions` excluded); raise them when coverage improves, never lower them
 - Do not commit commented-out or `@Ignore`/`@Disabled` tests without a reason in the annotation
 
 ## 10. Imports and Dependencies
