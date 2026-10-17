@@ -131,7 +131,7 @@ public class JsonPersisterTest
             LargeArrayClass instance = new LargeArrayClass(10);
             jp.nextToken();
             while (jp.nextToken() != JsonToken.END_OBJECT) {
-                String fieldName = jp.getCurrentName();
+                String fieldName = jp.currentName();
                 List<Long> l = new LinkedList<Long>();
                 if ("set".equals(fieldName)) {
                     while (jp.nextToken() != JsonToken.END_ARRAY) {
@@ -278,7 +278,7 @@ public class JsonPersisterTest
         String str = out.toString();
 
         Reader reader = new StringReader(str);
-        DirHasherResult res = (DirHasherResult) instance.load(reader, DirHasherResult.class);
+        DirHasherResult res = instance.load(reader, DirHasherResult.class);
         assertEquals(obj, res);
     }
 
@@ -287,7 +287,7 @@ public class JsonPersisterTest
         Reader stream = new StringReader(this.testDirHasherResultInJson);
         Class<DirHasherResult> clazz = DirHasherResult.class;
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
-        DirHasherResult result = (DirHasherResult) instance.load(stream, clazz);
+        DirHasherResult result = instance.load(stream, clazz);
         assertEquals(1, result.size());
         assertTrue("Should contain myfile", result.containsKey("myfile"));
         DigestResult digestResult = result.get("myfile");

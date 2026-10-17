@@ -46,7 +46,7 @@ public class OldStylePersistenceProviderTest
             File file = new File("testdata/oldformat.txt");
             Reader input = new FileReader(file);
             OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
-            DirHasherResult result = (DirHasherResult) provider.load(input, DirHasherResult.class);
+            DirHasherResult result = provider.load(input, DirHasherResult.class);
             assert result != null;
             assertEquals(4, result.size());
             assertEquals("md5:a4850cd827a34a7e54dacf6814e06f55", result.get(new File("hashtree256.py"))

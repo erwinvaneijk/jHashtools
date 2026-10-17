@@ -41,7 +41,7 @@ import nl.minjus.nfi.dt.jhashtools.hashers.DigestMask;
 /**
  * @author Erwin van Eijk
  */
-public class DigestResult extends TreeSet<Digest>
+public final class DigestResult extends TreeSet<Digest>
 {
     /**
      * Generated serial id.

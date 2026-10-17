@@ -203,6 +203,8 @@ public class App
         return directoryHasher;
     }
 
+    // The replacement org.apache.commons.cli.help.HelpFormatter lays out --help differently; keep the output stable.
+    @SuppressWarnings("deprecation")
     private static CommandLine getCommandLine(final String[] theArguments) {
         final CommandLineParser parser = new DefaultParser();
 

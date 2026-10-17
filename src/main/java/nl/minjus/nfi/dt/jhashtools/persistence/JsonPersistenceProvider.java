@@ -84,11 +84,10 @@ public class JsonPersistenceProvider implements PersistenceProvider
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T load(Reader reader, TypeReference<T> type) throws PersistenceException {
         try {
-            return (T) OBJECT_MAPPER.readValue(reader, type);
+            return OBJECT_MAPPER.readValue(reader, type);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }

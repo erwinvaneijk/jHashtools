@@ -69,7 +69,7 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
     {
         final DirHasherResult result = new DirHasherResult();
         while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
-            final String fieldName = aJsonParser.getCurrentName();
+            final String fieldName = aJsonParser.currentName();
             if ("constructionInfo".equals(fieldName)) {
                 aJsonParser.nextToken();
                 result.setConstructionInfo(aJsonParser.readValueAs(ConstructionInfo.class));
@@ -77,7 +77,7 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
             if ("content".equals(fieldName)) {
                 aJsonParser.nextToken();
                 while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
-                    final String filePath = aJsonParser.getCurrentName();
+                    final String filePath = aJsonParser.currentName();
                     aJsonParser.nextToken();
                     final DigestResult digestResult = aJsonParser.readValueAs(DigestResult.class);
                     result.put(new File(filePath), digestResult);

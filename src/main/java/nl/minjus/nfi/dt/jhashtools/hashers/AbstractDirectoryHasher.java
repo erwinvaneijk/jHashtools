@@ -71,7 +71,7 @@ public abstract class AbstractDirectoryHasher implements DirectoryHasher
     }
 
     @Override
-    public void addAlgorithm(final String algorithm) throws NoSuchAlgorithmException {
+    public final void addAlgorithm(final String algorithm) throws NoSuchAlgorithmException {
         algorithms.add(DigestAlgorithmFactory.create(algorithm));
     }
 
