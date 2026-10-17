@@ -40,10 +40,6 @@ public enum PersistenceStyle
      */
     JSON,
     /**
-     * XML.
-     */
-    XML,
-    /**
      * The old style of outputting the results. Pretty horrible format, really.
      */
     OLDSTYLE;
@@ -56,9 +52,7 @@ public enum PersistenceStyle
      * @return a PersistenceStyle
      */
     public static PersistenceStyle convert(final String aDescription) {
-        if ("xml".equals(aDescription)) {
-            return XML;
-        } else if ("json".equals(aDescription)) {
+        if ("json".equals(aDescription)) {
             return JSON;
         } else if ("old".equals(aDescription)) {
             return OLDSTYLE;

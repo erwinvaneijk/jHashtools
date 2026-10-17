@@ -43,20 +43,9 @@ public class PersistenceProviderCreator
      * @return a provider.
      */
     public static PersistenceProvider create(final PersistenceStyle thePersistenceStyle) {
-        PersistenceProvider persistenceProvider = null;
-        switch (thePersistenceStyle) {
-            case JSON:
-                persistenceProvider = new JsonPersistenceProvider(true);
-                break;
-            case OLDSTYLE:
-                persistenceProvider = new OldStylePersistenceProvider();
-                break;
-            case XML:
-                throw new RuntimeException("XML is not yet supported.");
-            default:
-                throw new UnsupportedOperationException("We know nothing of persistenceStyle "
-                    + thePersistenceStyle);
-        }
-        return persistenceProvider;
+        return switch (thePersistenceStyle) {
+            case JSON -> new JsonPersistenceProvider(true);
+            case OLDSTYLE -> new OldStylePersistenceProvider();
+        };
     }
 }
