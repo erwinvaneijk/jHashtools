@@ -41,12 +41,11 @@ import nl.minjus.nfi.dt.jhashtools.utils.Version;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,9 +203,8 @@ public class App
         return directoryHasher;
     }
 
-    @SuppressWarnings("static-access")
     private static CommandLine getCommandLine(final String[] theArguments) {
-        final CommandLineParser parser = new PosixParser();
+        final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
 
@@ -222,15 +220,15 @@ public class App
         options.addOption("v", "verbose", false, "Create verbose output");
         options.addOption("f", "force", false, "Force overwriting any previous output");
         options.addOption(null, "single", false, "Only use single threaded execution path");
-        final Option outputOption = OptionBuilder.withLongOpt("output")
-            .withDescription("The file the output is written to").hasArg().withArgName("outputfile")
-            .create("o");
+        final Option outputOption = Option.builder("o").longOpt("output")
+            .desc("The file the output is written to").hasArg().argName("outputfile")
+            .get();
         options.addOption(outputOption);
-        options.addOption(OptionBuilder.withLongOpt("input")
-            .withDescription("The file needed to verify the found digests").hasArg().withArgName("inputfile")
-            .create("i"));
-        options.addOption(OptionBuilder.withLongOpt("style").withDescription("The input/output style to use")
-            .hasArg().withArgName("style").create("s"));
+        options.addOption(Option.builder("i").longOpt("input")
+            .desc("The file needed to verify the found digests").hasArg().argName("inputfile")
+            .get());
+        options.addOption(Option.builder("s").longOpt("style").desc("The input/output style to use")
+            .hasArg().argName("style").get());
         options.addOption(null, "single", false, "Only use single threaded execution path");
         CommandLine line;
         try {
