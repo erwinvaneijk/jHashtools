@@ -31,6 +31,7 @@ package nl.minjus.nfi.dt.jhashtools;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -110,14 +111,17 @@ public class DirHasherResultVerifier
     public void loadDigestsFromFile(final String aFilename) throws FileNotFoundException,
         PersistenceException
     {
-        Reader reader;
         this.file = new File(aFilename);
-        reader = new InputStreamReader(new FileInputStream(this.file), StandardCharsets.UTF_8);
-
         final PersistenceProvider persistenceProvider = PersistenceProviderCreator
             .create(this.persistenceStyle);
 
-        this.verificationDigests = persistenceProvider.load(reader, DirHasherResult.class);
+        try (Reader reader = new InputStreamReader(new FileInputStream(this.file), StandardCharsets.UTF_8)) {
+            this.verificationDigests = persistenceProvider.load(reader, DirHasherResult.class);
+        } catch (final FileNotFoundException ex) {
+            throw ex;
+        } catch (final IOException ex) {
+            throw new PersistenceException("Could not close " + this.file, ex);
+        }
     }
 
     /**
