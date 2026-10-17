@@ -28,8 +28,8 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
@@ -58,35 +58,35 @@ public class IntegrationTest
         Reader reader = new FileReader("testdata/include-md5-sha1.txt");
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
         final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
-        assertEquals(3976, setOne.size());
+        assertThat(setOne.size()).isEqualTo(3976);
 
         reader = new FileReader("testdata/include-sha1-sha256-sha512.txt");
         final DirHasherResult setTwo = provider.load(reader, DirHasherResult.class);
-        assertEquals(3976, setTwo.size());
+        assertThat(setTwo.size()).isEqualTo(3976);
 
         final DirHasherResult setOneSha1 = setOne.getByAlgorithm("sha-1");
         final DirHasherResult setTwoSha1 = setTwo.getByAlgorithm("sha-1");
         DirHasherResult diff = setOneSha1.exclude(setTwoSha1);
-        assertEquals(0, diff.size());
+        assertThat(diff.size()).isEqualTo(0);
 
         assert setOne.matches(setTwo);
         assert setTwo.matches(setOne);
 
         diff = setOne.exclude(setTwo);
-        assertEquals(0, diff.size());
+        assertThat(diff.size()).isEqualTo(0);
 
         diff = setOne.includeWrong(setTwo);
-        assertEquals(0, diff.size());
+        assertThat(diff.size()).isEqualTo(0);
 
         diff = setTwo.includeWrong(setOne);
-        assertEquals(0, diff.size());
+        assertThat(diff.size()).isEqualTo(0);
 
         diff = setOne.intersect(setTwo);
         assert setOne.matches(diff);
         assert diff.matches(setTwo);
 
         diff = setOne.notIntersect(setTwo);
-        assertEquals(0, diff.size());
+        assertThat(diff.size()).isEqualTo(0);
     }
 
     // @Test(timeout=120000)

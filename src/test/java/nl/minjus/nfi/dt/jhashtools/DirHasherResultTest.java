@@ -1,11 +1,8 @@
 package nl.minjus.nfi.dt.jhashtools;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 
@@ -15,10 +12,10 @@ public class DirHasherResultTest {
     public void testIntersection() throws Exception {
         final DirHasherResult knownDigests = KnownDigests.getKnownResults();
         final DirHasherResult knownSha256Digests = knownDigests.getByAlgorithm("sha-256");
-        assertThat(knownDigests, is(not(equalTo(knownSha256Digests))));
-        assertThat(knownSha256Digests, is(not(equalTo(knownDigests))));
+        assertThat(knownDigests).isNotEqualTo(knownSha256Digests);
+        assertThat(knownSha256Digests).isNotEqualTo(knownDigests);
         final DirHasherResult intersected = knownDigests.intersect(knownSha256Digests);
-        assertThat(intersected, is(not(equalTo(knownDigests))));
-        assertThat(intersected, is(equalTo(knownSha256Digests)));
+        assertThat(intersected).isNotEqualTo(knownDigests);
+        assertThat(intersected).isEqualTo(knownSha256Digests);
     }
 }

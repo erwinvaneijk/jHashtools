@@ -33,12 +33,12 @@
 
 package nl.minjus.nfi.dt.jhashtools;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * 
@@ -51,19 +51,19 @@ public class DigestTest
     {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -75,7 +75,7 @@ public class DigestTest
         String algorithm = "crc";
         Digest instance = new Digest("foo", "deadbeef");
         instance.setAlgorithm(algorithm);
-        assertEquals("crc", instance.getAlgorithm());
+        assertThat(instance.getAlgorithm()).isEqualTo("crc");
     }
 
     /**
@@ -86,7 +86,7 @@ public class DigestTest
         byte[] value = new byte[] { (byte) 0xde, (byte) 0xea, (byte) 0xbe, (byte) 0xef };
         Digest instance = new Digest("crc", "");
         instance.setContent(value);
-        assertEquals(value, instance.getContent());
+        assertThat(instance.getContent()).isEqualTo(value);
     }
 
     /**
@@ -98,7 +98,7 @@ public class DigestTest
         Digest instance = new Digest("crc", value);
         String expResult = "deedbeef";
         String result = instance.toHex();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -110,7 +110,7 @@ public class DigestTest
         Digest instance = new Digest("crc", value);
         String expResult = "crc:deedbeef";
         String result = instance.toString();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -120,21 +120,21 @@ public class DigestTest
     public void testEquals() {
         Object o = new Digest("crc", "deadbeef");
         Digest instance = new Digest("crc", "deadbeef");
-        assertEquals(true, instance.equals(o));
-        assertEquals(true, o.equals(instance));
+        assertThat(instance.equals(o)).isEqualTo(true);
+        assertThat(o.equals(instance)).isEqualTo(true);
 
-        assertEquals(false, instance.equals(null));
-        assertEquals(false, instance.equals(new Object()));
+        assertThat(instance.equals(null)).isEqualTo(false);
+        assertThat(instance.equals(new Object())).isEqualTo(false);
 
         o = new Digest("crc", "deadbeee");
-        assertEquals(false, instance.equals(o));
-        assertEquals(false, o.equals(instance));
+        assertThat(instance.equals(o)).isEqualTo(false);
+        assertThat(o.equals(instance)).isEqualTo(false);
 
         o = new Digest("md4", "deadbeefdeadbeefdeadbeefdeadbeef");
-        assertEquals(false, instance.equals(o));
-        assertEquals(false, o.equals(instance));
+        assertThat(instance.equals(o)).isEqualTo(false);
+        assertThat(o.equals(instance)).isEqualTo(false);
 
-        assertEquals(instance, instance);
+        assertThat(instance).isEqualTo(instance);
     }
 
     /**
@@ -149,13 +149,13 @@ public class DigestTest
         Digest longer = new Digest("crc", "deadbeefbeef");
         Digest instance = new Digest("crc", "deadbeef");
 
-        assertTrue(instance.compareTo(veryLess) > 0);
-        assertTrue(veryLess.compareTo(instance) < 0);
-        assertEquals(0, instance.compareTo(instance));
-        assertTrue(instance.compareTo(less) < 0);
-        assertEquals(1, less.compareTo(instance));
-        assertEquals(0, instance.compareTo(equal));
-        assertEquals(1, instance.compareTo(more));
-        assertTrue(instance.compareTo(longer) < 0);
+        assertThat(instance.compareTo(veryLess) > 0).isTrue();
+        assertThat(veryLess.compareTo(instance) < 0).isTrue();
+        assertThat(instance.compareTo(instance)).isEqualTo(0);
+        assertThat(instance.compareTo(less) < 0).isTrue();
+        assertThat(less.compareTo(instance)).isEqualTo(1);
+        assertThat(instance.compareTo(equal)).isEqualTo(0);
+        assertThat(instance.compareTo(more)).isEqualTo(1);
+        assertThat(instance.compareTo(longer) < 0).isTrue();
     }
 }

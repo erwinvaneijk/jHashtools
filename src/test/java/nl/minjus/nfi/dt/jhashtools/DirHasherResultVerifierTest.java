@@ -1,9 +1,7 @@
 package nl.minjus.nfi.dt.jhashtools;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,7 +18,7 @@ import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProviderCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DirHasherResultVerifierTest
 {
@@ -42,12 +40,12 @@ public class DirHasherResultVerifierTest
             verifier.loadDigestsFromFile(testfile.getCanonicalPath());
             final ByteArrayOutputStream anOutput = new ByteArrayOutputStream();
             verifier.verify(new PrintWriter(anOutput));
-            assertThat(anOutput.size(), is(equalTo(0)));
+            assertThat(anOutput.size()).isEqualTo(0);
             testfile.delete();
 
             verifier.setIgnoreCase(false);
             verifier.verify(new PrintWriter(anOutput));
-            assertThat(anOutput.size(), is(equalTo(0)));
+            assertThat(anOutput.size()).isEqualTo(0);
             testfile.delete();
         } catch (final FileNotFoundException e) {
             fail("Should not happen");
