@@ -28,7 +28,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Erwin van Eijk

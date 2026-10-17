@@ -32,9 +32,8 @@
  */
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
@@ -45,11 +44,11 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Erwin van Eijk <erwin.vaneijk@gmail.com>
@@ -64,19 +63,19 @@ public class DirMultiHashTest
         this.knownDigests = KnownDigests.getKnownResults();
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -88,22 +87,22 @@ public class DirMultiHashTest
             directoryHasher.addAlgorithm("sha-1");
             directoryHasher.addAlgorithm("md5");
             final DirHasherResult digests = directoryHasher.getDigests(new File("testdata"));
-            assertEquals(13, digests.size());
-            assertEquals(knownDigests.size(), 13);
-            assertEquals(knownDigests.getByAlgorithm("sha-256").size(), digests.size());
-            assertEquals(knownDigests.getByAlgorithm("sha-1").size(), digests.size());
-            assertEquals(knownDigests.getByAlgorithm("md5").size(), digests.size());
-            assertEquals(digests.getByAlgorithm("md5").size(), digests.size());
-            assertEquals(digests.getByAlgorithm("sha-256").size(), digests.size());
-            assertEquals(digests.getByAlgorithm("sha-1").size(), digests.size());
+            assertThat(digests.size()).isEqualTo(13);
+            assertThat(13).isEqualTo(knownDigests.size());
+            assertThat(digests.size()).isEqualTo(knownDigests.getByAlgorithm("sha-256").size());
+            assertThat(digests.size()).isEqualTo(knownDigests.getByAlgorithm("sha-1").size());
+            assertThat(digests.size()).isEqualTo(knownDigests.getByAlgorithm("md5").size());
+            assertThat(digests.size()).isEqualTo(digests.getByAlgorithm("md5").size());
+            assertThat(digests.size()).isEqualTo(digests.getByAlgorithm("sha-256").size());
+            assertThat(digests.size()).isEqualTo(digests.getByAlgorithm("sha-1").size());
 
             for (final Map.Entry<File, DigestResult> entry : knownDigests) {
                 final File filename = entry.getKey();
                 final DigestResult knownResults = entry.getValue();
-                assertTrue(digests.containsKey(filename));
+                assertThat(digests.containsKey(filename)).isTrue();
                 final DigestResult foundResults = digests.get(filename);
                 for (final Digest digest : knownResults) {
-                    assertTrue(filename + "--" + digest.toString(), foundResults.contains(digest));
+                    assertThat(foundResults.contains(digest)).as(filename + "--" + digest.toString()).isTrue();
                 }
             }
         } catch (final NoSuchAlgorithmException e) {

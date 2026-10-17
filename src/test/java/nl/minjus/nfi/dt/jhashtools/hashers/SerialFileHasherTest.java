@@ -28,7 +28,7 @@
 
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.security.NoSuchAlgorithmException;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Erwin van Eijk
@@ -50,7 +50,7 @@ public class SerialFileHasherTest
         SerialFileHasher serialFileHasher = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
         DigestResult result = serialFileHasher.getDigest(stream);
 
-        assertEquals("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae", result
-            .getDigest("sha-256").toString());
+        assertThat(result
+            .getDigest("sha-256").toString()).isEqualTo("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
     }
 }
