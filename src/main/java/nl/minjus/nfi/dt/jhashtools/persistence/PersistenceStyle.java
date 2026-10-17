@@ -28,6 +28,8 @@
 
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
+import nl.minjus.nfi.dt.jhashtools.exceptions.UnsupportedPersistenceStyleException;
+
 /**
  * The definition of the various supported persistence styles.
  *
@@ -50,6 +52,8 @@ public enum PersistenceStyle
      * @param aDescription
      *            the description to convert.
      * @return a PersistenceStyle
+     * @throws UnsupportedPersistenceStyleException
+     *             if <code>aDescription</code> is not one of the supported styles.
      */
     public static PersistenceStyle convert(final String aDescription) {
         if ("json".equals(aDescription)) {
@@ -57,7 +61,8 @@ public enum PersistenceStyle
         } else if ("old".equals(aDescription)) {
             return OLDSTYLE;
         } else {
-            throw new RuntimeException("We do not support option " + aDescription);
+            throw new UnsupportedPersistenceStyleException("Unsupported style '" + aDescription
+                + "', use one of: json, old");
         }
     }
 }

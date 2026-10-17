@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
+import nl.minjus.nfi.dt.jhashtools.exceptions.UnsupportedPersistenceStyleException;
 import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
@@ -106,7 +107,13 @@ public class App
     private static PersistenceStyle getPersistenceStyle(final CommandLine line) {
         PersistenceStyle persistenceStyle;
         if (line.hasOption("style")) {
-            persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
+            try {
+                persistenceStyle = PersistenceStyle.convert(line.getOptionValue("style"));
+            } catch (final UnsupportedPersistenceStyleException ex) {
+                LOG.error(ex.getMessage());
+                System.exit(EXIT_PERSISTENCE_ERROR);
+                return null;
+            }
         } else {
             persistenceStyle = PersistenceStyle.JSON;
         }
@@ -233,8 +240,9 @@ public class App
         options.addOption(Option.builder("i").longOpt("input")
             .desc("The file needed to verify the found digests").hasArg().argName("inputfile")
             .get());
-        options.addOption(Option.builder("s").longOpt("style").desc("The input/output style to use")
-            .hasArg().argName("style").get());
+        options
+            .addOption(Option.builder("s").longOpt("style").desc("The input/output style to use: json (default) or old")
+                .hasArg().argName("style").get());
         options.addOption(null, "single", false, "Only use single threaded execution path");
         CommandLine line;
         try {
