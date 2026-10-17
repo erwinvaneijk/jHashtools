@@ -1,10 +1,11 @@
 package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import org.jetlang.channels.Channel;
 import org.jetlang.fibers.Fiber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generate <code>File</code> objects to use for further processing.
@@ -13,7 +14,7 @@ import org.jetlang.fibers.Fiber;
  */
 public class FileNameGenerator extends Actor<File, File>
 {
-    private static final Logger LOG = Logger.getLogger(FileNameGenerator.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FileNameGenerator.class);
 
     public FileNameGenerator(final Channel<File> inbox,
         final Channel<File> outbox,
@@ -26,7 +27,7 @@ public class FileNameGenerator extends Actor<File, File>
 
     @Override
     public File act(final File startPath) {
-        LOG.fine("Starting on " + startPath);
+        LOG.debug("Starting on {}", startPath);
         walkTheFile(startPath);
         return null;
     }
@@ -50,7 +51,7 @@ public class FileNameGenerator extends Actor<File, File>
 
     @Override
     protected void emit(final File theFile) {
-        LOG.fine("Yielding file " + theFile);
+        LOG.debug("Yielding file {}", theFile);
         super.emit(theFile);
     }
 }
