@@ -146,7 +146,7 @@ public class DirHasherResultTest
 
     @Test
     public void testEquals() {
-        assertThat(setOne != setTwo).isTrue();
+        assertThat(setOne).isNotSameAs(setTwo);
         assertThat(setTwo).isEqualTo(setOne);
         assertThat(setOne).isEqualTo(setTwo);
     }

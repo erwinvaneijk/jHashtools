@@ -118,6 +118,7 @@ public class DigestTest
      * Test of equals method, of class Digest.
      */
     @Test
+    @SuppressWarnings("SelfEquals") // deliberately checks that equals is reflexive
     public void testEquals() {
         Object o = new Digest("crc", "deadbeef");
         Digest instance = new Digest("crc", "deadbeef");
@@ -135,13 +136,14 @@ public class DigestTest
         assertThat(instance.equals(o)).isEqualTo(false);
         assertThat(o.equals(instance)).isEqualTo(false);
 
-        assertThat(instance).isEqualTo(instance);
+        assertThat(instance.equals(instance)).isTrue();
     }
 
     /**
      * Test of compareTo method, of class Digest.
      */
     @Test
+    @SuppressWarnings("SelfComparison") // deliberately checks compareTo against itself
     public void testCompareTo() {
         Digest veryLess = new Digest("aaa", "deadbeee");
         Digest less = new Digest("crc", "deadbeee");

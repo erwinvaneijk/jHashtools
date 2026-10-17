@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -52,7 +53,7 @@ public class ConcurrentFileHasherTest
     @Test
     public void testGetDigest() throws NoSuchAlgorithmException, IOException {
         final String content = "foo";
-        final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
+        final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         final FileHasher serialFileHasher = new ConcurrentFileHasher(DigestAlgorithmFactory.create("sha-256"));
         final DigestResult result = serialFileHasher.getDigest(stream);
 

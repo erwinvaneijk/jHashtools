@@ -36,11 +36,11 @@ public class FileNameGenerator extends Actor<File, File>
             return;
         }
         if (aPath.isFile()) {
-            this.yield(aPath);
+            emit(aPath);
         } else if (aPath.isDirectory()) {
             for (final File child : aPath.listFiles()) {
                 if (child.isFile()) {
-                    this.yield(child);
+                    emit(child);
                 } else {
                     walkTheFile(child);
                 }
@@ -49,8 +49,8 @@ public class FileNameGenerator extends Actor<File, File>
     }
 
     @Override
-    protected void yield(final File theFile) {
+    protected void emit(final File theFile) {
         LOG.fine("Yielding file " + theFile);
-        super.yield(theFile);
+        super.emit(theFile);
     }
 }

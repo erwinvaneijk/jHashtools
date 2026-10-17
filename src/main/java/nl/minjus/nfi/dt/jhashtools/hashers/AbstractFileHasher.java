@@ -35,6 +35,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
@@ -45,6 +48,8 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
 abstract class AbstractFileHasher implements FileHasher
 {
     public static final int BLOCK_READ_SIZE = 1024 * 1024;
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractFileHasher.class);
 
     private final Collection<DigestAlgorithm> digests;
 
@@ -72,9 +77,6 @@ abstract class AbstractFileHasher implements FileHasher
      *
      * @param algorithmName
      *            the algorithm to add.
-     *
-     * @throws NoSuchAlgorithmException
-     *             when the algorithm is not supported by the underlying JVM.
      */
     @Override
     public void addAlgorithm(final DigestAlgorithm algorithmName) {
@@ -112,8 +114,8 @@ abstract class AbstractFileHasher implements FileHasher
             try {
                 messageDigests.add(algorithm.getInstance());
             } catch (final NoSuchAlgorithmException ex) {
-                ex.printStackTrace(); // this cannot happen, we've already
-                                      // checked them before.
+                // this cannot happen, we've already checked them before.
+                LOG.error("Digest algorithm {} is not available", algorithm, ex);
             }
         }
         return messageDigests;

@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -153,7 +154,7 @@ public class JsonPersisterTest
 
     @JsonSerialize(using = LargeArraySerializer.class)
     @JsonDeserialize(using = LargeArrayDeserializer.class)
-    class LargeArrayClassMixIn
+    static class LargeArrayClassMixIn
     {
     }
 
@@ -183,7 +184,7 @@ public class JsonPersisterTest
             JsonPersistenceProvider provider = new JsonPersistenceProvider();
             provider.persist(out, mySet);
 
-            Reader input = new StringReader(out.toString());
+            Reader input = new StringReader(out.toString(StandardCharsets.UTF_8));
             TypeReference<Set<Integer>> setType = new TypeReference<Set<Integer>>()
             {
             };
@@ -215,7 +216,7 @@ public class JsonPersisterTest
             JsonPersistenceProvider provider = new JsonPersistenceProvider();
             provider.persist(out, mySet);
 
-            Reader reader = new StringReader(out.toString());
+            Reader reader = new StringReader(out.toString(StandardCharsets.UTF_8));
             TypeReference<TreeSet<Integer>> setType = new TypeReference<TreeSet<Integer>>()
             {
             };
@@ -247,7 +248,7 @@ public class JsonPersisterTest
             obj.add(d);
             JsonPersistenceProvider instance = new JsonPersistenceProvider();
             instance.persist(out, obj);
-            String str = out.toString();
+            String str = out.toString(StandardCharsets.UTF_8);
             assertThat(str).isEqualTo(this.testDigestResultInJson);
         } catch (PersistenceException ex) {
             fail("This should not raise an exception");
@@ -282,7 +283,7 @@ public class JsonPersisterTest
         JsonPersistenceProvider instance = new JsonPersistenceProvider();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         instance.persist(out, obj);
-        String str = out.toString();
+        String str = out.toString(StandardCharsets.UTF_8);
 
         Reader reader = new StringReader(str);
         DirHasherResult res = instance.load(reader, DirHasherResult.class);

@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,12 +56,12 @@ public class IntegrationTest
 
     @Test
     public void testIncludeFiles() throws IOException, PersistenceException {
-        Reader reader = new FileReader("testdata/include-md5-sha1.txt");
+        Reader reader = new FileReader("testdata/include-md5-sha1.txt", StandardCharsets.UTF_8);
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
         final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
         assertThat(setOne.size()).isEqualTo(3976);
 
-        reader = new FileReader("testdata/include-sha1-sha256-sha512.txt");
+        reader = new FileReader("testdata/include-sha1-sha256-sha512.txt", StandardCharsets.UTF_8);
         final DirHasherResult setTwo = provider.load(reader, DirHasherResult.class);
         assertThat(setTwo.size()).isEqualTo(3976);
 
@@ -102,7 +103,7 @@ public class IntegrationTest
                 .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
-            final Reader reader = new FileReader("boost-hashes.txt");
+            final Reader reader = new FileReader("boost-hashes.txt", StandardCharsets.UTF_8);
             final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
             final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
 
@@ -129,7 +130,7 @@ public class IntegrationTest
                 .getDigests(new File("/Users/eijk/Sources/boost_1_42_0"));
             assert digests.size() > 0;
 
-            final Reader reader = new FileReader("boost-hashes.txt");
+            final Reader reader = new FileReader("boost-hashes.txt", StandardCharsets.UTF_8);
             final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.JSON);
             final DirHasherResult setOne = provider.load(reader, DirHasherResult.class);
 

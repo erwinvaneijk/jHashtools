@@ -100,7 +100,7 @@ public class FileWalkerTest
         assertThat(result).isEqualTo(expResult);
     }
 
-    class WalkerVisitorImpl implements WalkerVisitor
+    static class WalkerVisitorImpl implements WalkerVisitor
     {
         private int number;
 

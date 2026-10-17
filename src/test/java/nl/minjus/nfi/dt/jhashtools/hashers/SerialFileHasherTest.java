@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ public class SerialFileHasherTest
     @Test
     public void testGetDigest() throws NoSuchAlgorithmException, IOException {
         String content = "foo";
-        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
+        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         SerialFileHasher serialFileHasher = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
         DigestResult result = serialFileHasher.getDigest(stream);
 

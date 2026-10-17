@@ -30,6 +30,7 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.cli.CommandLine;
@@ -138,7 +139,7 @@ public class App
             verifier.setIgnoreCase(line.hasOption("ignorecase"));
             verifier.loadDigestsFromFile(filename);
             verifier.generateDigests(filesToProcess);
-            verifier.verify(new PrintWriter(System.out, true));
+            verifier.verify(new PrintWriter(System.out, true, StandardCharsets.UTF_8));
         } catch (final FileNotFoundException ex) {
             LOG.error("A file could not be found.", ex);
             System.exit(-1);

@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,12 +40,12 @@ public class DirHasherResultVerifierTest
             provider.persist(out, result);
             verifier.loadDigestsFromFile(testfile.getCanonicalPath());
             final ByteArrayOutputStream anOutput = new ByteArrayOutputStream();
-            verifier.verify(new PrintWriter(anOutput));
+            verifier.verify(new PrintWriter(anOutput, false, StandardCharsets.UTF_8));
             assertThat(anOutput.size()).isEqualTo(0);
             testfile.delete();
 
             verifier.setIgnoreCase(false);
-            verifier.verify(new PrintWriter(anOutput));
+            verifier.verify(new PrintWriter(anOutput, false, StandardCharsets.UTF_8));
             assertThat(anOutput.size()).isEqualTo(0);
             testfile.delete();
         } catch (final FileNotFoundException e) {

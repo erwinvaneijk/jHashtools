@@ -99,7 +99,7 @@ public abstract class Actor<InType, OutType>
      * @param message
      *            the message to stuff into the oubound queue.
      */
-    protected void yield(final OutType message) {
+    protected void emit(final OutType message) {
         this.outChannel.publish(message);
     }
 }

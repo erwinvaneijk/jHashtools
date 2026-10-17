@@ -95,6 +95,8 @@ public class Digest implements Comparable<Digest>
      * @param aValue
      *            the value to parse.
      */
+    // The input is "<algorithm>:<hex>"; String.split's handling of empty parts does not matter here.
+    @SuppressWarnings("StringSplitter")
     @JsonCreator
     public Digest(final String aValue)
     {

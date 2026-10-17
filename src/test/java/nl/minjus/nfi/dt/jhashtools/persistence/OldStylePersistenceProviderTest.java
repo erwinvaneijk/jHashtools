@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +46,7 @@ public class OldStylePersistenceProviderTest
     public void testLoadFile() {
         try {
             File file = new File("testdata/oldformat.txt");
-            Reader input = new FileReader(file);
+            Reader input = new FileReader(file, StandardCharsets.UTF_8);
             OldStylePersistenceProvider provider = new OldStylePersistenceProvider();
             DirHasherResult result = provider.load(input, DirHasherResult.class);
             assert result != null;
