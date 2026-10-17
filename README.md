@@ -2,6 +2,12 @@ jHashtools![Project status](http://stillmaintained.com/nicoulaj/maven-zsh-comple
 =========================================================================================
 v1.2, Erwin van Eijk<erwin.vaneijk@gmail.com>
 
+## Contributing
+
+Use **Conventional Commits** for commit messages (for example:
+`feat(scope): short description`, `fix: short description`).
+See `CONTRIBUTING.md` for full contribution and commit guidelines.
+
 History
 -------
 jHashtools is the java-port of a tool that was developed a couple of years ago
