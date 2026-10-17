@@ -111,7 +111,11 @@ public class DigestMask
                 synchronized (LOCK) {
                     result = MASKS.get(algorithm.toLowerCase(Locale.ROOT));
                     if (result == null) {
-                        MASKS.put(algorithm.toUpperCase(Locale.ROOT), maxValue);
+                        if (maxValue <= 0) {
+                            throw new IllegalStateException("No digest mask left to register algorithm " + algorithm);
+                        }
+                        // Register under the key used for lookups, so the algorithm keeps this mask (issue #30).
+                        MASKS.put(algorithm.toLowerCase(Locale.ROOT), maxValue);
                         REVERSE_MASKS.put(maxValue, algorithm);
                         final short returnValue = maxValue;
                         maxValue = (short) (maxValue << 1);
