@@ -68,7 +68,7 @@ public class DigestMask
             MASKS.put(MessageDigest.getInstance("sha-256").getAlgorithm(), SHA256_ALGORITHM_MASK);
             MASKS.put(MessageDigest.getInstance("sha-384").getAlgorithm(), SHA384_ALGORITHM_MASK);
             MASKS.put(MessageDigest.getInstance("sha-512").getAlgorithm(), SHA512_ALGORITHM_MASK);
-            MASKS.put(MessageDigest.getInstance("ripemd160").getAlgorithm(), RIPEMD_ALGORITHM_MASK);
+            MASKS.put("ripemd160", RIPEMD_ALGORITHM_MASK);
             MASKS.put("crc", CRC_ALGORITHM);
 
             REVERSE_MASKS.put(MD5_ALGORITHM, MessageDigest.getInstance("md5").getAlgorithm());
@@ -76,7 +76,7 @@ public class DigestMask
             REVERSE_MASKS.put(SHA256_ALGORITHM_MASK, MessageDigest.getInstance("sha-256").getAlgorithm());
             REVERSE_MASKS.put(SHA384_ALGORITHM_MASK, MessageDigest.getInstance("sha-384").getAlgorithm());
             REVERSE_MASKS.put(SHA512_ALGORITHM_MASK, MessageDigest.getInstance("sha-512").getAlgorithm());
-            REVERSE_MASKS.put(RIPEMD_ALGORITHM_MASK, MessageDigest.getInstance("ripemd160").getAlgorithm());
+            REVERSE_MASKS.put(RIPEMD_ALGORITHM_MASK, "ripemd160");
             REVERSE_MASKS.put(CRC_ALGORITHM, "crc");
         } catch (final NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);

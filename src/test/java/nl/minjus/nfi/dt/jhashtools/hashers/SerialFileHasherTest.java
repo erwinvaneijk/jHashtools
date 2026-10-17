@@ -55,4 +55,16 @@ public class SerialFileHasherTest
             .getDigest("sha-256").toString())
             .isEqualTo("sha-256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
     }
+
+    @Test
+    public void testGetRipemd160Digest() throws NoSuchAlgorithmException, IOException {
+        final ByteArrayInputStream stream = new ByteArrayInputStream("abc".getBytes(StandardCharsets.UTF_8));
+        final SerialFileHasher serialFileHasher = new SerialFileHasher(DigestAlgorithmFactory.create("ripemd160"));
+
+        final DigestResult result = serialFileHasher.getDigest(stream);
+
+        // Test vector from the RIPEMD-160 specification.
+        assertThat(result.getDigest("ripemd160").toString())
+            .isEqualTo("ripemd160:8eb208f7e05d987a9b044a8e98c6b087f15a0bfc");
+    }
 }

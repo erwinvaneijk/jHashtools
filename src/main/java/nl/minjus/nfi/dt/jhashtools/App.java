@@ -190,8 +190,8 @@ public class App
         if (line.hasOption("all") || line.hasOption("md5")) {
             directoryHasher.addAlgorithm("md5");
         }
-        if (line.hasOption("all") || line.hasOption("md2")) {
-            directoryHasher.addAlgorithm("md2");
+        if (line.hasOption("all") || line.hasOption("ripemd160")) {
+            directoryHasher.addAlgorithm("ripemd160");
         }
     }
 
@@ -217,7 +217,7 @@ public class App
         options.addOption(null, "sha-384", false, "Output a sha-384 digest");
         options.addOption(null, "sha-512", false, "Output a sha-512 digest");
         options.addOption(null, "md5", false, "Output a md5 digest");
-        options.addOption(null, "md2", false, "Output a md2 digest (should not be used!)");
+        options.addOption(null, "ripemd160", false, "Output a ripemd160 digest");
         options.addOption("a", "all", false, "Include all available digest algorithms");
         options.addOption("n", "ignorecase", false, "Ignore the case on the file, only used when verifying.");
         options.addOption("v", "verbose", false, "Create verbose output");
