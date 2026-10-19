@@ -39,6 +39,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.minjus.nfi.dt.jhashtools.exceptions.PersistenceException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceProvider;
@@ -54,6 +57,7 @@ import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
  */
 public class DirHasherResultVerifier
 {
+    private static final Logger LOG = LoggerFactory.getLogger(DirHasherResultVerifier.class);
 
     private DirHasherResult measuredDigests;
     private DirHasherResult verificationDigests;
@@ -96,6 +100,8 @@ public class DirHasherResultVerifier
         for (final String pathName : thePathsToProcess) {
             this.directoryHasher.updateDigests(measuredDigests, new File(pathName));
         }
+        measuredDigests.getChangedAccessTimes().forEach((file, accessTimes) -> LOG.warn(
+            "Access time of {} changed while hashing: {} -> {}", file, accessTimes.before(), accessTimes.after()));
     }
 
     /**

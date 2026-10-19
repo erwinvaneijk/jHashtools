@@ -34,6 +34,7 @@ public class ReducerActor extends Actor<DigestMessage, Void>
         if ((request != null) && (request.getFile() != null)) {
             LOG.debug("Got a message " + request.getFile());
             dirHasherResult.put(request.getFile(), request.getDigestResult());
+            dirHasherResult.putAccessTimes(request.getFile(), request.getAccessTimes());
             LOG.debug("#" + dirHasherResult.size());
         } else {
             LOG.debug("Null message");

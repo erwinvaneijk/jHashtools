@@ -32,12 +32,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.FileTime;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
@@ -193,5 +200,19 @@ public class ActorDirectoryHasherTest
         } catch (final IllegalArgumentException ex) {
             // everything is ok.
         }
+    }
+
+    @Test
+    public void testRecordsAccessTimes(@TempDir final Path tempFolder) throws Exception {
+        final FileTime knownAccessTime = FileTime.from(Instant.parse("2001-02-03T04:05:06Z"));
+        final Path file = Files.writeString(tempFolder.resolve("file.txt"), "content");
+        Files.getFileAttributeView(file, BasicFileAttributeView.class).setTimes(null, knownAccessTime, null);
+        final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
+
+        final DirHasherResult digests = directoryHasher.getDigests(tempFolder.toFile());
+
+        final AccessTimes accessTimes = digests.getAccessTimes().get(file.toFile());
+        assertThat(accessTimes.before()).isEqualTo(knownAccessTime);
+        assertThat(accessTimes.after()).isEqualTo(AccessTimes.lastAccessTime(file.toFile()));
     }
 }

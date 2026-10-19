@@ -30,12 +30,19 @@ package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
@@ -81,7 +88,39 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
                     result.put(new File(filePath), digestResult);
                 }
             }
+            if ("accessTimes".equals(fieldName)) {
+                aJsonParser.nextToken();
+                readAccessTimes(aJsonParser, result);
+            }
         }
         return result;
+    }
+
+    private static void readAccessTimes(final JsonParser aJsonParser, final DirHasherResult aResult)
+        throws IOException
+    {
+        final JsonNode accessTimes = aJsonParser.readValueAsTree();
+        if (accessTimes == null || !accessTimes.isObject()) {
+            throw JsonMappingException.from(aJsonParser, "accessTimes must be an object");
+        }
+        for (final Map.Entry<String, JsonNode> entry : accessTimes.properties()) {
+            final JsonNode times = entry.getValue();
+            aResult.putAccessTimes(new File(entry.getKey()), new AccessTimes(
+                readFileTime(aJsonParser, entry.getKey(), times.get("before")),
+                readFileTime(aJsonParser, entry.getKey(), times.get("after"))));
+        }
+    }
+
+    private static FileTime readFileTime(final JsonParser aJsonParser, final String aFilePath, final JsonNode aTime)
+        throws JsonMappingException
+    {
+        if (aTime == null || !aTime.isTextual()) {
+            throw JsonMappingException.from(aJsonParser, "Missing access time for " + aFilePath);
+        }
+        try {
+            return FileTime.from(Instant.parse(aTime.asText()));
+        } catch (final DateTimeParseException ex) {
+            throw JsonMappingException.from(aJsonParser, "Invalid access time for " + aFilePath, ex);
+        }
     }
 }

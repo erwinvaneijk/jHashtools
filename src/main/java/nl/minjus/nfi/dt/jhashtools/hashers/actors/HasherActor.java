@@ -2,6 +2,7 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Set;
@@ -11,6 +12,7 @@ import org.jetlang.fibers.Fiber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.exceptions.AlgorithmNotFoundException;
 import nl.minjus.nfi.dt.jhashtools.hashers.DigestAlgorithm;
@@ -74,8 +76,9 @@ public class HasherActor extends Actor<File, DigestMessage>
         }
         try {
             LOG.debug("hashing: " + file);
+            final FileTime accessTimeBefore = AccessTimes.lastAccessTime(file);
             final DigestResult digest = fileHasher.getDigest(file);
-            return new DigestMessage(file, digest);
+            return new DigestMessage(file, digest, new AccessTimes(accessTimeBefore, AccessTimes.lastAccessTime(file)));
         } catch (final IOException ex) {
             return null;
         }

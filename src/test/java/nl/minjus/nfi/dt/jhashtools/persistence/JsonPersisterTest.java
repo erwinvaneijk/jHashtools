@@ -33,10 +33,13 @@
 package nl.minjus.nfi.dt.jhashtools.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -53,6 +56,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.Digest;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
@@ -301,5 +305,40 @@ public class JsonPersisterTest
         DigestResult digestResult = result.get("myfile");
         assertThat(digestResult.digest().getAlgorithm()).isEqualTo("sha-1");
         assertThat(digestResult.digest().toHex()).isEqualTo("0000111122223333444455556666777788889999aaaa");
+    }
+
+    @Test
+    public void testPersistAndLoadAccessTimes() throws PersistenceException {
+        final AccessTimes accessTimes = new AccessTimes(FileTime.from(Instant.parse("2001-02-03T04:05:06Z")),
+            FileTime.from(Instant.parse("2001-02-03T04:05:06.123456789Z")));
+        final DirHasherResult obj = new DirHasherResult();
+        obj.put("myfile", new DigestResult(new Digest("sha-1", "0000111122223333444455556666777788889999aaaa")));
+        obj.putAccessTimes(new File("myfile"), accessTimes);
+        final JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        instance.persist(out, obj);
+        final String json = out.toString(StandardCharsets.UTF_8);
+        final DirHasherResult res = instance.load(new StringReader(json), DirHasherResult.class);
+
+        assertThat(json).contains(
+            "\"accessTimes\":{\"myfile\":{\"before\":\"2001-02-03T04:05:06Z\",\"after\":\"2001-02-03T04:05:06.123456789Z\"}}");
+        assertThat(res).isEqualTo(obj);
+        assertThat(res.getAccessTimes()).containsExactly(Map.entry(new File("myfile"), accessTimes));
+    }
+
+    @Test
+    public void testLoadRejectsMalformedAccessTimes() {
+        final JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        final List<String> malformed = List.of(
+            "{\"content\":{},\"accessTimes\":[]}",
+            "{\"content\":{},\"accessTimes\":{\"myfile\":{\"before\":\"2001-02-03T04:05:06Z\"}}}",
+            "{\"content\":{},\"accessTimes\":{\"myfile\":{\"before\":1,\"after\":2}}}",
+            "{\"content\":{},\"accessTimes\":{\"myfile\":{\"before\":\"yesterday\",\"after\":\"today\"}}}");
+
+        for (final String json : malformed) {
+            assertThatExceptionOfType(PersistenceException.class).as(json)
+                .isThrownBy(() -> instance.load(new StringReader(json), DirHasherResult.class));
+        }
     }
 }

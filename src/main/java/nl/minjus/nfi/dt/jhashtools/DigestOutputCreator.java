@@ -110,6 +110,8 @@ public class DigestOutputCreator
                 LOG.debug("We don't care", t);
             }
         }
+        digests.getChangedAccessTimes().forEach((file, accessTimes) -> LOG.warn(
+            "Access time of {} changed while hashing: {} -> {}", file, accessTimes.before(), accessTimes.after()));
     }
 
     /**

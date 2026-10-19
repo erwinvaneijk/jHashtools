@@ -31,12 +31,15 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.attribute.FileTime;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
@@ -82,9 +85,11 @@ public class DirectoryVisitor implements WalkerVisitor
     @Override
     public void visit(final File theFile) {
         try {
+            final FileTime accessTimeBefore = AccessTimes.lastAccessTime(theFile);
             final DigestResult res = this.fileHasher.getDigest(theFile);
             resultMap.put(theFile, res);
-        } catch (final FileNotFoundException ex) {
+            resultMap.putAccessTimes(theFile, new AccessTimes(accessTimeBefore, AccessTimes.lastAccessTime(theFile)));
+        } catch (final FileNotFoundException | NoSuchFileException ex) {
             this.logger.error("File not found: " + theFile.getPath());
         } catch (final IOException ex) {
             this.logger.error("Got IOException while processing " + theFile.toString());
