@@ -29,8 +29,10 @@
 package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.cli.CommandLine;
@@ -49,6 +51,7 @@ import nl.minjus.nfi.dt.jhashtools.hashers.ConcurrencyMode;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.hashers.DirectoryHasherCreator;
 import nl.minjus.nfi.dt.jhashtools.persistence.PersistenceStyle;
+import nl.minjus.nfi.dt.jhashtools.utils.FileOperations;
 import nl.minjus.nfi.dt.jhashtools.utils.Version;
 
 /**
@@ -60,6 +63,7 @@ public class App
 {
 
     private static final double MILLISEC_TO_SEC_FACTOR = 1000.0;
+    private static final int EXIT_INVALID_OUTPUT = 1;
     private static final int EXIT_PERSISTENCE_ERROR = 2;
     private static final int EXIT_VERIFICATION_FAILED = 3;
     private static final String USAGE = "[options] dir [dir...]";
@@ -123,6 +127,7 @@ public class App
     private static void processFilesAndWrite(final DirectoryHasher directoryHasher, final String outputFile,
         final PersistenceStyle style, final boolean forceOverwrite, final String[] filesToProcess)
     {
+        refuseOutputInsideInputs(outputFile, filesToProcess);
         try {
             final DigestOutputCreator outputCreator = new DigestOutputCreator(System.err, directoryHasher,
                 forceOverwrite);
@@ -134,6 +139,21 @@ public class App
         } catch (final FileNotFoundException ex) {
             System.err.println("File " + outputFile + " exists or not forced to be overwritten. Stop.");
             System.exit(-1);
+        }
+    }
+
+    private static void refuseOutputInsideInputs(final String outputFile, final String[] filesToProcess) {
+        for (final String input : filesToProcess) {
+            try {
+                if (FileOperations.isWithin(Path.of(outputFile), Path.of(input))) {
+                    LOG.error("Refusing to write {} inside {}: it would change the files being hashed", outputFile,
+                        input);
+                    System.exit(EXIT_INVALID_OUTPUT);
+                }
+            } catch (final IOException ex) {
+                LOG.error("Cannot determine whether {} lies inside {}", outputFile, input, ex);
+                System.exit(EXIT_INVALID_OUTPUT);
+            }
         }
     }
 

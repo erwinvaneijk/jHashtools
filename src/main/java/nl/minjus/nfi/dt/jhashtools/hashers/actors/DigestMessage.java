@@ -2,6 +2,7 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
 /**
@@ -17,10 +18,13 @@ public class DigestMessage
 
     private final DigestResult digest;
 
-    public DigestMessage(final File file, final DigestResult digest)
+    private final AccessTimes accessTimes;
+
+    public DigestMessage(final File file, final DigestResult digest, final AccessTimes accessTimes)
     {
         this.digest = digest;
         this.file = file;
+        this.accessTimes = accessTimes;
     }
 
     /**
@@ -39,5 +43,14 @@ public class DigestMessage
      */
     public DigestResult getDigestResult() {
         return this.digest;
+    }
+
+    /**
+     * Get the access times observed while hashing the file.
+     *
+     * @return the observed access times
+     */
+    public AccessTimes getAccessTimes() {
+        return this.accessTimes;
     }
 }

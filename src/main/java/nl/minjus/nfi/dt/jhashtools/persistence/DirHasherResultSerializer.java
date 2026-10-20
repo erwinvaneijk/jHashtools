@@ -37,6 +37,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 
@@ -58,6 +59,17 @@ class DirHasherResultSerializer extends JsonSerializer<DirHasherResult>
         for (Map.Entry<File, DigestResult> entry : dirHasherResult.getContent().entrySet()) {
             jsonGenerator.writeFieldName(entry.getKey().getPath());
             jsonGenerator.writeObject(entry.getValue());
+        }
+        jsonGenerator.writeEndObject();
+
+        jsonGenerator.writeFieldName("accessTimes");
+        jsonGenerator.writeStartObject();
+        for (Map.Entry<File, AccessTimes> entry : dirHasherResult.getAccessTimes().entrySet()) {
+            jsonGenerator.writeFieldName(entry.getKey().getPath());
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeStringField("before", entry.getValue().before().toInstant().toString());
+            jsonGenerator.writeStringField("after", entry.getValue().after().toInstant().toString());
+            jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndObject();
         jsonGenerator.writeEndObject();

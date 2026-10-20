@@ -30,10 +30,12 @@ package nl.minjus.nfi.dt.jhashtools;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.slf4j.Logger;
@@ -54,6 +56,8 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
 
     private final ConcurrentSkipListMap<File, DigestResult> content;
 
+    private final ConcurrentSkipListMap<File, AccessTimes> accessTimes;
+
     /**
      * Constructor.
      */
@@ -72,6 +76,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
     {
         final Comparator<File> comparator = new FileComparator(ignoreCase);
         this.content = new ConcurrentSkipListMap<>(comparator);
+        this.accessTimes = new ConcurrentSkipListMap<>(comparator);
         this.constructionInfo = new ConstructionInfo();
     }
 
@@ -117,6 +122,43 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
      */
     public synchronized void putAll(final DirHasherResult other) {
         this.content.putAll(other.content);
+        this.accessTimes.putAll(other.accessTimes);
+    }
+
+    /**
+     * Record the access times observed while hashing <c>file<c>.
+     *
+     * @param file
+     *            the file that was hashed.
+     * @param theAccessTimes
+     *            the access times observed before and after reading the file.
+     */
+    public void putAccessTimes(final File file, final AccessTimes theAccessTimes) {
+        this.accessTimes.put(file, theAccessTimes);
+    }
+
+    /**
+     * Get the access times observed while hashing, by file.
+     *
+     * @return an unmodifiable view of the observed access times.
+     */
+    public Map<File, AccessTimes> getAccessTimes() {
+        return Collections.unmodifiableMap(this.accessTimes);
+    }
+
+    /**
+     * Get the files whose access time changed while they were hashed.
+     *
+     * @return the observed access times of the files whose access time changed.
+     */
+    public Map<File, AccessTimes> getChangedAccessTimes() {
+        final Map<File, AccessTimes> changed = new TreeMap<>(this.accessTimes.comparator());
+        this.accessTimes.forEach((file, times) -> {
+            if (times.changed()) {
+                changed.put(file, times);
+            }
+        });
+        return changed;
     }
 
     /**
@@ -246,6 +288,7 @@ public class DirHasherResult implements Iterable<Map.Entry<File, DigestResult>>
      */
     public void clear() {
         this.content.clear();
+        this.accessTimes.clear();
     }
 
     /**

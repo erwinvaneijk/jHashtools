@@ -3,10 +3,15 @@ package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jetlang.channels.Channel;
+import org.jetlang.channels.MemoryChannel;
 import org.jetlang.core.Disposable;
 import org.jetlang.fibers.Fiber;
 import org.jetlang.fibers.PoolFiberFactory;
@@ -114,19 +119,29 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
                 fileFeederFiber);
         generator.start();
 
+        final Set<File> claimedFiles = ConcurrentHashMap.newKeySet();
+        final Channel<Void> hasherStopChannel = new MemoryChannel<>();
         for (int i = 0; i < numHashers; i++) {
             final Fiber hasherFiber = fiberFactory.create();
             hasherFiber.add(dispose);
             final HasherActor hasherActor =
                 new HasherActor(getTheAlgorithms(),
                     channels.getFilenameChannel(), channels.getDigestChannel(),
-                    channels.getFilenameStopChannel(), channels.getDigestStopChannel(),
-                    hasherFiber);
+                    channels.getFilenameStopChannel(), hasherStopChannel,
+                    hasherFiber, claimedFiles);
             hasherActor.start();
         }
 
         final Fiber reducerFiber = fiberFactory.create();
         reducerFiber.add(dispose);
+        // Each hasher publishes its digests before it signals that it stopped, so once every hasher has stopped
+        // all digests are queued on the reducer fiber ahead of the reducer's stop signal.
+        final AtomicInteger runningHashers = new AtomicInteger(numHashers);
+        hasherStopChannel.subscribe(reducerFiber, aStopSignal -> {
+            if (runningHashers.decrementAndGet() == 0) {
+                channels.getDigestStopChannel().publish(null);
+            }
+        });
         final ReducerActor reducerActor =
             new ReducerActor(digests, channels.getDigestChannel(), channels.getDigestStopChannel(), reducerFiber);
 

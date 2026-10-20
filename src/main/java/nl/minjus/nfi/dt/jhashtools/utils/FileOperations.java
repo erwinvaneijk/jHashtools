@@ -30,6 +30,8 @@ package nl.minjus.nfi.dt.jhashtools.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Utility class for operations on files.
@@ -73,5 +75,36 @@ public class FileOperations
         final File firstFile = new File(aFirstFile);
         final File secondFile = new File(aSecondFile);
         return FileOperations.isSameFile(firstFile, secondFile);
+    }
+
+    /**
+     * Determine whether writing to <code>aCandidate</code> would write inside <code>aDirectory</code>, or overwrite
+     * <code>aDirectory</code> itself when it is a file. Symbolic links are resolved, so a link pointing into
+     * <code>aDirectory</code> counts as inside it.
+     *
+     * @param aCandidate
+     *            the path to check, which does not have to exist.
+     * @param aDirectory
+     *            the directory or file to check against.
+     * @return true if <code>aCandidate</code> is <code>aDirectory</code> or lies below it; false if
+     *         <code>aDirectory</code> does not exist.
+     * @throws IOException
+     *             when a path cannot be resolved.
+     */
+    public static boolean isWithin(final Path aCandidate, final Path aDirectory) throws IOException {
+        if (!Files.exists(aDirectory)) {
+            return false;
+        }
+        final Path absoluteCandidate = aCandidate.toAbsolutePath().normalize();
+        final Path parent = absoluteCandidate.getParent();
+        final Path candidate;
+        if (Files.exists(absoluteCandidate)) {
+            candidate = absoluteCandidate.toRealPath();
+        } else if (parent != null && Files.exists(parent)) {
+            candidate = parent.toRealPath().resolve(absoluteCandidate.getFileName());
+        } else {
+            candidate = absoluteCandidate;
+        }
+        return candidate.startsWith(aDirectory.toRealPath());
     }
 }
