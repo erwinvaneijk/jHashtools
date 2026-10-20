@@ -261,8 +261,9 @@ public class App
             .desc("The file needed to verify the found digests").hasArg().argName("inputfile")
             .get());
         options
-            .addOption(Option.builder("s").longOpt("style").desc("The input/output style to use: json (default) or old")
-                .hasArg().argName("style").get());
+            .addOption(
+                Option.builder("s").longOpt("style").desc("The input/output style to use: json (default), old or case")
+                    .hasArg().argName("style").get());
         options.addOption(null, "single", false, "Only use single threaded execution path");
         CommandLine line;
         try {

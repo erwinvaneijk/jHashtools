@@ -1,0 +1,349 @@
+{
+  "@context": {
+    "action": "https://ontology.unifiedcyberontology.org/uco/action/",
+    "case-investigation": "https://ontology.caseontology.org/case/investigation/",
+    "core": "https://ontology.unifiedcyberontology.org/uco/core/",
+    "identity": "https://ontology.unifiedcyberontology.org/uco/identity/",
+    "observable": "https://ontology.unifiedcyberontology.org/uco/observable/",
+    "tool": "https://ontology.unifiedcyberontology.org/uco/tool/",
+    "types": "https://ontology.unifiedcyberontology.org/uco/types/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:uuid:e6101aac-39f7-4f11-aae5-3e6c95d9520e",
+      "@type": "tool:AnalyticTool",
+      "core:name": "hashtree",
+      "tool:toolType": "hash-calculator",
+      "tool:version": "3.0.1"
+    },
+    {
+      "@id": "urn:uuid:53d4867a-9958-43ad-90a6-b4301e4bb9ec",
+      "@type": "identity:Person",
+      "core:name": "examiner"
+    },
+    {
+      "@id": "urn:uuid:6f010660-5bc9-42a5-957a-fa5499a73e5f",
+      "@type": "observable:File",
+      "core:hasFacet": [
+        {
+          "@id": "urn:uuid:eb2fd1f2-d7e3-4fbc-96db-0b32c9212863",
+          "@type": "observable:FileFacet",
+          "observable:fileName": "gamma.txt",
+          "observable:filePath": "basic_tree/nested/deeper/gamma.txt"
+        },
+        {
+          "@id": "urn:uuid:4f6fbbfd-f346-477b-80be-b5c962445092",
+          "@type": "observable:ContentDataFacet",
+          "observable:hash": [
+            {
+              "@id": "urn:uuid:99000192-100a-4b4a-a197-c80d708cbbec",
+              "@type": "types:Hash",
+              "types:hashMethod": "MD5",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "303febb9068384eca46b5b6516843b35"
+              }
+            },
+            {
+              "@id": "urn:uuid:6984463e-197a-4f03-9bd6-456cef1ea9c0",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA1",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "37f385b028bf2f93a4b497ca9ff44eea63945b7f"
+              }
+            },
+            {
+              "@id": "urn:uuid:64241221-f2cd-43af-9711-2e05b27dd11d",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA256",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "ae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2"
+              }
+            },
+            {
+              "@id": "urn:uuid:4a5cfba3-00f0-47fa-9b00-fa5a10f0b739",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA384",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "bbc9c2754f90a5223f5d35ce05c7f4292552f8069041891dd59fc06f60538c43453acbc223adbf6accd83f4900e2bd2f"
+              }
+            },
+            {
+              "@id": "urn:uuid:7bb998a6-876c-4d04-a834-c092ba74cf81",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA512",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "9643fe6b2f93f4ce31860649865976bb9d28c09411ca3abe69d9a105ac48ea4fb3b94557f63120fef9cd638838a0480fde910915de3b02f1b6a0200bf36b0ac3"
+              }
+            },
+            {
+              "@id": "urn:uuid:4ac64110-2e0b-4e37-b087-817093611c92",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-256",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "503e4bb626805f9783390622012883803e5243dd4911c75be28a0d318ab813ca"
+              }
+            },
+            {
+              "@id": "urn:uuid:7d9cf8c4-a821-4e2a-8381-3ccc2f48d5d0",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-384",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "251557c269df38398a04e35d842491b699519f40360fd6983f660c4babbd0913bdd78c1d639a2da494da5a8ec7cf31de"
+              }
+            },
+            {
+              "@id": "urn:uuid:ae11b957-f3e7-4a3b-abd4-173285b313e7",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-512",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "d1b34749f7e29ea51135ba8429fc4056a297bf68b88491fa2cd0d067ce381264096df6d09f6c52956270f66f4dbc4932e5677c8015150fa8d383757018a4cf2f"
+              }
+            },
+            {
+              "@id": "urn:uuid:1a031034-f531-42aa-a71b-3648176da928",
+              "@type": "types:Hash",
+              "types:hashMethod": "RIPEMD160",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "af374c1d85f1583f9c37ec00ddd10f2c9a0d41e9"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@id": "urn:uuid:8bf8c696-be6a-4ec5-b4bb-082cd69fb6f1",
+      "@type": "observable:File",
+      "core:hasFacet": [
+        {
+          "@id": "urn:uuid:aaa6288c-9ff2-4c9c-a274-8142af68f525",
+          "@type": "observable:FileFacet",
+          "observable:fileName": "beta.txt",
+          "observable:filePath": "basic_tree/nested/beta.txt"
+        },
+        {
+          "@id": "urn:uuid:48769f28-7559-4756-b23b-44f5002ff818",
+          "@type": "observable:ContentDataFacet",
+          "observable:hash": [
+            {
+              "@id": "urn:uuid:e9093806-63af-4171-8656-b7c6d3d675ae",
+              "@type": "types:Hash",
+              "types:hashMethod": "MD5",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "2099e399d88346a54fc20182846dfe52"
+              }
+            },
+            {
+              "@id": "urn:uuid:d43b1832-a055-47b3-961a-5ffa7f0b1e62",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA1",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "1f26a72488edb6cb48e3f0eac9fc1f0dafdbf62d"
+              }
+            },
+            {
+              "@id": "urn:uuid:ef9dd044-4c5f-4c56-84ef-bdb797a16877",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA256",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "68aff8968ef4f932111707a0021bf69c5aa0f449494c703ddd8c9edf9fe3d98e"
+              }
+            },
+            {
+              "@id": "urn:uuid:7da55537-f312-45f8-8908-355edf10f21f",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA384",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "d13ea8cc9b21e121ffdb821de71007a8e379b3d4cb54f9e5674661d10be21f091ee26c8b3207c4e44ba94ec1a41ef3fc"
+              }
+            },
+            {
+              "@id": "urn:uuid:94496993-98a6-4f62-8141-3328579ca861",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA512",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "fadf4af6531423a4892e0db1fe822b806946d0e04cd1e515ee1450051229cc3959b86495548a1d5d855960901ca55771974a8c785eb900f6799cf5ed7b5467d7"
+              }
+            },
+            {
+              "@id": "urn:uuid:665dbc1b-7e96-4f4a-b1de-2e31e897aeb9",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-256",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "677a4b8b512ccf466e48aefef35737ed487bfc4c771eecdabfdd02d459046f73"
+              }
+            },
+            {
+              "@id": "urn:uuid:a01d0c71-5318-40bd-a0cf-2acf0f50c432",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-384",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "13455db5d33de317d5b840a24bab3ca895ed647a0578eb3bca2edc3003e2a26806f717bf6a01866f42e62528b7d0d299"
+              }
+            },
+            {
+              "@id": "urn:uuid:538dfea8-d214-49c8-859c-95c73042d032",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-512",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "15b6a618d848167567babd42edd45b55857ee8a0f836c21e76928f1c0acee552ee7f763dbbd52d7746fe415f62526c78c96dfcaba47bfb5ed47d7c18091a1345"
+              }
+            },
+            {
+              "@id": "urn:uuid:7990ac61-5511-42a0-8ead-93c73e90bfbc",
+              "@type": "types:Hash",
+              "types:hashMethod": "RIPEMD160",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "edabe21077d42742a882caea73ac08dfa3a912b7"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@id": "urn:uuid:dd063648-7890-4378-833b-985f05ebd5d5",
+      "@type": "observable:File",
+      "core:hasFacet": [
+        {
+          "@id": "urn:uuid:6f2f2c24-4682-46d6-8808-2b53e4f6140b",
+          "@type": "observable:FileFacet",
+          "observable:fileName": "alpha.txt",
+          "observable:filePath": "basic_tree/alpha.txt"
+        },
+        {
+          "@id": "urn:uuid:ba1491cd-67a9-408e-ab95-dddd27788235",
+          "@type": "observable:ContentDataFacet",
+          "observable:hash": [
+            {
+              "@id": "urn:uuid:f1f2f2ff-217b-4908-bf9b-8fee169c29b4",
+              "@type": "types:Hash",
+              "types:hashMethod": "MD5",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "89d0d5c4eed2f39cade27f7415fc0c0b"
+              }
+            },
+            {
+              "@id": "urn:uuid:38139786-d022-494f-bce0-df12000e3ec6",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA1",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "0770de18130c1aee37d32be349970813f2e2bdd8"
+              }
+            },
+            {
+              "@id": "urn:uuid:752d71de-68ca-4a30-9164-1a2c7ecdb15d",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA256",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "b76b08e074143b424a51915549ce7a4ada10b90e569995d23a9fa4dedead091b"
+              }
+            },
+            {
+              "@id": "urn:uuid:672f6f04-1869-433f-bb93-6ca56ffaee09",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA384",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "dbec71dce15b117e29707b82525ab101058cd81fea59c7bba1b76979334e72bf78bf6a5a44c78a013444265cafe58480"
+              }
+            },
+            {
+              "@id": "urn:uuid:e1d0ae37-f9f5-4f31-99dd-dbf0181a2940",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA512",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "021ef99d64770a6201ab115c1a3fd2812ca47e76dc20324b48d0edffbabbfc066f2094817578a567b6b09b9ed8546f11d34d4c78711707c19fcfd065cbd941f4"
+              }
+            },
+            {
+              "@id": "urn:uuid:8a8f384c-042d-478e-a205-2dd6205bf81a",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-256",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "601414390df44defba60dc1c466d048a528f50567128289137003a989cad9edf"
+              }
+            },
+            {
+              "@id": "urn:uuid:583c1474-7d59-4b65-b65b-46fb7da85329",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-384",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "0b544376b7fc12abba583640bc15d49ea9085d1da65349354962e94b2ca428bc8074ca1b58f6f1a4a14d1928870722de"
+              }
+            },
+            {
+              "@id": "urn:uuid:04050427-9fc4-4b03-8700-023902651faf",
+              "@type": "types:Hash",
+              "types:hashMethod": "SHA3-512",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "74695bf1c813b32d4111eee1e4b9bcfe92b69b90076b7b5927567a941246eae68c8d99467a7026ab0f55d9dad9fa0cc7409bf777deae4084fa93fb8b08a08df4"
+              }
+            },
+            {
+              "@id": "urn:uuid:c6a7307d-f0d0-4f1c-87a5-07dd6f2c87d3",
+              "@type": "types:Hash",
+              "types:hashMethod": "RIPEMD160",
+              "types:hashValue": {
+                "@type": "xsd:hexBinary",
+                "@value": "e1430f58206e69c537635b5af9ed1c261270953e"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@id": "urn:uuid:c7b0c11e-014e-46e2-9eb1-13cc380fe9e5",
+      "@type": "case-investigation:InvestigativeAction",
+      "action:instrument": {
+        "@id": "urn:uuid:e6101aac-39f7-4f11-aae5-3e6c95d9520e"
+      },
+      "action:performer": {
+        "@id": "urn:uuid:53d4867a-9958-43ad-90a6-b4301e4bb9ec"
+      },
+      "action:result": [
+        {
+          "@id": "urn:uuid:6f010660-5bc9-42a5-957a-fa5499a73e5f"
+        },
+        {
+          "@id": "urn:uuid:8bf8c696-be6a-4ec5-b4bb-082cd69fb6f1"
+        },
+        {
+          "@id": "urn:uuid:dd063648-7890-4378-833b-985f05ebd5d5"
+        }
+      ],
+      "action:startTime": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-20T11:53:59.873+02:00"
+      },
+      "core:name": "Compute digests"
+    }
+  ]
+}

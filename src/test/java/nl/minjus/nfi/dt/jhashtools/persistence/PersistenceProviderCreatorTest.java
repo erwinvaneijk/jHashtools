@@ -18,4 +18,10 @@ public class PersistenceProviderCreatorTest
         final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.OLDSTYLE);
         assertThat(provider).isInstanceOf(OldStylePersistenceProvider.class);
     }
+
+    @Test
+    public void testCreateCase() {
+        final PersistenceProvider provider = PersistenceProviderCreator.create(PersistenceStyle.CASE);
+        assertThat(provider).isInstanceOf(CasePersistenceProvider.class);
+    }
 }

@@ -40,6 +40,28 @@ Usage
     java -jar target/jHashtools-1.2.jar -2 -s json -o digests.json <dir>
     java -jar target/jHashtools-1.2.jar -2 -s json -i digests.json <dir>
 
+### CASE output
+
+`-s case` writes the digests as [CASE](https://caseontology.org/)/UCO 1.5.0
+JSON-LD, for exchange with other forensic tooling, and `-s case -i` verifies
+against such a file:
+
+    java -jar target/jHashtools-1.2.jar -a -s case -o digests.jsonld <dir>
+    java -jar target/jHashtools-1.2.jar -a -s case -i digests.jsonld <dir>
+
+Every file becomes an `observable:File` with an `observable:FileFacet` (path,
+name, and the access time from before hashing) and an
+`observable:ContentDataFacet` with one `types:Hash` per digest. The run is
+recorded as a `case-investigation:InvestigativeAction` by an `identity:Person`
+with a `tool:AnalyticTool`. [hashtree](https://github.com/erwinvaneijk/hashtree)
+writes the same structure, so each tool can verify the other's files.
+
+The output validates with `case_validate --built-version case-1.5.0
+--allow-info` from [case-utils](https://github.com/casework/CASE-Utilities-Python).
+`--allow-info` is needed for RIPEMD-160 digests, because `RIPEMD160` is not in
+the (open) UCO hash name vocabulary. Only the access time from before hashing
+is written, and the operating system is not recorded.
+
 Forensic use
 ------------
 jHashtools only reads the files it hashes, so it never changes their
@@ -78,7 +100,8 @@ output (`-s json`, the default) next to the digests:
 
 When hashing (`-o`) or verifying (`-i`) changes an access time, jHashtools
 logs a warning naming the file and both times. The old-style format (`-s old`)
-does not include access times.
+does not include access times; the CASE format (`-s case`) includes the time
+from before hashing.
 
 Limitations:
 

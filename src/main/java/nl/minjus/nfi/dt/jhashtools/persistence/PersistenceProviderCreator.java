@@ -46,6 +46,7 @@ public class PersistenceProviderCreator
         return switch (thePersistenceStyle) {
             case JSON -> new JsonPersistenceProvider(true);
             case OLDSTYLE -> new OldStylePersistenceProvider();
+            case CASE -> new CasePersistenceProvider();
         };
     }
 }

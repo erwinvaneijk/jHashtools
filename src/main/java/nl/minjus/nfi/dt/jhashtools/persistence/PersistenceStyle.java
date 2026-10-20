@@ -44,7 +44,11 @@ public enum PersistenceStyle
     /**
      * The old style of outputting the results. Pretty horrible format, really.
      */
-    OLDSTYLE;
+    OLDSTYLE,
+    /**
+     * CASE/UCO JSON-LD.
+     */
+    CASE;
 
     /**
      * Convert the description into the suitable enum member. The description is matched ignoring case.
@@ -60,9 +64,11 @@ public enum PersistenceStyle
             return JSON;
         } else if ("old".equalsIgnoreCase(aDescription)) {
             return OLDSTYLE;
+        } else if ("case".equalsIgnoreCase(aDescription)) {
+            return CASE;
         } else {
             throw new UnsupportedPersistenceStyleException("Unsupported style '" + aDescription
-                + "', use one of: json, old");
+                + "', use one of: json, old, case");
         }
     }
 }
