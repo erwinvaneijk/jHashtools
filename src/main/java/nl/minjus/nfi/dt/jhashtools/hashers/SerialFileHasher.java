@@ -29,10 +29,10 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -80,8 +80,9 @@ class SerialFileHasher extends AbstractFileHasher
         if (!file.exists()) {
             throw new FileNotFoundException(file.toString());
         }
-        final FileInputStream inputStream = new FileInputStream(file);
-        return getDigest(inputStream);
+        try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+            return getDigest(inputStream);
+        }
     }
 
     /**

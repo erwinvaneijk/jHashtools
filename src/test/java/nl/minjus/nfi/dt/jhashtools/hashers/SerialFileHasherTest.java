@@ -29,13 +29,20 @@
 package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import nl.minjus.nfi.dt.jhashtools.DigestResult;
 
@@ -66,5 +73,22 @@ public class SerialFileHasherTest
         // Test vector from the RIPEMD-160 specification.
         assertThat(result.getDigest("ripemd160").toString())
             .isEqualTo("ripemd160:8eb208f7e05d987a9b044a8e98c6b087f15a0bfc");
+    }
+
+    @Test
+    public void testGetDigestOfFileClosesTheFile(@TempDir final Path tempDir) throws NoSuchAlgorithmException,
+        IOException
+    {
+        final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        assumeThat(osBean).isInstanceOf(UnixOperatingSystemMXBean.class);
+        final UnixOperatingSystemMXBean unixOsBean = (UnixOperatingSystemMXBean) osBean;
+        final Path file = Files.writeString(tempDir.resolve("foo.txt"), "foo", StandardCharsets.UTF_8);
+        final SerialFileHasher serialFileHasher = new SerialFileHasher(DigestAlgorithmFactory.create("sha-256"));
+        serialFileHasher.getDigest(file.toFile());
+        final long openFilesBefore = unixOsBean.getOpenFileDescriptorCount();
+
+        serialFileHasher.getDigest(file.toFile());
+
+        assertThat(unixOsBean.getOpenFileDescriptorCount()).isLessThanOrEqualTo(openFilesBefore);
     }
 }
