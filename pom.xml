@@ -38,7 +38,8 @@
     <url>http://maven.apache.org</url>
     <licenses>
         <license>
-            <name>BSD</name>
+            <name>EUPL-1.2</name>
+            <url>https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

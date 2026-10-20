@@ -92,7 +92,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
   - Opening brace on its own line for class and constructor declarations; on the same line for methods and control flow
   - Parameters are `final`; existing code uses `a`/`the` prefixes (`aHasher`, `thePathsToProcess`) - match it in files that use it
   - Import order: `java.*`/`javax.*`, then third-party, then `nl.minjus.*`, separated by blank lines
-- New source files start with the BSD license header used in existing files
+- New source files start with the EUPL-1.2 license header in `java.header`
 - Formatting is enforced by tooling (section 15); the formatter configuration is the source of truth
 
 ## 6. Error Handling
