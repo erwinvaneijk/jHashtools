@@ -41,6 +41,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nl.minjus.nfi.dt.jhashtools.AccessTimes;
 import nl.minjus.nfi.dt.jhashtools.ConstructionInfo;
@@ -54,6 +56,8 @@ import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
  */
 class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
 {
+    private static final Logger LOG = LoggerFactory.getLogger(DirHasherResultDeserializer.class);
+
     /**
      * DeSerialize a DirHasherResult.
      *
@@ -78,8 +82,7 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
             if ("constructionInfo".equals(fieldName)) {
                 aJsonParser.nextToken();
                 result.setConstructionInfo(aJsonParser.readValueAs(ConstructionInfo.class));
-            }
-            if ("content".equals(fieldName)) {
+            } else if ("content".equals(fieldName)) {
                 aJsonParser.nextToken();
                 while (aJsonParser.nextToken() != JsonToken.END_OBJECT) {
                     final String filePath = aJsonParser.currentName();
@@ -87,10 +90,13 @@ class DirHasherResultDeserializer extends JsonDeserializer<DirHasherResult>
                     final DigestResult digestResult = aJsonParser.readValueAs(DigestResult.class);
                     result.put(new File(filePath), digestResult);
                 }
-            }
-            if ("accessTimes".equals(fieldName)) {
+            } else if ("accessTimes".equals(fieldName)) {
                 aJsonParser.nextToken();
                 readAccessTimes(aJsonParser, result);
+            } else {
+                LOG.warn("Skipping unknown field '{}' in digest file", fieldName);
+                aJsonParser.nextToken();
+                aJsonParser.skipChildren();
             }
         }
         return result;
