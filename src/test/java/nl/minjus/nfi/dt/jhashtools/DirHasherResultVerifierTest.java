@@ -34,7 +34,7 @@ public class DirHasherResultVerifierTest
     public Path tempDir;
 
     @ParameterizedTest
-    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE" })
+    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE", "CASE" })
     public void testUnchangedFilesPassVerification(final PersistenceStyle style)
         throws IOException, NoSuchAlgorithmException, PersistenceException
     {
@@ -49,7 +49,7 @@ public class DirHasherResultVerifierTest
     }
 
     @ParameterizedTest
-    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE" })
+    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE", "CASE" })
     public void testDigestFileInsideVerifiedDirectoryPassesVerification(final PersistenceStyle style)
         throws IOException, NoSuchAlgorithmException, PersistenceException
     {
@@ -64,7 +64,7 @@ public class DirHasherResultVerifierTest
     }
 
     @ParameterizedTest
-    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE" })
+    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE", "CASE" })
     public void testModifiedFileFailsVerification(final PersistenceStyle style)
         throws IOException, NoSuchAlgorithmException, PersistenceException
     {
@@ -80,7 +80,7 @@ public class DirHasherResultVerifierTest
     }
 
     @ParameterizedTest
-    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE" })
+    @EnumSource(value = PersistenceStyle.class, names = { "JSON", "OLDSTYLE", "CASE" })
     public void testDeletedFileFailsVerification(final PersistenceStyle style)
         throws IOException, NoSuchAlgorithmException, PersistenceException
     {
