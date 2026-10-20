@@ -153,4 +153,4 @@ When submitting a pull request:
 
 ## License
 
-This project uses a BSD license. See LICENSE.txt for details.
+This project is licensed under the European Union Public Licence v. 1.2 (EUPL-1.2). See LICENSE.txt for details.
