@@ -341,4 +341,25 @@ public class JsonPersisterTest
                 .isThrownBy(() -> instance.load(new StringReader(json), DirHasherResult.class));
         }
     }
+
+    @Test
+    public void testLoadSkipsUnknownFields() throws PersistenceException {
+        final JsonPersistenceProvider instance = new JsonPersistenceProvider();
+        final DirHasherResult expected = instance.load(new StringReader(this.testDirHasherResultInJson),
+            DirHasherResult.class);
+        final String content = this.testDirHasherResultInJson.substring(1);
+        final List<String> withUnknownFields = List.of(
+            "{\"unknownScalar\":\"value\"," + content,
+            "{\"unknownObject\":{\"nested\":{\"deeper\":1},\"other\":[{}]}," + content,
+            "{\"unknownArray\":[{\"nested\":{}},[1,2],\"x\"]," + content,
+            this.testDirHasherResultInJson.replaceFirst("}$", ",\"unknownTrailing\":{\"nested\":{}}}"));
+
+        for (final String json : withUnknownFields) {
+            final DirHasherResult result = instance.load(new StringReader(json), DirHasherResult.class);
+
+            assertThat(result).as(json).isEqualTo(expected);
+            assertThat(result.getConstructionInfo()).as(json).usingRecursiveComparison()
+                .isEqualTo(expected.getConstructionInfo());
+        }
+    }
 }
