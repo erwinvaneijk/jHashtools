@@ -142,10 +142,7 @@ public class ActingDirectoryHasher extends AbstractDirectoryHasher implements Di
             final Fiber hasherFiber = fiberFactory.create();
             hasherFiber.add(dispose);
             final HasherActor hasherActor =
-                new HasherActor(getTheAlgorithms(),
-                    channels.getFilenameChannel(), channels.getDigestChannel(),
-                    channels.getFilenameStopChannel(), hasherStopChannel,
-                    hasherFiber, claimedFiles);
+                new HasherActor(getTheAlgorithms(), channels, hasherStopChannel, hasherFiber, claimedFiles);
             hasherActor.start();
         }
 

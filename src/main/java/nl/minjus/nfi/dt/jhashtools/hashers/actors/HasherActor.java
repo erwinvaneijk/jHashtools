@@ -55,27 +55,25 @@ public class HasherActor extends Actor<File, DigestMessage>
      *
      * @param algorithms
      *            the algorithms to compute.
-     * @param inbox
-     *            the channel the files to hash arrive on. Every hasher subscribed to it receives every file.
-     * @param outbox
-     *            the channel to publish the digests on.
-     * @param stopChannel
-     *            the channel that signals this actor to stop.
+     * @param channels
+     *            the channels to read the files to hash from (every hasher subscribed to the filename channel
+     *            receives every file), to publish the digests on, and to receive the stop signal from.
      * @param nextStopChannel
      *            the channel to signal when this actor stops.
      * @param fiber
      *            the fiber to run on.
      * @param theClaimedFiles
-     *            the files claimed by the hashers sharing <code>inbox</code>, so that each file is hashed only once.
+     *            the files claimed by the hashers sharing the filename channel, so that each file is hashed only
+     *            once.
      * @throws AlgorithmNotFoundException
      *             when one of the algorithms is not supported.
      */
-    public HasherActor(final Collection<DigestAlgorithm> algorithms, final Channel<File> inbox,
-        final Channel<DigestMessage> outbox, final Channel<Void> stopChannel,
+    public HasherActor(final Collection<DigestAlgorithm> algorithms, final Channels channels,
         final Channel<Void> nextStopChannel, final Fiber fiber, final Set<File> theClaimedFiles)
         throws AlgorithmNotFoundException
     {
-        super(inbox, outbox, stopChannel, nextStopChannel, fiber);
+        super(channels.getFilenameChannel(), channels.getDigestChannel(), channels.getFilenameStopChannel(),
+            nextStopChannel, fiber);
         this.claimedFiles = theClaimedFiles;
 
         try {

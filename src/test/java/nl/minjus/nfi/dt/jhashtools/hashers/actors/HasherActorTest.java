@@ -42,8 +42,8 @@ public class HasherActorTest
     }
 
     private HasherActor createHasherActor(final Set<File> theClaimedFiles) throws Exception {
-        return new HasherActor(List.of(DigestAlgorithmFactory.create("sha-256")), new MemoryChannel<>(),
-            new MemoryChannel<>(), new MemoryChannel<>(), new MemoryChannel<>(), fiber, theClaimedFiles);
+        return new HasherActor(List.of(DigestAlgorithmFactory.create("sha-256")), new Channels(),
+            new MemoryChannel<>(), fiber, theClaimedFiles);
     }
 
     @Test
