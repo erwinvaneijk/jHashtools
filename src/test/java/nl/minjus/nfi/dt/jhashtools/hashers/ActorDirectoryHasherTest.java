@@ -19,6 +19,7 @@ package nl.minjus.nfi.dt.jhashtools.hashers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -38,6 +39,7 @@ import nl.minjus.nfi.dt.jhashtools.DigestResult;
 import nl.minjus.nfi.dt.jhashtools.DirHasherResult;
 import nl.minjus.nfi.dt.jhashtools.hashers.actors.ActingDirectoryHasher;
 import nl.minjus.nfi.dt.jhashtools.utils.KnownDigests;
+import nl.minjus.nfi.dt.jhashtools.utils.OsUtils;
 
 /**
  */
@@ -203,5 +205,21 @@ public class ActorDirectoryHasherTest
         final AccessTimes accessTimes = digests.getAccessTimes().get(file.toFile());
         assertThat(accessTimes.before()).isEqualTo(knownAccessTime);
         assertThat(accessTimes.after()).isEqualTo(AccessTimes.lastAccessTime(file.toFile()));
+    }
+
+    @Test
+    public void testDoesNotFollowSymbolicLinks(@TempDir final Path tempFolder) throws Exception {
+        assumeFalse(OsUtils.isWindows(), "creating symbolic links needs extra privileges on Windows");
+        final Path tree = Files.createDirectory(tempFolder.resolve("tree"));
+        final Path outside = Files.createDirectory(tempFolder.resolve("outside"));
+        final Path realFile = Files.writeString(tree.resolve("real.txt"), "inside");
+        Files.writeString(outside.resolve("secret.txt"), "outside");
+        Files.createSymbolicLink(tree.resolve("link.txt"), realFile);
+        Files.createSymbolicLink(tree.resolve("linkdir"), outside);
+        final DirectoryHasher directoryHasher = new ActingDirectoryHasher("sha-256");
+
+        final DirHasherResult digests = directoryHasher.getDigests(tree.toFile());
+
+        assertThat(digests.getContent()).containsOnlyKeys(realFile.toFile());
     }
 }
