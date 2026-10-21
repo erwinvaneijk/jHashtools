@@ -18,6 +18,7 @@
 package nl.minjus.nfi.dt.jhashtools.hashers.actors;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import org.jetlang.channels.Channel;
 import org.jetlang.fibers.Fiber;
@@ -53,15 +54,15 @@ public class FileNameGenerator extends Actor<File, File>
         if (aPath == null || !aPath.exists()) {
             return;
         }
+        if (Files.isSymbolicLink(aPath.toPath())) {
+            LOG.debug("Skipping symlink: {}", aPath);
+            return;
+        }
         if (aPath.isFile()) {
             emit(aPath);
         } else if (aPath.isDirectory()) {
             for (final File child : aPath.listFiles()) {
-                if (child.isFile()) {
-                    emit(child);
-                } else {
-                    walkTheFile(child);
-                }
+                walkTheFile(child);
             }
         }
     }
